@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif Oseanografi Biologi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .quiz-option.selected {
+            background-color: #3b82f6; /* bg-blue-500 */
+            color: white;
+            border-color: #2563eb; /* border-blue-600 */
+        }
+        #explanationModal, #nav-panel {
+            transition: opacity 0.3s ease;
+        }
+        .nav-btn {
+            border: 1px solid #d1d5db;
+            background-color: #f9fafb;
+        }
+        .nav-btn.answered {
+            background-color: #dbeafe; /* bg-blue-100 */
+            border-color: #93c5fd; /* border-blue-300 */
+            color: #1e40af; /* text-blue-800 */
+        }
+        .nav-btn.current {
+            background-color: #3b82f6;
+            border-color: #2563eb;
+            color: white;
+            font-weight: bold;
+        }
+        .topic-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .topic-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
+    <div id="quiz-container" class="w-full max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+        <!-- Layar Awal (Pemilihan Topik) -->
+        <div id="start-screen">
+            <h1 class="text-3xl sm:text-4xl font-bold text-center text-blue-600 mb-4">Kuis Oseanografi Biologi</h1>
+            <p class="text-center text-gray-600 mb-8">Pilih topik untuk memulai kuis.</p>
+            <div id="topic-selection" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Tombol topik akan di-generate oleh JavaScript -->
+            </div>
+        </div>
+
+        <!-- Layar Kuis -->
+        <div id="quiz-screen" class="hidden">
+            <div class="flex justify-between items-start mb-2">
+                 <div>
+                    <h2 id="quiz-topic-title" class="text-2xl font-bold text-blue-600"></h2>
+                    <button id="nav-toggle-btn" onclick="toggleNavPanel()" class="text-sm text-blue-600 hover:underline mt-1">
+                        Navigasi Soal
+                    </button>
+                </div>
+                <span id="question-counter" class="text-lg font-semibold text-gray-500 text-right"></span>
+            </div>
+            
+             <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"></div>
+            </div>
+            
+            <div id="question-card" class="bg-blue-50 border-2 border-blue-200 p-6 rounded-xl min-h-[150px] flex items-center justify-center mb-6">
+                <p id="question-text" class="text-center text-lg sm:text-xl"></p>
+            </div>
+
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
+            <div id="essay-container" class="hidden mb-6">
+                 <textarea id="essay-answer" class="w-full p-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" rows="6" placeholder="Ketik jawaban esai Anda di sini..."></textarea>
+            </div>
+
+            <div class="flex justify-between items-center mt-8">
+                 <button id="prev-btn" onclick="prevQuestion()" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition duration-300">Sebelumnya</button>
+                 <button onclick="showResults()" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition duration-300">Lihat Hasil</button>
+                 <button id="next-btn" onclick="nextQuestion()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300">Selanjutnya</button>
+            </div>
+        </div>
+
+        <!-- Layar Hasil -->
+        <div id="result-screen" class="hidden text-center">
+            <h2 class="text-3xl font-bold text-blue-600 mb-4">Hasil Kuis</h2>
+            <div id="topic-scores-breakdown" class="mb-8 text-left border rounded-lg p-4">
+                <!-- Rincian skor per topik akan ditampilkan di sini -->
+            </div>
+            <p class="text-lg mb-6">Tinjau jawaban Anda di bawah ini:</p>
+            <div id="answers-review" class="text-left max-h-[40vh] overflow-y-auto p-4 bg-gray-50 rounded-lg border"></div>
+            <div class="mt-8 flex justify-center space-x-4">
+                <button onclick="restartQuiz()" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300">
+                    Kembali ke Awal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Navigasi -->
+    <div id="nav-panel" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-40" onclick="toggleNavPanel()">
+        <div class="bg-white rounded-2xl p-6 max-w-3xl w-full shadow-2xl" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-bold mb-4">Lompat ke Soal</h3>
+            <div id="nav-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2 max-h-[60vh] overflow-y-auto p-2"></div>
+            <div class="mt-6 text-right">
+                <button onclick="toggleNavPanel()" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Penjelasan -->
+    <div id="explanationModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50" onclick="closeModal()">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl transform transition-transform duration-300 scale-95" onclick="event.stopPropagation()">
+            <h3 class="text-2xl font-bold text-blue-600 mb-4" id="modal-question"></h3>
+            <p class="text-lg mb-2 font-semibold">Jawaban yang Benar:</p>
+            <p class="text-green-600 bg-green-100 p-3 rounded-lg mb-4" id="modal-correct-answer"></p>
+            <p class="text-lg mb-2 font-semibold">Penjelasan:</p>
+            <p id="modal-explanation" class="text-gray-700"></p>
+            <div class="mt-6 text-right">
+                <button onclick="closeModal()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Data Kuis (Dikelompokkan per Topik) ---
+        const quizDataCategorized = {
+            "Pendahuluan & Konsep Dasar": {
+                mcq: [
+                    { question: "Cabang ilmu yang mempelajari interaksi antara organisme laut dengan lingkungannya, dengan mempertimbangkan aspek kimia, geologi, dan fisika laut disebut...", options: ["Biologi Laut", "Ekologi Laut", "Oseanografi Biologi", "Oseanografi Kimia"], answer: "Oseanografi Biologi", explanation: "Oseanografi Biologi adalah disiplin ekologi interdisipliner yang berfokus pada ekologi lautan, interaksi antara organisme dan lingkungannya, serta mempertimbangkan aspek kimia, geologi, dan fisika laut." },
+                    { question: "Berapa persen perkiraan permukaan bumi yang ditutupi oleh lautan?", options: ["50%", "61%", "71%", "82%"], answer: "71%", explanation: "Sekitar 71% permukaan bumi ditutupi oleh lautan, yang menyediakan ruang hidup 300 kali lebih besar daripada daratan dan air tawar jika digabungkan." },
+                    { question: "Organisme pertama yang melakukan fotosintesis dan melepaskan oksigen ke atmosfer adalah...", options: ["Trilobita", "Diatom", "Cyanobacteria", "Foraminifera"], answer: "Cyanobacteria", explanation: "Cyanobacteria (alga biru-hijau) adalah organisme pertama yang mengembangkan kemampuan fotosintesis menggunakan air, yang melepaskan oksigen sebagai produk sampingan dan secara fundamental mengubah atmosfer bumi." },
+                    { question: "Faktor utama yang membatasi kehidupan di laut dibandingkan di darat adalah...", options: ["Ketersediaan air", "Gravitasi", "Cahaya dan Nutrien", "Variasi suhu"], answer: "Cahaya dan Nutrien", explanation: "Di laut, cahaya terbatas karena cepat diserap oleh air, dan nutrien seperti nitrat dan fosfat seringkali langka di permukaan, berbeda dengan daratan di mana cahaya melimpah dan tanah kaya nutrien." },
+                    { question: "Istilah 'Abiogenesis' merujuk pada...", options: ["Asal usul kehidupan dari luar angkasa", "Asal usul kehidupan dari materi tak hidup", "Evolusi organisme multiseluler", "Proses fotosintesis"], answer: "Asal usul kehidupan dari materi tak hidup", explanation: "Abiogenesis adalah teori tentang asal usul kehidupan dari materi tak hidup (non-living matter), yang sering juga disebut sebagai 'Spontaneous Generation'." },
+                    { question: "Samudra manakah yang memiliki kedalaman rata-rata paling dangkal?", options: ["Pasifik", "Atlantik", "Hindia", "Arktik"], answer: "Arktik", explanation: "Samudra Arktik memiliki kedalaman rata-rata paling dangkal (sekitar 1117 m) dibandingkan dengan samudra lainnya." },
+                    { question: "Fosil Trilobita yang melimpah merupakan penanda dari periode geologi...", options: ["Prekambrium", "Kambrium", "Jura", "Kapur"], answer: "Kambrium", explanation: "Periode Kambrium (sekitar 541-485 juta tahun yang lalu) dikenal dengan 'Ledakan Kambrium', di mana banyak kelompok hewan utama muncul dalam catatan fosil, termasuk trilobita." },
+                    { question: "Manakah dari berikut ini yang BUKAN merupakan subdisiplin utama dari Oseanografi?", options: ["Oseanografi Fisika", "Oseanografi Kimia", "Oseanografi Astronomi", "Oseanografi Biologi"], answer: "Oseanografi Astronomi", explanation: "Subdisiplin utama Oseanografi adalah Fisika, Kimia, Biologi, dan Geologi. Oseanografi Astronomi bukanlah subdisiplin yang umum." },
+                    { question: "Menurut materi, semua filum hewan yang dikenal berasal dari...", options: ["Darat", "Udara", "Laut", "Air tawar"], answer: "Laut", explanation: "Materi kuliah menyatakan bahwa semua filum yang dikenal berasal dari laut, dan kehidupan di bumi diyakini telah dimulai di lautan purba." },
+                    { question: "Perbedaan utama antara lingkungan laut dan darat dalam hal penyokong tubuh adalah...", options: ["Udara lebih padat dari air", "Air laut menyokong tubuh organisme, mengurangi dampak gravitasi", "Organisme darat tidak memerlukan kerangka", "Suhu di laut lebih ekstrem"], answer: "Air laut menyokong tubuh organisme, mengurangi dampak gravitasi", explanation: "Karena densitas air laut mirip dengan densitas tubuh organisme, air memberikan daya apung yang menyokong tubuh, sehingga organisme laut tidak perlu menginvestasikan banyak energi untuk kerangka penyokong sekuat hewan darat." },
+                    { question: "Studi tentang sedimen laut dan sejarah yang terekam di dalamnya disebut...", options: ["Sedimentologi", "Paleoseanografi", "Stratigrafi", "Geokronologi"], answer: "Paleoseanografi", explanation: "Paleoseanografi menggunakan proksi (seperti fosil mikro dan komposisi kimia sedimen) untuk merekonstruksi kondisi samudra dan iklim di masa lalu." },
+                    { question: "Alat pengukur kedalaman air menggunakan gelombang suara disebut...", options: ["Sonar", "Radar", "Lidar", "CTD"], answer: "Sonar", explanation: "Sonar (Sound Navigation and Ranging) bekerja dengan mengirimkan pulsa suara dan mengukur waktu yang dibutuhkan gema untuk kembali, yang dapat digunakan untuk memetakan dasar laut." },
+                    { question: "Gaya fiktif akibat rotasi Bumi yang membelokkan pergerakan benda (termasuk arus laut) ke kanan di Belahan Bumi Utara dan ke kiri di Belahan Bumi Selatan disebut...", options: ["Gaya gravitasi", "Gaya sentrifugal", "Efek Coriolis", "Gaya gradien tekanan"], answer: "Efek Coriolis", explanation: "Efek Coriolis adalah faktor fundamental yang membentuk pola sirkulasi samudra dan atmosfer dalam skala besar." },
+                    { question: "Sirkulasi global lautan yang didorong oleh perbedaan suhu dan salinitas disebut...", options: ["Sirkulasi angin", "Sirkulasi termohalin", "Arus geostropik", "Arus pasang surut"], answer: "Sirkulasi termohalin", explanation: "Sirkulasi termohalin, atau 'Global Ocean Conveyor Belt', adalah pergerakan air laut dalam skala besar yang memainkan peran penting dalam mengatur iklim global." },
+                    { question: "Penyebab utama pasang surut di Bumi adalah...", options: ["Gaya gravitasi Bulan dan Matahari", "Angin dan tekanan atmosfer", "Rotasi Bumi (efek Coriolis)", "Gempa bumi bawah laut"], answer: "Gaya gravitasi Bulan dan Matahari", explanation: "Gaya tarik gravitasi Bulan, dan pada tingkat yang lebih rendah Matahari, menyebabkan tonjolan air di lautan, yang kita alami sebagai pasang surut saat Bumi berotasi." },
+                    { question: "Fosil hidup yang merupakan sisa dari koloni cyanobacteria purba dan masih dapat ditemukan di beberapa lokasi seperti Shark Bay, Australia, adalah...", options: ["Trilobita", "Amonit", "Stromatolit", "Foraminifera"], answer: "Stromatolit", explanation: "Stromatolit adalah struktur berlapis yang dibentuk oleh penangkapan dan pengikatan sedimen oleh biofilm mikroorganisme, terutama cyanobacteria. Fosil stromatolit adalah bukti kehidupan tertua di Bumi." },
+                    { question: "Organisme yang tidak dapat mengatur suhu tubuh internalnya dan suhunya bergantung pada lingkungan eksternal disebut...", options: ["Endoterm", "Eksoterm (Poikiloterm)", "Homeoterm", "Heteroterm"], answer: "Eksoterm (Poikiloterm)", explanation: "Hampir semua ikan, invertebrata, dan reptil laut adalah eksoterm. Suhu tubuh mereka bervariasi mengikuti suhu air di sekitarnya." },
+                    { question: "Organisme yang dapat mempertahankan suhu tubuh internal yang konstan dan relatif tinggi, terlepas dari suhu lingkungan, disebut...", options: ["Endoterm (Homeoterm)", "Eksoterm", "Poikiloterm", "Stenoterm"], answer: "Endoterm (Homeoterm)", explanation: "Mamalia laut dan burung laut adalah endoterm. Mereka menghasilkan panas metabolik untuk menjaga suhu tubuh tetap hangat dan stabil." },
+                    { question: "Studi tentang ikan disebut...", options: ["Cetologi", "Malakologi", "Iktiologi", "Herpetologi"], answer: "Iktiologi", explanation: "Iktiologi adalah cabang zoologi yang didedikasikan untuk studi tentang ikan." },
+                    { question: "Studi tentang hubungan evolusioner antar organisme disebut...", options: ["Taksonomi", "Filogenetika", "Ekologi", "Fisiologi"], answer: "Filogenetika", explanation: "Filogenetika bertujuan untuk merekonstruksi sejarah evolusi dan hubungan kekerabatan antar kelompok organisme, seringkali menggunakan data molekuler (DNA)." }
+                ],
+                essay: [
+                     { question: "Jelaskan perbedaan mendasar antara Oseanografi Biologi, Biologi Laut, dan Ekologi Laut. Berikan contoh fokus studi dari masing-masing bidang.", answer: "Oseanografi Biologi adalah studi interdisipliner tentang ekosistem laut, menekankan interaksi antara biota dengan lingkungan fisika, kimia, dan geologi laut (misalnya, bagaimana upwelling mempengaruhi kelimpahan fitoplankton). Biologi Laut lebih fokus pada organisme itu sendiri—fisiologi, taksonomi, dan siklus hidupnya (misalnya, studi tentang adaptasi fisiologis paus untuk menyelam dalam). Ekologi Laut fokus pada interaksi antar organisme dan antara organisme dengan lingkungannya, mirip dengan Oseanografi Biologi tetapi seringkali dalam skala yang lebih lokal dan dengan penekanan lebih sedikit pada proses oseanografi fisik skala besar (misalnya, studi tentang kompetisi ruang antara dua spesies karang)." },
+                     { question: "Jelaskan secara singkat proses terbentuknya lautan di bumi purba dan kapan kehidupan pertama kali muncul menurut bukti fosil.", answer: "Bumi purba awalnya sangat panas. Seiring waktu, planet mendingin, memungkinkan uap air dari permukaan yang panas untuk mengembun membentuk awan dan kemudian hujan. Hujan ini mengisi cekungan-cekungan di permukaan bumi, membentuk lautan sekitar 4 miliar tahun yang lalu. Bukti fosil tertua kehidupan, berupa stromatolit yang dibentuk oleh koloni cyanobacteria, berasal dari sekitar 3.5 miliar tahun yang lalu." }
+                ]
+            },
+            "Lingkungan Abiotik": {
+                mcq: [
+                    { question: "Warna cahaya manakah yang menembus paling dalam di perairan laut terbuka yang jernih?", options: ["Merah", "Kuning", "Hijau", "Biru"], answer: "Biru", explanation: "Air laut menyerap panjang gelombang cahaya merah dan kuning dengan sangat cepat, sementara panjang gelombang biru dapat menembus hingga kedalaman yang jauh lebih besar." },
+                    { question: "Lapisan di mana suhu menurun secara drastis dengan bertambahnya kedalaman disebut...", options: ["Haloklin", "Piknoklin", "Termoklin", "Lisoklin"], answer: "Termoklin", explanation: "Termoklin adalah lapisan transisi antara air permukaan yang lebih hangat dan air dalam yang lebih dingin." },
+                    { question: "Salinitas rata-rata air laut di lautan terbuka adalah sekitar...", options: ["25 ppt", "30 ppt", "35 ppt", "40 ppt"], answer: "35 ppt", explanation: "Salinitas rata-rata lautan dunia adalah sekitar 35 bagian per seribu (ppt), atau 3.5%." },
+                    { question: "Gas terlarut yang konsentrasinya 60 kali lebih banyak di lautan dibandingkan di atmosfer adalah...", options: ["Oksigen", "Nitrogen", "Karbon dioksida", "Argon"], answer: "Karbon dioksida", explanation: "Karbon dioksida sangat mudah larut di air laut dan merupakan komponen kunci dalam sistem penyangga pH lautan dan siklus karbon global." },
+                    { question: "Setiap kenaikan kedalaman 10 meter di laut, tekanan hidrostatik akan bertambah sebesar...", options: ["0.5 atmosfer", "1 atmosfer", "2 atmosfer", "10 atmosfer"], answer: "1 atmosfer", explanation: "Tekanan di permukaan laut adalah 1 atmosfer. Tekanan akan bertambah 1 atmosfer untuk setiap 10 meter kedalaman." },
+                    { question: "Air laut bersifat sedikit basa, dengan pH rata-rata sekitar...", options: ["6.0", "7.0", "8.1", "9.2"], answer: "8.1", explanation: "pH air laut permukaan biasanya berkisar antara 8.0 hingga 8.3, menjadikannya sedikit basa." },
+                    { question: "Proses naiknya massa air dingin yang kaya nutrien dari laut dalam ke permukaan disebut...", options: ["Downwelling", "Konveksi", "Upwelling", "Adveksi"], answer: "Upwelling", explanation: "Upwelling membawa nutrien yang tenggelam kembali ke zona fotik, sehingga mendukung produktivitas primer yang sangat tinggi. Daerah upwelling adalah beberapa daerah penangkapan ikan paling produktif di dunia." },
+                    { question: "Zona di mana cahaya masih dapat terdeteksi oleh hewan tetapi tidak cukup untuk fotosintesis disebut...", options: ["Zona Eufotik", "Zona Disfotik", "Zona Afotik", "Zona Neritik"], answer: "Zona Disfotik", explanation: "Zona Disfotik, atau zona 'twilight', terletak di bawah zona eufotik dan di atas zona afotik yang gelap total." },
+                    { question: "Di daerah subtropis (sekitar 20-30 derajat lintang), salinitas permukaan laut cenderung tinggi karena...", options: ["Curah hujan tinggi", "Banyaknya aliran sungai", "Tingkat penguapan (evaporasi) lebih tinggi dari curah hujan", "Suhu air lebih dingin"], answer: "Tingkat penguapan (evaporasi) lebih tinggi dari curah hujan", explanation: "Di wilayah subtropis, penguapan yang tinggi menghilangkan air tawar dari permukaan laut, meninggalkan garam dan meningkatkan salinitas." },
+                    { question: "Kelarutan gas (seperti oksigen) di air laut akan meningkat jika...", options: ["Suhu meningkat dan salinitas meningkat", "Suhu menurun dan salinitas menurun", "Suhu meningkat dan tekanan menurun", "Suhu menurun dan tekanan meningkat"], answer: "Suhu menurun dan tekanan meningkat", explanation: "Air dingin dapat menampung lebih banyak gas terlarut daripada air hangat. Tekanan yang lebih tinggi juga meningkatkan kelarutan gas." },
+                    { question: "Faktor abiotik yang menyebabkan fenomena 'dead zone' atau zona hipoksia adalah...", options: ["Kelebihan cahaya matahari", "Kelebihan nutrien (eutrofikasi)", "Kekurangan salinitas", "Suhu air yang sangat rendah"], answer: "Kelebihan nutrien (eutrofikasi)", explanation: "Eutrofikasi menyebabkan ledakan alga. Ketika alga mati dan diuraikan oleh bakteri, proses dekomposisi ini menghabiskan oksigen terlarut di dalam air." },
+                    { question: "Lapisan di mana densitas air laut meningkat tajam dengan kedalaman disebut...", options: ["Termoklin", "Haloklin", "Piknoklin", "Kemoklin"], answer: "Piknoklin", explanation: "Piknoklin adalah lapisan dengan gradien densitas yang kuat. Lapisan ini bisa disebabkan oleh perubahan suhu (termoklin) atau salinitas (haloklin), dan berfungsi sebagai penghalang pencampuran antara lapisan air permukaan dan dalam." },
+                    { question: "Organisme yang dapat mentolerir rentang salinitas yang luas disebut...", options: ["Stenohalin", "Euryhalin", "Stenotermal", "Eurytermal"], answer: "Euryhalin", explanation: "Organisme euryhalin, seperti yang ditemukan di muara, mampu bertahan dalam kondisi salinitas yang berfluktuasi." },
+                    { question: "Organisme yang hanya dapat mentolerir rentang suhu yang sempit disebut...", options: ["Stenotermal", "Eurytermal", "Stenohalin", "Euryhalin"], answer: "Stenotermal", explanation: "Organisme stenotermal, seperti karang tropis, sangat sensitif terhadap perubahan suhu dan hanya dapat hidup dalam rentang suhu yang spesifik dan sempit." },
+                    { question: "Penurunan pH air laut akibat penyerapan CO2 dari atmosfer disebut...", options: ["Pemanasan global", "Eutrofikasi", "Pengasaman laut (ocean acidification)", "Hipoksia"], answer: "Pengasaman laut (ocean acidification)", explanation: "Peningkatan CO2 di atmosfer menyebabkan lebih banyak CO2 larut di laut, membentuk asam karbonat dan menurunkan pH. Ini menyulitkan organisme seperti karang dan moluska untuk membangun cangkang kalsium karbonat mereka." },
+                    { question: "Di perairan pesisir yang keruh, warna cahaya apa yang paling dominan?", options: ["Biru", "Ungu", "Merah", "Hijau-Kuning"], answer: "Hijau-Kuning", explanation: "Di perairan pesisir, partikel tersuspensi dan bahan organik terlarut menyerap dan menghamburkan cahaya biru secara efektif, sehingga cahaya hijau dan kuning dapat menembus lebih jauh dibandingkan di laut terbuka." },
+                    { question: "Kepadatan air laut terutama dipengaruhi oleh...", options: ["Suhu dan tekanan", "Suhu dan salinitas", "Salinitas dan kedalaman", "Tekanan dan kedalaman"], answer: "Suhu dan salinitas", explanation: "Air menjadi lebih padat saat lebih dingin dan lebih asin. Perbedaan kepadatan ini mendorong sirkulasi laut global (sirkulasi termohalin)." },
+                    { question: "Zona di lautan yang memiliki konsentrasi oksigen terlarut sangat rendah sehingga sulit mendukung kehidupan hewan disebut...", options: ["Zona fotik", "Zona disfotik", "Zona minimum oksigen (OMZ)", "Zona abisal"], answer: "Zona minimum oksigen (OMZ)", explanation: "OMZ biasanya terjadi di kedalaman menengah (sekitar 200-1000m) di mana konsumsi oksigen oleh respirasi bakteri yang menguraikan materi organik lebih besar daripada pasokan oksigen dari permukaan atau dari perairan dalam." },
+                    { question: "Organisme yang dapat hidup dalam rentang suhu yang luas disebut...", options: ["Eurytermal", "Stenotermal", "Euryhalin", "Stenohalin"], answer: "Eurytermal", explanation: "Organisme eurytermal dapat mentolerir variasi suhu yang besar, sering ditemukan di zona intertidal atau daerah beriklim sedang." },
+                    { question: "Gas terlarut yang paling melimpah di air laut adalah...", options: ["Oksigen", "Karbon dioksida", "Nitrogen", "Argon"], answer: "Nitrogen", explanation: "Seperti di atmosfer, nitrogen (N2) adalah gas yang paling banyak terlarut di lautan, meskipun sebagian besar tidak dapat digunakan secara langsung oleh organisme kecuali oleh bakteri fiksasi nitrogen." },
+                    { question: "Sistem arus samudra yang berputar dalam skala besar di cekungan samudra, seperti North Atlantic Gyre, disebut...", options: ["Eddy", "Gyre", "Upwelling", "Downwelling"], answer: "Gyre", explanation: "Gyre samudra didorong oleh angin global dan efek Coriolis, dan seringkali memiliki area tengah yang oligotrofik (miskin nutrien)." },
+                    { question: "Kumpulan populasi yang berbeda yang hidup dan berinteraksi di area yang sama disebut...", options: ["Ekosistem", "Komunitas", "Bioma", "Biosfer"], answer: "Komunitas", explanation: "Komunitas biologis hanya mencakup komponen biotik (hidup) dari suatu ekosistem." },
+                    { question: "Perubahan bertahap dalam komposisi spesies suatu komunitas dari waktu ke waktu, misalnya setelah gangguan, disebut...", options: ["Evolusi", "Siklus hidup", "Suksessi ekologis", "Zonasi"], answer: "Suksessi ekologis", explanation: "Suksessi ekologis menggambarkan proses pemulihan dan perubahan komunitas setelah gangguan, dimulai dari spesies pionir hingga mencapai komunitas klimaks." },
+                    { question: "Organisme yang hidup di lingkungan dengan salinitas sangat tinggi, seperti di kolam penguapan garam, disebut...", options: ["Termofil", "Psikrofil", "Halofil", "Asidofil"], answer: "Halofil", explanation: "Halofil adalah organisme ekstremofil yang tumbuh subur di lingkungan dengan konsentrasi garam yang tinggi." },
+                    { question: "Organisme yang dapat bertahan hidup tanpa oksigen disebut...", options: ["Aerobik", "Anaerobik", "Fakultatif", "Obligat"], answer: "Anaerobik", explanation: "Organisme anaerobik menggunakan senyawa lain selain oksigen (seperti sulfat atau nitrat) sebagai akseptor elektron terakhir dalam respirasi." }
+                ],
+                essay: [
+                    { question: "Jelaskan bagaimana tiga faktor abiotik utama (cahaya, suhu, dan salinitas) mempengaruhi distribusi kehidupan di lautan.", answer: "Cahaya: Menentukan kedalaman zona fotik, tempat fotosintesis terjadi. Ini membatasi produsen primer (fitoplankton) ke lapisan permukaan dan secara tidak langsung mempengaruhi distribusi semua kehidupan lain yang bergantung padanya. Suhu: Mengontrol laju metabolisme organisme poikilotermik (berdarah dingin) dan menentukan batas geografis spesies stenotermal (toleransi suhu sempit) seperti karang. Suhu juga mempengaruhi densitas air dan sirkulasi. Salinitas: Mempengaruhi daya apung dan keseimbangan osmotik organisme. Sebagian besar organisme laut bersifat stenohalin (toleransi salinitas sempit) dan distribusinya terbatas pada perairan dengan salinitas tertentu, sementara organisme euryhalin dapat hidup di lingkungan yang berfluktuasi seperti muara." },
+                    { question: "Apa itu termoklin, haloklin, dan piknoklin? Jelaskan bagaimana lapisan-lapisan ini bertindak sebagai penghalang di kolom air.", answer: "Termoklin adalah lapisan dengan perubahan suhu yang cepat. Haloklin adalah lapisan dengan perubahan salinitas yang cepat. Piknoklin adalah lapisan dengan perubahan densitas yang cepat. Karena densitas adalah fungsi dari suhu dan salinitas, piknoklin seringkali bertepatan dengan termoklin atau haloklin. Lapisan-lapisan ini bertindak sebagai penghalang fisik yang kuat terhadap pencampuran vertikal. Air yang lebih ringan di permukaan sulit bercampur dengan air yang lebih padat di bawahnya. Hal ini dapat mengisolasi nutrien di perairan dalam, memisahkannya dari fitoplankton yang membutuhkan cahaya di permukaan." }
+                ]
+            },
+            "Zonasi Perairan": {
+                mcq: [
+                    { question: "Zona perairan laut yang berada di atas landas kontinen dengan kedalaman hingga 200 meter disebut...", options: ["Zona Oseanik", "Zona Neritik", "Zona Litoral", "Zona Abisal"], answer: "Zona Neritik", explanation: "Zona Neritik adalah wilayah perairan laut yang terletak di atas landas kontinen, dari garis pasang surut terendah hingga kedalaman sekitar 200 meter. Zona ini memiliki keanekaragaman hayati tertinggi." },
+                    { question: "Zona laut berdasarkan penetrasi cahaya yang masih memungkinkan terjadinya fotosintesis disebut...", options: ["Zona Afotik", "Zona Disfotik", "Zona Fotik", "Zona Batial"], answer: "Zona Fotik", explanation: "Zona Fotik (atau zona epipelagik) adalah lapisan permukaan laut yang menerima cukup sinar matahari untuk terjadinya fotosintesis, biasanya hingga kedalaman 200 meter." },
+                    { question: "Organisme yang hidup di dasar laut, baik menempel, merayap, atau di dalam sedimen, dikelompokkan sebagai...", options: ["Plankton", "Nekton", "Bentos", "Neuston"], answer: "Bentos", explanation: "Bentos adalah organisme yang hidup di atau pada dasar laut (zona bentik). Mereka bisa sesil (menempel) seperti karang, atau vagrant (bergerak) seperti bintang laut dan kepiting." },
+                    { question: "Zona 'twilight' atau remang-remang di mana cahaya sangat sedikit dan tidak cukup untuk fotosintesis adalah...", options: ["Epipelagik", "Mesopelagik", "Batipelagik", "Abisalpelagik"], answer: "Mesopelagik", explanation: "Zona Mesopelagik, atau zona twilight, berada di kedalaman 200 hingga 1000 meter. Cahaya yang masuk sangat minim, sehingga tidak ada fotosintesis yang terjadi di sini." },
+                    { question: "Hewan seperti cumi-cumi raksasa dan anglerfish umumnya ditemukan di zona...", options: ["Neritik", "Epipelagik", "Batipelagik", "Litoral"], answer: "Batipelagik", explanation: "Zona Batipelagik (zona tengah malam) berada di kedalaman 1000 hingga 4000 meter. Zona ini gelap total dan dihuni oleh hewan-hewan yang telah beradaptasi dengan tekanan tinggi dan ketiadaan cahaya, seperti anglerfish dan cumi-cumi vampir." },
+                    { question: "Area yang berada di antara garis pasang tertinggi dan surut terendah disebut...", options: ["Zona Sublitoral", "Zona Intertidal", "Zona Neritik", "Zona Supratidal"], answer: "Zona Intertidal", explanation: "Zona Intertidal adalah area pesisir yang terpapar udara saat surut dan terendam air saat pasang. Organisme di sini harus beradaptasi dengan perubahan kondisi yang ekstrem." },
+                    { question: "Pengelompokan organisme laut menjadi plankton, nekton, dan bentos didasarkan pada...", options: ["Ukuran tubuh", "Cara makan", "Gaya hidup dan kemampuan bergerak", "Kedalaman habitat"], answer: "Gaya hidup dan kemampuan bergerak", explanation: "Plankton adalah organisme yang hanyut, nekton adalah perenang aktif yang bisa melawan arus, dan bentos adalah penghuni dasar. Klasifikasi ini didasarkan pada mobilitas dan posisi mereka di kolom air." },
+                    { question: "Zona Ekonomi Eksklusif (ZEE) Indonesia, sesuai UNCLOS 1982, membentang sejauh...", options: ["12 mil laut", "24 mil laut", "200 mil laut", "350 mil laut"], answer: "200 mil laut", explanation: "Zona Ekonomi Eksklusif (ZEE) adalah wilayah laut sejauh 200 mil laut dari garis pangkal pantai, di mana negara pantai memiliki hak eksklusif atas sumber daya alamnya." },
+                    { question: "Organisme yang hidup di lapisan permukaan paling atas (beberapa milimeter) air laut disebut...", options: ["Pleuston", "Bentos", "Nekton", "Neuston"], answer: "Neuston", explanation: "Neuston adalah komunitas organisme yang mendiami lapisan film permukaan air, biasanya terdiri dari bakteri, protozoa, dan larva." },
+                    { question: "Zona Hadalpelagik merujuk pada perairan yang berada di...", options: ["Landas kontinen", "Lereng benua", "Dasar abisal", "Palung laut"], answer: "Palung laut", explanation: "Zona Hadalpelagik adalah zona terdalam di lautan, berada di kedalaman lebih dari 6000 meter, yang biasanya ditemukan di palung-palung samudra." },
+                    { question: "Bulu babi, bintang laut, dan kepiting adalah contoh organisme yang hidup di zona...", options: ["Oseanik", "Litoral/Intertidal", "Mesopelagik", "Afotik"], answer: "Litoral/Intertidal", explanation: "Organisme-organisme ini umum ditemukan di zona litoral atau intertidal, di mana mereka beradaptasi untuk hidup di dasar yang dangkal dan terkadang terpapar udara." },
+                    { question: "Provinsi bentik yang mencakup lereng benua dari kedalaman 200 hingga 2000 meter adalah...", options: ["Sublitoral", "Batial", "Abisal", "Hadal"], answer: "Batial", explanation: "Zona Batial adalah bagian dari provinsi bentik yang sesuai dengan lereng benua (continental slope)." },
+                    { question: "Organisme bentik yang hidup menempel pada substrat, seperti spons dan karang, disebut...", options: ["Vagrant", "Infauna", "Sesil", "Motil"], answer: "Sesil", explanation: "Organisme sesil adalah organisme yang hidup melekat pada suatu permukaan dan tidak bergerak bebas." },
+                    { question: "Wilayah laut teritorial suatu negara pantai adalah sejauh...", options: ["3 mil laut", "12 mil laut", "24 mil laut", "200 mil laut"], answer: "12 mil laut", explanation: "Laut teritorial adalah wilayah kedaulatan penuh suatu negara yang membentang hingga 12 mil laut dari garis pangkal." },
+                    { question: "Zona laut yang terletak di luar landas kontinen disebut...", options: ["Zona Neritik", "Zona Oseanik", "Zona Litoral", "Zona Batial"], answer: "Zona Oseanik", explanation: "Zona Oseanik adalah wilayah perairan laut terbuka yang luas, di luar dari landas kontinen." },
+                    { question: "Organisme yang hidup di kolom air, tidak di dasar maupun di permukaan, disebut...", options: ["Bentik", "Pelagis", "Neritk", "Oseanik"], answer: "Pelagis", explanation: "Organisme pelagis adalah mereka yang hidup di kolom air terbuka. Ini mencakup plankton dan nekton." },
+                    { question: "Urutan zona pelagik dari yang paling dangkal hingga paling dalam adalah...", options: ["Epipelagik, Mesopelagik, Batipelagik, Abisalpelagik, Hadalpelagik", "Epipelagik, Batipelagik, Mesopelagik, Abisalpelagik, Hadalpelagik", "Mesopelagik, Epipelagik, Batipelagik, Hadalpelagik, Abisalpelagik", "Epipelagik, Mesopelagik, Abisalpelagik, Batipelagik, Hadalpelagik"], answer: "Epipelagik, Mesopelagik, Batipelagik, Abisalpelagik, Hadalpelagik", explanation: "Urutan zona pelagik berdasarkan kedalaman yang meningkat adalah Epipelagik (0-200m), Mesopelagik (200-1000m), Batipelagik (1000-4000m), Abisalpelagik (4000-6000m), dan Hadalpelagik (>6000m)." },
+                    { question: "Zona bentik yang berada tepat di bawah zona neritik adalah...", options: ["Litoral", "Sublitoral", "Batial", "Abisal"], answer: "Sublitoral", explanation: "Zona Sublitoral adalah bagian dari dasar laut yang membentang dari garis pasang surut terendah hingga tepi landas kontinen (~200m), berada di bawah zona perairan neritik." },
+                    { question: "Organisme yang hidup di zona abisal harus beradaptasi dengan kondisi...", options: ["Cahaya terang, suhu hangat, tekanan rendah", "Cahaya redup, suhu bervariasi, tekanan sedang", "Gelap total, suhu sangat dingin, tekanan sangat tinggi", "Tidak ada oksigen, salinitas tinggi, banyak makanan"], answer: "Gelap total, suhu sangat dingin, tekanan sangat tinggi", explanation: "Lingkungan laut dalam dicirikan oleh ketiadaan cahaya matahari, suhu yang mendekati titik beku, dan tekanan hidrostatik yang ekstrem." },
+                    { question: "Organisme yang hidup di zona neritik cenderung lebih melimpah daripada di zona oseanik karena...", options: ["Lebih sedikit predator", "Suhu lebih stabil", "Ketersediaan cahaya dan nutrien yang lebih tinggi", "Tekanan lebih rendah"], answer: "Ketersediaan cahaya dan nutrien yang lebih tinggi", explanation: "Zona neritik yang dangkal menerima banyak cahaya dan pasokan nutrien dari daratan, sehingga mendukung produktivitas primer yang tinggi dan jaring makanan yang kompleks." },
+                    { question: "Istilah untuk organisme yang hidup di zona pasang surut (intertidal) adalah...", options: ["Litoral", "Sublitoral", "Pelagis", "Bentik"], answer: "Litoral", explanation: "Zona litoral adalah nama lain untuk zona intertidal, area yang secara periodik terendam dan terpapar oleh pasang surut." },
+                    { question: "Organisme yang hidup di permukaan sedimen dasar laut disebut...", options: ["Infauna", "Epifauna", "Meiofauna", "Nekton"], answer: "Epifauna", explanation: "Epifauna adalah hewan bentik yang hidup di atas permukaan substrat, seperti bintang laut, kepiting, dan siput." },
+                    { question: "Organisme yang hidup di perairan dengan salinitas rendah (air payau) disebut...", options: ["Organisme laut", "Organisme air tawar", "Organisme payau (brackish)", "Organisme hipersalin"], answer: "Organisme payau (brackish)", explanation: "Organisme payau telah beradaptasi untuk hidup di lingkungan dengan salinitas yang berada di antara air tawar dan air laut penuh, seperti di muara." },
+                    { question: "Organisme yang hidup di zona pelagik tetapi terkait dengan dasar laut untuk mencari makan atau berlindung disebut...", options: ["Bentopelagis", "Epipelagis", "Mesopelagis", "Demersal"], answer: "Bentopelagis", explanation: "Organisme bentopelagis, seperti beberapa spesies ikan kod, berenang di kolom air tepat di atas dasar laut." },
+                    { question: "Zona laut yang terletak di bawah zona mesopelagik dan di atas zona abisalpelagik adalah...", options: ["Epipelagik", "Batipelagik", "Hadalpelagik", "Litoral"], answer: "Batipelagik", explanation: "Urutan zona pelagik dari atas ke bawah adalah Epipelagik, Mesopelagik, Batipelagik, Abisalpelagik, dan Hadalpelagik." }
+                ],
+                essay: [
+                    { question: "Gambarkan dan jelaskan pembagian zona laut berdasarkan kedalaman (zona pelagik) dan berdasarkan penetrasi cahaya. Sebutkan setidaknya satu organisme khas untuk setiap zona utama.", answer: "Berdasarkan kedalaman (pelagik): 1. Epipelagik (0-200m, zona fotik): Fitoplankton, tuna. 2. Mesopelagik (200-1000m, zona twilight): Ikan lentera (lanternfish), cumi-cumi. 3. Batipelagik (1000-4000m, zona tengah malam): Anglerfish, cumi-cumi vampir. 4. Abisalpelagik (4000-6000m): Tripod fish. 5. Hadalpelagik (>6000m, di palung): Ikan siput (snailfish). Berdasarkan cahaya: 1. Fotik (cukup cahaya untuk fotosintesis, ~0-200m). 2. Disfotik (cahaya redup, tidak cukup untuk fotosintesis, ~200-1000m). 3. Afotik (gelap total, >1000m)." },
+                    { question: "Jelaskan perbedaan antara lingkungan pelagis dan bentik. Berikan masing-masing dua contoh organisme yang menjadi ciri khas lingkungan tersebut.", answer: "Lingkungan pelagis adalah seluruh kolom air lautan, dari permukaan hingga dasar. Organisme yang hidup di sini tidak bergantung pada dasar laut, contohnya adalah plankton (seperti copepoda) dan nekton (seperti tuna). Lingkungan bentik adalah dasar laut itu sendiri, termasuk permukaan sedimen dan di dalamnya. Organisme yang hidup di sini disebut bentos, contohnya adalah organisme sesil seperti karang dan organisme vagrant (bergerak) seperti bintang laut." }
+                ]
+            },
+            "Plankton": {
+                mcq: [
+                    { question: "Plankton yang menghabiskan seluruh siklus hidupnya sebagai plankton disebut...", options: ["Meroplankton", "Holoplankton", "Tikoplankton", "Makroplankton"], answer: "Holoplankton", explanation: "Holoplankton adalah organisme yang tetap bersifat planktonik sepanjang hidup mereka, contohnya copepoda dan diatom." },
+                    { question: "Kelompok fitoplankton yang memiliki cangkang dari silika dan sering mendominasi di perairan dingin adalah...", options: ["Dinoflagellata", "Coccolithophores", "Diatom", "Cyanobacteria"], answer: "Diatom", explanation: "Diatom adalah kelompok fitoplankton utama yang memiliki frustula (cangkang) dari silika. Mereka sangat melimpah di perairan subur, terutama di daerah beriklim sedang dan kutub." },
+                    { question: "Fenomena 'Red Tide' atau pasang merah yang berpotensi beracun sering disebabkan oleh ledakan populasi dari kelompok...", options: ["Diatom", "Dinoflagellata", "Copepoda", "Krill"], answer: "Dinoflagellata", explanation: "Beberapa spesies Dinoflagellata dapat berkembang biak secara eksplosif (blooming) dan menyebabkan fenomena 'Red Tide'. Beberapa di antaranya menghasilkan racun yang berbahaya bagi kehidupan laut dan manusia." },
+                    { question: "Zooplankton yang merupakan larva dari organisme bentik atau nekton, seperti larva kepiting dan ikan, disebut...", options: ["Holoplankton", "Meroplankton", "Fitoplankton", "Bakterioplankton"], answer: "Meroplankton", explanation: "Meroplankton adalah organisme yang hanya menghabiskan sebagian dari siklus hidupnya sebagai plankton (biasanya tahap larva), sebelum menjadi bentos atau nekton saat dewasa." },
+                    { question: "Migrasi vertikal harian (diel vertical migration) yang dilakukan oleh banyak zooplankton bertujuan utama untuk...", options: ["Mencari pasangan", "Menghindari predator dan menghemat energi", "Mengikuti arus laut", "Mencari suhu yang lebih hangat"], answer: "Menghindari predator dan menghemat energi", explanation: "Zooplankton bermigrasi ke perairan dalam yang gelap pada siang hari untuk menghindari predator visual seperti ikan, dan naik ke permukaan pada malam hari untuk memakan fitoplankton. Berada di air dingin juga dapat menghemat energi." },
+                    { question: "Organisme planktonik terbesar seperti ubur-ubur termasuk dalam kategori ukuran...", options: ["Mikroplankton", "Mesoplankton", "Makroplankton", "Megaplankton"], answer: "Megaplankton", explanation: "Megaplankton adalah kategori ukuran untuk plankton yang lebih besar dari 20 cm, seperti ubur-ubur besar dan salp raksasa." },
+                    { question: "Copepoda, yang sering disebut 'serangga laut', adalah kelompok dominan dari...", options: ["Fitoplankton", "Zooplankton", "Bakterioplankton", "Nekton kecil"], answer: "Zooplankton", explanation: "Copepoda adalah krustasea kecil yang merupakan kelompok zooplankton paling melimpah di lautan dan menjadi sumber makanan penting bagi banyak hewan laut." },
+                    { question: "Salah satu adaptasi plankton untuk memperlambat laju tenggelam adalah...", options: ["Membentuk cangkang berat", "Memiliki bentuk tubuh bulat sempurna", "Memperbesar rasio luas permukaan terhadap volume", "Berenang aktif ke atas"], answer: "Memperbesar rasio luas permukaan terhadap volume", explanation: "Plankton sering memiliki bentuk tubuh yang pipih, berambut, atau membentuk rantai untuk meningkatkan rasio luas permukaan terhadap volume. Hal ini meningkatkan gaya hambat (drag) dan memperlambat laju tenggelam mereka di kolom air." },
+                    { question: "Kelompok fitoplankton yang memiliki flagela dan beberapa di antaranya dapat bersifat heterotrof atau bahkan beracun adalah...", options: ["Diatom", "Cyanobacteria", "Coccolithophores", "Dinoflagellata"], answer: "Dinoflagellata", explanation: "Dinoflagellata memiliki dua flagela yang memungkinkan mereka bergerak di kolom air. Beberapa spesies dapat menelan partikel makanan (heterotrof) selain berfotosintesis." },
+                    { question: "Plankton yang berukuran antara 2 hingga 20 mikrometer, seperti diatom dan dinoflagellata kecil, diklasifikasikan sebagai...", options: ["Pikoplankton", "Nanoplankton", "Mikroplankton", "Mesoplankton"], answer: "Nanoplankton", explanation: "Nanoplankton adalah kategori ukuran untuk plankton dengan rentang ukuran 2-20 µm." },
+                    { question: "Mekanisme mengapung pada Noctiluca melibatkan...", options: ["Pembentukan cangkang silika", "Menyimpan tetesan minyak", "Mengganti ion berat dengan ion ringan seperti amonium", "Memiliki banyak duri panjang"], answer: "Mengganti ion berat dengan ion ringan seperti amonium", explanation: "Noctiluca secara aktif mengganti ion-ion berat dalam vakuolanya dengan ion amonium yang lebih ringan, membuat densitasnya lebih rendah dari air laut sehingga ia bisa mengapung." },
+                    { question: "Zooplankton gelatin yang merupakan anggota filum Chordata adalah...", options: ["Ubur-ubur", "Ctenophora", "Salp dan Larvacea", "Pteropoda"], answer: "Salp dan Larvacea", explanation: "Salp dan Larvacea (Appendicularia) termasuk dalam Subfilum Tunicata, yang merupakan bagian dari Filum Chordata. Mereka memiliki notokord pada salah satu tahap kehidupannya." },
+                    { question: "Penyebab utama penurunan populasi fitoplankton di musim panas di perairan beriklim sedang adalah...", options: ["Kurangnya cahaya matahari", "Suhu air terlalu dingin", "Habisnya nutrien di permukaan dan meningkatnya grazing oleh zooplankton", "Peningkatan salinitas"], answer: "Habisnya nutrien di permukaan dan meningkatnya grazing oleh zooplankton", explanation: "Setelah ledakan populasi (bloom) di musim semi, nutrien di lapisan permukaan habis. Pada saat yang sama, populasi zooplankton yang memakannya mencapai puncaknya, sehingga biomassa fitoplankton menurun." },
+                    { question: "Proses di mana zooplankton memakan fitoplankton disebut...", options: ["Predasi", "Grazing", "Filter feeding", "Parasitisme"], answer: "Grazing", explanation: "Istilah 'grazing' (merumput) sering digunakan untuk menggambarkan proses konsumsi fitoplankton oleh zooplankton herbivora." },
+                    { question: "Fecal pellet (kotoran) dari zooplankton penting secara ekologis karena...", options: ["Menjadi racun bagi ikan", "Mempercepat transfer karbon ke laut dalam", "Menyebabkan pemutihan karang", "Menghalangi cahaya matahari"], answer: "Mempercepat transfer karbon ke laut dalam", explanation: "Fecal pellet yang padat tenggelam jauh lebih cepat daripada sel fitoplankton individual, sehingga menjadi mekanisme penting dalam 'pompa biologis' yang mengangkut karbon ke dasar laut." },
+                    { question: "Fitoplankton terkecil (kurang dari 2 mikrometer) termasuk dalam kategori ukuran...", options: ["Nanoplankton", "Pikoplankton", "Mikroplankton", "Femtoplankton"], answer: "Pikoplankton", explanation: "Pikoplankton, seperti Prochlorococcus dan Synechococcus, sangat kecil tetapi secara kolektif bertanggung jawab atas sebagian besar produktivitas primer di lautan terbuka." },
+                    { question: "Kelompok zooplankton yang memiliki cangkang kalsium karbonat berlubang-lubang dan penting sebagai indikator iklim masa lalu adalah...", options: ["Radiolaria", "Foraminifera", "Copepoda", "Diatom"], answer: "Foraminifera", explanation: "Cangkang (tes) foraminifera yang tenggelam ke dasar laut menjadi bagian penting dari sedimen. Komposisi kimia cangkang ini dapat digunakan oleh para ilmuwan untuk merekonstruksi suhu dan kondisi laut di masa lalu." },
+                    { question: "Kelompok zooplankton yang memiliki kerangka internal dari silika yang rumit dan indah adalah...", options: ["Radiolaria", "Foraminifera", "Tintinnid", "Acantharia"], answer: "Radiolaria", explanation: "Seperti foraminifera, kerangka silika radiolaria yang tenggelam juga membentuk sedimen laut dalam yang disebut 'ooze radiolaria'." },
+                    { question: "Contoh dari meroplankton adalah...", options: ["Diatom", "Copepoda", "Larva teritip (barnacle)", "Ubur-ubur"], answer: "Larva teritip (barnacle)", explanation: "Teritip dewasa hidup menempel (sesil) pada substrat keras, tetapi tahap larvanya (nauplius dan cyprid) hidup sebagai plankton sebelum menetap." },
+                    { question: "Cahaya yang dihasilkan oleh dinoflagellata saat air terganggu (misalnya oleh ombak atau perahu) adalah contoh dari...", options: ["Fotosintesis", "Bioluminesens", "Fluoresens", "Termoluminesens"], answer: "Bioluminesens", explanation: "Banyak spesies dinoflagellata, seperti Noctiluca, akan memancarkan kilatan cahaya biru ketika terganggu secara mekanis, menciptakan pemandangan laut yang berpendar di malam hari." },
+                    { question: "Kumpulan telur ikan yang dilepaskan ke kolom air dan mengapung sebagai plankton disebut...", options: ["Spermatofor", "Ikhtioplankton", "Nekton", "Meroplankton"], answer: "Ikhtioplankton", explanation: "Ikhtioplankton adalah istilah untuk telur dan larva ikan yang bersifat planktonik." },
+                    { question: "Istilah umum untuk larva krustasea pada tahap awal adalah...", options: ["Nauplius", "Zoea", "Megalopa", "Cyprid"], answer: "Nauplius", explanation: "Nauplius adalah tahap larva pertama yang umum bagi banyak kelompok krustasea, termasuk copepoda dan teritip." },
+                    { question: "Istilah untuk larva kepiting adalah...", options: ["Nauplius", "Zoea dan Megalopa", "Veliger", "Trochophore"], answer: "Zoea dan Megalopa", explanation: "Kepiting menetas sebagai larva zoea yang planktonik, kemudian berkembang menjadi tahap megalopa sebelum akhirnya menetap sebagai kepiting muda." },
+                    { question: "Istilah untuk larva moluska (seperti siput dan kerang) yang planktonik adalah...", options: ["Nauplius", "Zoea", "Veliger", "Planula"], answer: "Veliger", explanation: "Larva veliger dicirikan oleh adanya 'velum', organ bersilia yang digunakan untuk berenang dan makan." },
+                    { question: "Istilah untuk larva karang dan anemon yang berenang bebas adalah...", options: ["Veliger", "Trochophore", "Planula", "Bipinnaria"], answer: "Planula", explanation: "Larva planula berenang menggunakan silia sampai menemukan tempat yang cocok untuk menetap dan bermetamorfosis menjadi polip." },
+                    { question: "Organisme yang mengapung pasif di permukaan laut, sebagian di atas dan sebagian di bawah air, seperti Physalia, disebut...", options: ["Neuston", "Bentos", "Pleuston", "Nekton"], answer: "Pleuston", explanation: "Pleuston adalah organisme yang hidup di antarmuka udara-air, mengapung di permukaan, contohnya adalah Portuguese man o' war (Physalia)." },
+                    { question: "Dasar dari hampir semua jaring makanan di laut adalah...", options: ["Zooplankton", "Fitoplankton", "Bakteri", "Detritus"], answer: "Fitoplankton", explanation: "Fitoplankton adalah produsen primer utama di lautan. Melalui fotosintesis, mereka mengubah energi matahari menjadi energi kimia yang menjadi dasar bagi sebagian besar kehidupan laut." },
+                    { question: "Struktur kalsium karbonat kecil yang diproduksi oleh kelompok fitoplankton Coccolithophores disebut...", options: ["Frustula", "Tes", "Kokkolit (coccolith)", "Spikula"], answer: "Kokkolit (coccolith)", explanation: "Kokkolit adalah lempengan kalsium karbonat yang menutupi sel Coccolithophore. Saat organisme ini mati, kokkolit tenggelam dan menjadi komponen utama sedimen laut dalam seperti kapur." },
+                    { question: "Kelompok organisme yang sering dianggap sebagai penghubung antara lingkaran mikroba dan jaring makanan klasik adalah...", options: ["Bakteri", "Virus", "Nanoflagellata heterotrofik", "Diatom"], answer: "Nanoflagellata heterotrofik", explanation: "Nanoflagellata heterotrofik adalah predator utama bakteri dan pikofitoplankton, dan mereka pada gilirannya dimakan oleh zooplankton yang lebih besar seperti ciliata dan copepoda." },
+                    { question: "Kumpulan materi organik dan anorganik yang tersuspensi di kolom air disebut...", options: ["Seston", "Tripton", "Nekton", "Bentos"], answer: "Seston", explanation: "Seston adalah istilah kolektif untuk semua partikel yang melayang di air, termasuk plankton (bioseston) dan partikel non-hidup/detritus (abioseston/tripton)." },
+                ],
+                essay: [
+                    { question: "Apa yang dimaksud dengan Diel Vertical Migration (DVM) pada zooplankton? Jelaskan hipotesis utama mengenai alasan terjadinya DVM dan signifikansi ekologisnya.", answer: "DVM adalah migrasi harian yang dilakukan oleh banyak zooplankton, di mana mereka berada di perairan dalam yang gelap pada siang hari dan naik ke perairan permukaan pada malam hari. Hipotesis utama penyebabnya adalah untuk menghindari predator visual (seperti ikan) di permukaan pada siang hari. Signifikansi ekologisnya sangat besar: 1. Memfasilitasi transfer energi antara permukaan dan laut dalam. 2. Berkontribusi pada 'pompa biologis' dengan melepaskan fecal pellet di kedalaman. 3. Mengurangi tekanan pemangsaan (grazing) pada fitoplankton selama siang hari." },
+                    { question: "Jelaskan perbedaan antara Holoplankton dan Meroplankton, dan berikan masing-masing dua contoh.", answer: "Holoplankton adalah organisme yang menghabiskan seluruh siklus hidupnya sebagai plankton. Contohnya adalah copepoda dan foraminifera. Meroplankton adalah organisme yang hanya menghabiskan sebagian (biasanya tahap larva) dari siklus hidupnya sebagai plankton, sebelum menjadi dewasa sebagai nekton atau bentos. Contohnya adalah larva kepiting (zoea) dan larva ikan (ikhtioplankton)." },
+                    { question: "Jelaskan setidaknya tiga cara adaptasi fitoplankton untuk tetap berada di zona fotik.", answer: "1. Ukuran Kecil: Ukuran sel yang sangat kecil meningkatkan rasio luas permukaan terhadap volume, yang meningkatkan gaya hambat dan memperlambat laju tenggelam. 2. Bentuk Tubuh: Memiliki bentuk tubuh yang pipih, membentuk rantai, atau memiliki duri/tonjolan yang rumit untuk meningkatkan luas permukaan dan gaya hambat. 3. Regulasi Daya Apung: Beberapa fitoplankton, seperti diatom, dapat menyimpan tetesan minyak (lipid) yang lebih ringan dari air. Beberapa cyanobacteria juga memiliki vakuola gas untuk mengatur daya apungnya." }
+                ]
+            },
+            "Nekton": {
+                mcq: [
+                    { question: "Kelompok organisme yang mampu berenang aktif dan melawan arus laut disebut...", options: ["Plankton", "Nekton", "Bentos", "Seston"], answer: "Nekton", explanation: "Nekton adalah hewan laut yang memiliki kemampuan lokomosi (berenang) yang cukup kuat untuk bergerak melawan arus, seperti ikan, cumi-cumi, dan mamalia laut." },
+                    { question: "Ikan bertulang rawan seperti hiu dan pari termasuk dalam kelas...", options: ["Osteichthyes", "Agnatha", "Chondrichthyes", "Cephalopoda"], answer: "Chondrichthyes", explanation: "Kelas Chondrichthyes mencakup ikan yang kerangkanya terbuat dari tulang rawan, bukan tulang sejati. Contohnya adalah hiu, pari, dan skate." },
+                    { question: "Banyak ikan bertulang sejati (Osteichthyes) menggunakan organ berisi gas untuk mengatur daya apung mereka. Organ ini disebut...", options: ["Paru-paru", "Kantung renang (swim bladder)", "Hati yang berminyak", "Operkulum"], answer: "Kantung renang (swim bladder)", explanation: "Kantung renang adalah organ internal berisi gas yang memungkinkan ikan bertulang sejati mengontrol daya apungnya untuk naik, turun, atau tetap melayang di kedalaman tertentu tanpa harus terus-menerus berenang." },
+                    { question: "Mamalia laut yang termasuk dalam Ordo Sirenia adalah...", options: ["Lumba-lumba dan paus", "Anjing laut dan singa laut", "Berang-berang laut", "Manatee dan Dugong"], answer: "Manatee dan Dugong", explanation: "Ordo Sirenia terdiri dari mamalia laut herbivora berukuran besar yang dikenal sebagai 'sapi laut', yaitu manatee dan dugong." },
+                    { question: "Perbedaan utama antara anjing laut (seal) dan singa laut (sea lion) adalah...", options: ["Ukuran tubuh", "Warna bulu", "Kehadiran daun telinga eksternal", "Jenis makanan"], answer: "Kehadiran daun telinga eksternal", explanation: "Singa laut (famili Otariidae) memiliki daun telinga eksternal yang terlihat, sedangkan anjing laut sejati (famili Phocidae) tidak memilikinya. Perbedaan lainnya ada pada cara mereka bergerak di darat dan berenang." },
+                    { question: "Paus bergigi (Odontoceti) seperti lumba-lumba dan paus sperma menggunakan kemampuan khusus untuk navigasi dan berburu yang disebut...", options: ["Bioluminesens", "Ekolokasi", "Kamuflase", "Elektroresepsi"], answer: "Ekolokasi", explanation: "Ekolokasi adalah kemampuan menggunakan suara yang dipantulkan (gema) untuk mendeteksi objek. Paus bergigi menghasilkan suara klik dan mendengarkan gema yang kembali untuk 'melihat' lingkungan mereka." },
+                    { question: "Paus Baleen (Mysticeti) menyaring makanannya, seperti krill dan ikan kecil, menggunakan struktur yang terbuat dari...", options: ["Gigi kecil", "Keratin", "Tulang", "Silika"], answer: "Keratin", explanation: "Paus Baleen tidak memiliki gigi. Sebaliknya, mereka memiliki lempengan baleen yang terbuat dari keratin (bahan yang sama seperti rambut dan kuku manusia) yang menggantung dari rahang atas mereka untuk menyaring makanan dari air." },
+                    { question: "Cumi-cumi dan gurita, yang merupakan nekton invertebrata, termasuk dalam kelas...", options: ["Crustacea", "Gastropoda", "Cephalopoda", "Bivalvia"], answer: "Cephalopoda", explanation: "Cephalopoda adalah kelas moluska yang mencakup cumi-cumi, gurita, sotong, dan nautilus. Mereka dikenal karena kecerdasan dan kemampuan berenangnya yang baik." },
+                    { question: "Bentuk tubuh ikan yang ideal untuk kecepatan tinggi, seperti tuna, adalah...", options: ["Pipih lateral (gepeng)", "Pipih dorsoventral (datar)", "Seperti ular (anguilliform)", "Bentuk torpedo (fusiform)"], answer: "Bentuk torpedo (fusiform)", explanation: "Bentuk tubuh fusiform atau seperti torpedo sangat hidrodinamis, mengurangi hambatan air dan memungkinkan pergerakan yang cepat dan efisien. Ini adalah bentuk umum pada perenang cepat di laut terbuka seperti tuna dan hiu." },
+                    { question: "Reptil laut yang sepenuhnya beradaptasi dengan kehidupan di laut, bahkan melahirkan di air, adalah...", options: ["Penyu laut", "Iguana laut", "Buaya muara", "Ular laut (Hydrophiinae)"], answer: "Ular laut (Hydrophiinae)", explanation: "Sebagian besar spesies ular laut (subfamili Hydrophiinae) bersifat vivipar, artinya mereka melahirkan anak-anaknya langsung di laut dan tidak perlu kembali ke darat." },
+                    { question: "Invertebrata terbesar di dunia adalah...", options: ["Ubur-ubur surai singa", "Cumi-cumi raksasa (Giant Squid)", "Kepiting laba-laba Jepang", "Lobster Amerika"], answer: "Cumi-cumi raksasa (Giant Squid)", explanation: "Cumi-cumi raksasa (genus Architeuthis) adalah invertebrata terbesar yang diketahui, hidup di laut dalam dan menjadi mangsa utama paus sperma." },
+                    { question: "Perbedaan utama antara manatee dan dugong terletak pada...", options: ["Ukuran tubuhnya", "Bentuk ekornya", "Warnanya", "Makanannya"], answer: "Bentuk ekornya", explanation: "Manatee memiliki ekor berbentuk dayung yang bulat, sedangkan dugong memiliki ekor yang bercabang seperti ekor lumba-lumba." },
+                    { question: "Mamalia laut yang tidak memiliki lapisan lemak tebal (blubber) dan mengandalkan bulu yang sangat padat untuk insulasi adalah...", options: ["Anjing laut", "Paus", "Berang-berang laut", "Walrus"], answer: "Berang-berang laut", explanation: "Berang-berang laut memiliki bulu terpadat dari semua mamalia, yang memerangkap lapisan udara untuk menjaga tubuh mereka tetap hangat di air dingin." },
+                    { question: "Jenis sirip ekor pada hiu, di mana lobus atas lebih besar dari lobus bawah, disebut...", options: ["Homocercal", "Diphycercal", "Heterocercal", "Protocercal"], answer: "Heterocercal", explanation: "Sirip ekor heterocercal pada hiu memberikan daya angkat (lift) saat berenang, membantu mengimbangi kecenderungan mereka untuk tenggelam karena tidak memiliki kantung renang." },
+                    { question: "Iguana laut, yang hanya ditemukan di Kepulauan Galapagos, adalah satu-satunya kadal modern yang...", options: ["Berenang di air tawar", "Mencari makan di lingkungan laut", "Berbisa", "Bisa terbang"], answer: "Mencari makan di lingkungan laut", explanation: "Iguana laut adalah herbivora yang menyelam ke perairan dingin di sekitar Galapagos untuk memakan alga laut." },
+                    { question: "Kemampuan ikan untuk 'merasakan' medan listrik yang dihasilkan oleh hewan lain, yang digunakan oleh hiu untuk berburu, disebut...", options: ["Ekolokasi", "Elektroresepsi", "Magnetoresepsi", "Kemoresepsi"], answer: "Elektroresepsi", explanation: "Hiu memiliki organ sensorik khusus yang disebut Ampullae of Lorenzini di sekitar moncongnya yang sangat sensitif terhadap medan listrik lemah yang dihasilkan oleh kontraksi otot mangsanya." },
+                    { question: "Paus Orca (Killer Whale) sebenarnya adalah...", options: ["Jenis paus baleen terbesar", "Jenis hiu terbesar", "Jenis lumba-lumba terbesar", "Jenis anjing laut terbesar"], answer: "Jenis lumba-lumba terbesar", explanation: "Meskipun disebut 'paus pembunuh', orca secara taksonomi termasuk dalam famili lumba-lumba samudra (Delphinidae) dan merupakan anggotanya yang terbesar." },
+                    { question: "Ikan yang terkenal karena kemampuannya melompat keluar dari air dan 'terbang' jarak pendek menggunakan sirip dada yang besar adalah...", options: ["Ikan todak (swordfish)", "Ikan terbang (flying fish)", "Ikan layar (sailfish)", "Ikan pari manta"], answer: "Ikan terbang (flying fish)", explanation: "Ikan terbang tidak benar-benar terbang, tetapi meluncur di udara menggunakan sirip pektoralnya yang seperti sayap untuk melarikan diri dari predator." },
+                    { question: "Penyu laut harus kembali ke darat untuk...", options: ["Makan", "Kawin", "Bertelur", "Menghangatkan diri"], answer: "Bertelur", explanation: "Meskipun menghabiskan sebagian besar hidupnya di laut, semua spesies penyu laut adalah reptil yang bernapas dengan paru-paru dan betina harus naik ke pantai untuk menggali sarang dan meletakkan telurnya." },
+                    { question: "Paus terbesar di dunia, yang juga merupakan hewan terbesar yang pernah ada, adalah...", options: ["Paus Sperma", "Paus Bungkuk", "Paus Biru", "Paus Orca"], answer: "Paus Biru", explanation: "Paus Biru (Balaenoptera musculus) adalah hewan terbesar di planet ini. Meskipun ukurannya raksasa, ia memakan salah satu hewan terkecil, yaitu krill." },
+                    { question: "Contoh dari krustasea nektonik selain krill adalah...", options: ["Kepiting", "Udang pelagis", "Teritip", "Lobster"], answer: "Udang pelagis", explanation: "Beberapa spesies udang berukuran besar dan merupakan perenang aktif di kolom air, sehingga diklasifikasikan sebagai nekton." },
+                    { question: "Sistem sensorik pada ikan yang mendeteksi gerakan dan getaran di air adalah...", options: ["Garis lateral (lateral line)", "Ampullae of Lorenzini", "Mata", "Insang"], answer: "Garis lateral (lateral line)", explanation: "Garis lateral adalah serangkaian pori-pori di sepanjang sisi tubuh ikan yang terhubung ke kanal berisi sel-sel rambut sensorik, yang memungkinkan ikan merasakan perubahan tekanan air." },
+                    { question: "Pola pewarnaan di mana bagian atas tubuh hewan laut berwarna gelap dan bagian bawahnya terang disebut...", options: ["Aposematisme", "Mimikri", "Kamuflase disruptif", "Countershading"], answer: "Countershading", explanation: "Countershading adalah bentuk kamuflase yang umum. Dari atas, punggung gelap menyatu dengan laut dalam yang gelap. Dari bawah, perut terang menyatu dengan permukaan laut yang terang." },
+                    { question: "Bentuk tubuh pipih lateral (gepeng dari sisi ke sisi) seperti pada ikan kepe-kepe sangat cocok untuk...", options: ["Berenang cepat di laut terbuka", "Bermanuver di antara terumbu karang", "Bersembunyi di dasar pasir", "Mengapung di permukaan"], answer: "Bermanuver di antara terumbu karang", explanation: "Bentuk tubuh yang pipih secara lateral memungkinkan ikan untuk berbelok dengan tajam dan bergerak dengan lincah di lingkungan yang kompleks seperti terumbu karang." },
+                    { question: "Pola reproduksi di mana betina menyimpan telur di dalam tubuhnya hingga menetas dan melahirkan anak yang hidup disebut...", options: ["Ovipar", "Vivipar", "Ovovivipar", "Partenogenesis"], answer: "Ovovivipar", explanation: "Pada ovovivipar, telur berkembang di dalam tubuh induk tetapi tidak ada hubungan plasenta; embrio mendapatkan nutrisi dari kuning telur. Beberapa spesies hiu bereproduksi dengan cara ini." },
+                    { question: "Kumpulan ikan atau hewan laut lain yang bergerak bersama secara terkoordinasi disebut...", options: ["Agregasi", "Koloni", "Gerombolan (school/shoal)", "Komunitas"], answer: "Gerombolan (school/shoal)", explanation: "Membentuk gerombolan memberikan banyak keuntungan, seperti perlindungan dari predator (efek kebingungan, banyak mata), efisiensi mencari makan, dan kemudahan menemukan pasangan." },
+                    { question: "Hewan yang mampu mengubah jenis kelaminnya selama siklus hidupnya disebut...", options: ["Hermafrodit simultan", "Hermafrodit sekuensial", "Gynogenesis", "Androgenesis"], answer: "Hermafrodit sekuensial", explanation: "Hermafrodit sekuensial adalah fenomena umum pada banyak spesies ikan karang, di mana individu dapat berfungsi sebagai jantan pada satu waktu dan betina pada waktu lain, atau sebaliknya." },
+                    { question: "Contoh dari moluska bivalvia adalah...", options: ["Siput", "Gurita", "Kerang", "Chiton"], answer: "Kerang", explanation: "Bivalvia adalah kelas moluska yang memiliki cangkang berengsel dua bagian, seperti kerang, tiram, dan remis." },
+                    { question: "Ikan yang menghabiskan sebagian hidupnya di air tawar dan sebagian di air asin, seperti salmon, disebut...", options: ["Anadromus", "Katadromus", "Oseandromus", "Potamodromus"], answer: "Anadromus", explanation: "Ikan anadromus lahir di air tawar, bermigrasi ke laut untuk tumbuh dewasa, dan kembali ke air tawar untuk berkembang biak (misalnya, salmon)." },
+                    { question: "Ikan yang menghabiskan sebagian besar hidupnya di air tawar dan bermigrasi ke laut untuk berkembang biak, seperti sidat, disebut...", options: ["Anadromus", "Katadromus", "Amfidromus", "Diadromus"], answer: "Katadromus", explanation: "Ikan katadromus memiliki siklus hidup yang berlawanan dengan ikan anadromus. Contoh paling terkenal adalah sidat Eropa dan Amerika." }
+                ],
+                essay: [
+                    { question: "Bandingkan dan kontraskan tiga kelompok nekton utama: ikan bertulang sejati (Osteichthyes), ikan bertulang rawan (Chondrichthyes), dan mamalia laut (Cetacea) dalam hal adaptasi untuk daya apung, pernapasan, dan reproduksi.", answer: "Daya apung: Osteichthyes menggunakan kantung renang. Chondrichthyes menggunakan hati besar yang berminyak dan sirip hidrodinamis. Cetacea menggunakan paru-paru dan lapisan lemak tebal (blubber). Pernapasan: Ikan (keduanya) menggunakan insang untuk mengekstrak oksigen dari air. Cetacea harus naik ke permukaan untuk bernapas menggunakan paru-paru melalui lubang sembur (blowhole). Reproduksi: Sebagian besar ikan bersifat ovipar (bertelur). Hiu ada yang ovipar, ovovivipar, atau vivipar. Semua Cetacea bersifat vivipar (melahirkan) dan menyusui anaknya." },
+                    { question: "Jelaskan tiga jenis hambatan (drag) yang dialami oleh organisme nektonik saat bergerak di air, dan bagaimana bentuk tubuh 'streamlined' membantu mengatasinya.", answer: "Tiga jenis hambatan adalah: 1. Hambatan Gesek (Frictional Resistance): Terkait dengan luas permukaan yang bersentuhan dengan air. 2. Hambatan Bentuk (Form Resistance): Terkait dengan bentuk penampang melintang organisme. 3. Hambatan Akibat Turbulensi (Induced Drag): Terkait dengan pusaran air yang terbentuk di belakang organisme. Bentuk tubuh 'streamlined' atau fusiform (seperti torpedo) meminimalkan ketiga hambatan ini dengan mengurangi luas penampang, menciptakan aliran air yang lancar (laminar), dan mengurangi turbulensi, sehingga memungkinkan pergerakan yang efisien." },
+                    { question: "Bandingkan strategi makan paus baleen (Mysticeti) dengan paus bergigi (Odontoceti).", answer: "Paus baleen adalah pemakan suspensi (filter feeder). Mereka menelan sejumlah besar air dan kemudian mendorongnya keluar melalui lempengan baleen mereka, menyaring organisme kecil seperti krill dan ikan kecil. Contoh: Paus Biru, Paus Bungkuk. Paus bergigi adalah predator aktif. Mereka menggunakan gigi mereka untuk menangkap mangsa yang lebih besar dan individual, seperti ikan, cumi-cumi, atau bahkan mamalia laut lainnya. Banyak dari mereka menggunakan ekolokasi untuk menemukan mangsanya. Contoh: Paus Sperma, Orca, Lumba-lumba." }
+                ]
+            },
+            "Bentos": {
+                mcq: [
+                    { question: "Organisme bentik yang hidup di dalam sedimen disebut...", options: ["Epifauna", "Infauna", "Meiofauna", "Nektobentos"], answer: "Infauna", explanation: "Infauna adalah hewan yang hidup dengan cara menggali atau membuat liang di dalam sedimen dasar laut, contohnya cacing dan kerang." },
+                    { question: "Organisme bentik yang hidup di atas permukaan sedimen disebut...", options: ["Epifauna", "Infauna", "Endofauna", "Hiperbentos"], answer: "Epifauna", explanation: "Epifauna adalah hewan yang hidup di atas permukaan dasar laut, baik yang menempel (sesil) seperti spons, maupun yang bergerak (vagrant) seperti bintang laut." },
+                    { question: "Strategi makan dengan cara menyaring partikel makanan yang tersuspensi di kolom air disebut...", options: ["Deposit feeding", "Suspension feeding", "Scavenging", "Grazing"], answer: "Suspension feeding", explanation: "Suspension feeder, seperti teritip dan kerang, menangkap partikel makanan (plankton, detritus) yang melayang di dalam air." },
+                    { question: "Strategi makan dengan cara menelan sedimen dan mencerna materi organik di dalamnya disebut...", options: ["Deposit feeding", "Suspension feeding", "Predasi", "Filter feeding"], answer: "Deposit feeding", explanation: "Deposit feeder, seperti teripang dan banyak cacing, memakan sedimen untuk mendapatkan nutrisi dari materi organik yang terkandung di dalamnya." },
+                    { question: "Sumber energi utama bagi komunitas di sekitar ventilasi hidrotermal (hydrothermal vents) adalah...", options: ["Fotosintesis", "Salju laut", "Kemosintesis", "Bioluminesens"], answer: "Kemosintesis", explanation: "Di lingkungan tanpa cahaya ini, bakteri kemosintetik menggunakan senyawa kimia seperti hidrogen sulfida sebagai sumber energi untuk menghasilkan materi organik, yang menjadi dasar jaring makanan." },
+                    { question: "Organisme bentik berukuran sangat kecil yang hidup di antara butiran sedimen disebut...", options: ["Makrofauna", "Mega fauna", "Meiofauna", "Mikrofauna"], answer: "Meiofauna", explanation: "Meiofauna adalah hewan-hewan kecil (biasanya berukuran antara 0.1 mm hingga 1 mm) yang menempati ruang interstisial di antara partikel sedimen." },
+                    { question: "Hewan seperti cacing tabung raksasa (Riftia) dan kerang raksasa di sekitar ventilasi hidrotermal mendapatkan nutrisi melalui...", options: ["Menyaring air panas", "Memakan bakteri secara langsung", "Simbiosis dengan bakteri kemosintetik", "Memakan salju laut"], answer: "Simbiosis dengan bakteri kemosintetik", explanation: "Banyak hewan di ventilasi hidrotermal tidak memiliki mulut atau sistem pencernaan. Mereka bergantung sepenuhnya pada bakteri kemosintetik yang hidup di dalam jaringan khusus mereka (seperti trofosom pada cacing tabung) untuk menyediakan nutrisi." },
+                    { question: "Manakah dari berikut ini yang merupakan contoh dari epifauna sesil?", options: ["Kepiting", "Bintang laut", "Teripang", "Teritip (Barnacle)"], answer: "Teritip (Barnacle)", explanation: "Teritip adalah krustasea sesil yang menghabiskan masa dewasanya menempel secara permanen pada substrat keras." },
+                    { question: "Biomassa bentik cenderung paling tinggi di...", options: ["Pusat samudra (gyre subtropis)", "Palung laut dalam", "Daerah landas kontinen yang produktif", "Sekitar ventilasi hidrotermal"], answer: "Daerah landas kontinen yang produktif", explanation: "Secara umum, biomassa bentik sangat bergantung pada pasokan makanan dari permukaan (produktivitas primer). Oleh karena itu, dasar laut di bawah perairan permukaan yang subur, seperti di landas kontinen dan daerah upwelling, memiliki biomassa bentik tertinggi." },
+                    { question: "Adaptasi umum pada hewan laut dalam (termasuk bentos) untuk mengatasi kelangkaan makanan adalah...", options: ["Metabolisme yang cepat", "Mulut besar dan perut yang dapat mengembang", "Warna tubuh yang cerah", "Bergantung pada fotosintesis"], answer: "Mulut besar dan perut yang dapat mengembang", explanation: "Karena pertemuan dengan mangsa jarang terjadi, banyak predator laut dalam memiliki adaptasi untuk dapat menelan mangsa yang sangat besar kapan pun kesempatan itu muncul." },
+                    { question: "Pergerakan sedimen oleh organisme yang hidup di dalamnya (misalnya, menggali, makan) disebut...", options: ["Bioerosi", "Bioturbasi", "Biokonsentrasi", "Bioakumulasi"], answer: "Bioturbasi", explanation: "Bioturbasi oleh hewan seperti cacing dan teripang dapat mengubah sifat fisik dan kimia sedimen, yang mempengaruhi siklus nutrien dan organisme lain yang hidup di sana." },
+                    { question: "Kelompok hewan yang mencakup teripang, bulu babi, dan bintang laut adalah...", options: ["Moluska", "Krustasea", "Annelida", "Echinodermata"], answer: "Echinodermata", explanation: "Filum Echinodermata (hewan berkulit duri) adalah komponen yang sangat umum dan penting dalam komunitas bentik di seluruh dunia." },
+                    { question: "Hewan yang memangsa hewan lain yang sudah mati disebut...", options: ["Predator", "Parasit", "Pemulung (Scavenger)", "Herbivora"], answer: "Pemulung (Scavenger)", explanation: "Pemulung seperti kepiting, lobster, dan hiu hagfish memainkan peran penting dalam membersihkan dasar laut dari bangkai." },
+                    { question: "Di dasar laut yang lunak (lumpur/pasir), strategi makan yang paling dominan adalah...", options: ["Suspension feeding", "Deposit feeding", "Fotosintesis", "Predasi aktif"], answer: "Deposit feeding", explanation: "Dasar laut yang lunak kaya akan detritus yang mengendap, sehingga mendukung komunitas besar pemakan deposit. Arus yang lemah juga berarti lebih sedikit makanan yang tersuspensi untuk para suspension feeder." },
+                    { question: "Organisme yang hidup di zona intertidal berbatu harus beradaptasi terhadap...", options: ["Tekanan tinggi", "Kegelapan total", "Stres kekeringan (desikasi) dan perubahan suhu", "Kekurangan oksigen"], answer: "Stres kekeringan (desikasi) dan perubahan suhu", explanation: "Organisme intertidal harus mampu bertahan dari paparan udara, sinar matahari langsung, dan hujan saat air surut, yang menyebabkan fluktuasi suhu dan risiko kekeringan yang ekstrem." },
+                    { question: "Lapisan tipis di permukaan sedimen dasar laut yang kaya akan mikroorganisme dan materi organik disebut...", options: ["Lapisan nefeloit", "Film biofilm", "Zona minimum oksigen", "Termoklin bentik"], answer: "Film biofilm", explanation: "Biofilm adalah lapisan mikroba (bakteri, diatom, dll.) yang menempel pada permukaan dan merupakan sumber makanan penting bagi banyak hewan pemakan deposit (deposit feeder)." },
+                    { question: "Contoh hewan bentik sesil adalah...", options: ["Kepiting", "Bintang laut", "Spons", "Cacing Polychaeta"], answer: "Spons", explanation: "Spons adalah hewan sesil yang hidup menempel pada dasar laut dan menyaring makanan dari air." },
+                    { question: "Organisme yang hidupnya terikat pada es laut, seperti diatom yang tumbuh di bagian bawah es, disebut organisme...", options: ["Kriopelagik", "Simpagik", "Bentik", "Epipelagik"], answer: "Simpagik", explanation: "Komunitas simpagik (atau 'sea ice biota') adalah bagian penting dari ekosistem kutub, menjadi sumber makanan utama di awal musim semi." },
+                    { question: "Hewan yang tidak memiliki tulang belakang disebut...", options: ["Vertebrata", "Chordata", "Invertebrata", "Craniata"], answer: "Invertebrata", explanation: "Invertebrata merupakan mayoritas besar dari keanekaragaman hewan di Bumi, termasuk serangga, moluska, krustasea, dan cacing." },
+                    { question: "Hewan yang memiliki simetri radial (bagian tubuh tersusun melingkar di sekitar sumbu pusat) adalah...", options: ["Ikan", "Kepiting", "Ubur-ubur", "Cacing"], answer: "Ubur-ubur", explanation: "Cnidaria (ubur-ubur, anemon) dan Ctenophora (ubur-ubur sisir) adalah contoh utama hewan dengan simetri radial." },
+                    { question: "Hewan yang memiliki simetri bilateral (dapat dibagi menjadi dua bagian cermin kiri dan kanan) adalah...", options: ["Spons", "Anemon laut", "Bintang laut dewasa", "Ikan"], answer: "Ikan", explanation: "Sebagian besar hewan, termasuk manusia, memiliki simetri bilateral, yang terkait dengan pergerakan aktif dan perkembangan kepala (sefalisasi)." },
+                    { question: "Organisme yang menyaring partikel makanan dari sedimen dasar laut disebut...", options: ["Pemakan suspensi", "Pemakan deposit", "Predator", "Grazer"], answer: "Pemakan deposit", explanation: "Pemakan deposit, seperti banyak teripang dan cacing, menelan sedimen untuk mengekstrak materi organik yang terkandung di dalamnya." },
+                    { question: "Bentuk reproduksi aseksual di mana individu baru tumbuh dari bagian tubuh induknya disebut...", options: ["Fragmentasi", "Pembelahan biner", "Tunas (Budding)", "Partenogenesis"], answer: "Tunas (Budding)", explanation: "Budding adalah metode reproduksi yang umum pada banyak hewan sesil sederhana seperti karang dan anemon." },
+                    { question: "Proses pelepasan gamet (sperma dan sel telur) ke kolom air untuk pembuahan eksternal disebut...", options: ["Pembuahan internal", "Partenogenesis", "Spawning", "Budding"], answer: "Spawning", explanation: "Spawning adalah metode reproduksi yang umum pada banyak invertebrata laut dan ikan, di mana pembuahan terjadi di luar tubuh di lingkungan air." },
+                    { question: "Proses di mana larva planktonik berhenti berenang dan menetap di dasar untuk memulai kehidupan bentiknya disebut...", options: ["Metamorfosis", "Rekrutmen", "Settlement", "Suksessi"], answer: "Settlement", explanation: "Settlement adalah tahap kritis dalam siklus hidup banyak invertebrata laut, di mana larva memilih substrat yang cocok untuk berubah menjadi dewasa." },
+                ],
+                essay: [
+                    { question: "Bandingkan dan kontraskan strategi makan 'suspension feeding' dan 'deposit feeding' pada organisme bentik. Berikan contoh organisme dan tipe habitat di mana masing-masing strategi dominan.", answer: "Suspension feeding adalah strategi menangkap partikel makanan (plankton, detritus) yang tersuspensi di kolom air. Strategi ini dominan di habitat dengan arus yang cukup kuat untuk membawa makanan, seperti dasar laut berbatu atau berpasir kasar. Contohnya adalah teritip, spons, dan kerang. Deposit feeding adalah strategi menelan sedimen dasar untuk mengekstrak materi organik yang terkandung di dalamnya. Strategi ini dominan di habitat berarus lemah di mana partikel halus dan detritus dapat mengendap, seperti dasar laut berlumpur. Contohnya adalah teripang dan banyak jenis cacing polychaeta." },
+                    { question: "Jelaskan bagaimana komunitas di sekitar ventilasi hidrotermal (hydrothermal vents) dapat berkembang di lingkungan laut dalam yang gelap dan ekstrem, tanpa bergantung pada energi matahari.", answer: "Komunitas ventilasi hidrotermal didasarkan pada kemosintesis, bukan fotosintesis. Bakteri dan archaea kemosintetik menjadi produsen primer dengan memanfaatkan energi kimia dari senyawa seperti hidrogen sulfida (H2S) yang dikeluarkan oleh ventilasi. Bakteri ini kemudian menjadi dasar jaring makanan, baik dengan dimakan langsung oleh hewan lain atau hidup dalam simbiosis mutualistik di dalam jaringan hewan yang lebih besar seperti cacing tabung raksasa (Riftia) dan kerang, menyediakan nutrisi bagi inangnya." },
+                    { question: "Jelaskan perbedaan antara epifauna dan infauna. Berikan masing-masing dua contoh organisme bentik.", answer: "Epifauna adalah organisme bentik yang hidup di atas permukaan substrat (dasar laut). Contohnya adalah bintang laut yang merayap dan spons yang menempel. Infauna adalah organisme bentik yang hidup di dalam substrat, dengan cara menggali atau membuat liang di pasir atau lumpur. Contohnya adalah cacing polychaeta dan kerang." }
+                ]
+            },
+            "Produktivitas & Rantai Makanan": {
+                mcq: [
+                    { question: "Proses di mana produsen primer mengubah karbon anorganik (CO2) menjadi materi organik menggunakan energi cahaya disebut...", options: ["Respirasi", "Dekomposisi", "Kemosintesis", "Fotosintesis"], answer: "Fotosintesis", explanation: "Fotosintesis adalah proses fundamental di mana organisme autotrof seperti fitoplankton menggunakan energi matahari untuk mengubah karbon dioksida dan air menjadi glukosa (materi organik) dan oksigen." },
+                    { question: "Produktivitas primer bersih (Net Primary Production) adalah...", options: ["Produktivitas kotor + Respirasi", "Produktivitas kotor - Respirasi", "Total biomassa produsen", "Laju konsumsi oleh herbivora"], answer: "Produktivitas kotor - Respirasi", explanation: "Produktivitas primer bersih adalah energi yang tersisa setelah produsen menggunakan sebagian untuk respirasi. Energi inilah yang tersedia untuk tingkat trofik berikutnya (herbivora)." },
+                    { question: "Rasio unsur Karbon, Nitrogen, dan Fosfor (C:N:P) pada fitoplankton yang sehat secara umum dikenal sebagai...", options: ["Rasio Eutrofikasi", "Rasio Liebig", "Rasio Redfield", "Rasio Fotosintesis"], answer: "Rasio Redfield", explanation: "Rasio Redfield adalah perkiraan rasio atom C:N:P sebesar 106:16:1 yang ditemukan pada biomassa fitoplankton laut. Rasio ini penting dalam memahami siklus nutrien di lautan." },
+                    { question: "Kedalaman di mana laju fotosintesis sama dengan laju respirasi disebut...", options: ["Zona fotik", "Kedalaman kritis", "Kedalaman kompensasi", "Termoklin"], answer: "Kedalaman kompensasi", explanation: "Pada kedalaman kompensasi, produksi oksigen oleh fotosintesis tepat seimbang dengan konsumsi oksigen oleh respirasi. Di atas kedalaman ini, ada produksi bersih; di bawahnya, ada konsumsi bersih." },
+                    { question: "Dalam piramida energi, berapa persen kira-kira energi yang ditransfer dari satu tingkat trofik ke tingkat trofik berikutnya?", options: ["1%", "10%", "50%", "90%"], answer: "10%", explanation: "Efisiensi transfer energi antar tingkat trofik rata-rata hanya sekitar 10%. Sisanya hilang sebagai panas melalui respirasi atau tidak dikonsumsi. Ini membatasi jumlah tingkat trofik dalam suatu ekosistem." },
+                    { question: "Organisme yang memakan produsen primer (tumbuhan/alga) disebut...", options: ["Karnivora", "Herbivora", "Dekomposer", "Detritivor"], answer: "Herbivora", explanation: "Herbivora adalah konsumen primer yang menempati tingkat trofik kedua. Di laut, contoh utamanya adalah zooplankton yang memakan fitoplankton." },
+                    { question: "Jalur aliran energi dan materi melalui bakteri dan protista heterotrofik, yang mendaur ulang bahan organik terlarut, dikenal sebagai...", options: ["Pompa biologis", "Jaring makanan detritus", "Lingkaran mikroba (microbial loop)", "Rantai makanan grazing"], answer: "Lingkaran mikroba (microbial loop)", explanation: "Lingkaran mikroba adalah jalur penting di mana karbon organik terlarut (DOC) dimanfaatkan kembali oleh bakteri, yang kemudian dimakan oleh protista, dan akhirnya masuk kembali ke jaring makanan klasik." },
+                    { question: "Jika 10.000 unit energi tersedia pada tingkat produsen primer, berapa banyak energi yang akan tersedia untuk konsumen tersier (tingkat trofik ke-4)?", options: ["1000 unit", "100 unit", "10 unit", "1 unit"], answer: "10 unit", explanation: "Dengan asumsi efisiensi 10% per tingkat: Produsen (10.000) -> Konsumen Primer (1.000) -> Konsumen Sekunder (100) -> Konsumen Tersier (10)." },
+                    { question: "Kedalaman di mana total fotosintesis di seluruh kolom air di atasnya sama dengan total respirasi disebut...", options: ["Kedalaman kompensasi", "Kedalaman kritis", "Termoklin", "Piknoklin"], answer: "Kedalaman kritis", explanation: "Kedalaman kritis adalah konsep populasi. Jika kedalaman pencampuran oleh angin melebihi kedalaman kritis, maka biomassa fitoplankton secara keseluruhan akan menurun karena terlalu banyak sel yang terbawa ke bawah zona fotik." },
+                    { question: "Pengukuran biomassa fitoplankton di area yang luas paling efisien dilakukan dengan...", options: ["Menghitung sel di bawah mikroskop", "Metode botol terang-gelap", "Penginderaan jauh satelit (warna laut)", "Mengukur silika terlarut"], answer: "Penginderaan jauh satelit (warna laut)", explanation: "Satelit seperti SeaWiFS dapat mengukur warna laut, yang berkorelasi dengan konsentrasi klorofil. Ini memungkinkan pemetaan biomassa fitoplankton dalam skala global." },
+                    { question: "Manakah dari berikut ini yang merupakan konsumen primer dalam jaring makanan laut?", options: ["Diatom", "Hiu", "Copepoda", "Tuna"], answer: "Copepoda", explanation: "Copepoda adalah zooplankton herbivora yang memakan fitoplankton (produsen primer), sehingga mereka adalah konsumen primer." },
+                    { question: "Dua faktor abiotik utama yang membatasi produktivitas primer di sebagian besar lautan adalah...", options: ["Suhu dan tekanan", "Salinitas dan oksigen", "Cahaya dan nutrien", "Arus dan gelombang"], answer: "Cahaya dan nutrien", explanation: "Fotosintesis membutuhkan cahaya sebagai sumber energi dan nutrien (seperti nitrat dan fosfat) sebagai bahan baku. Ketersediaan kedua faktor ini paling sering membatasi pertumbuhan fitoplankton." },
+                    { question: "Dalam piramida biomassa di laut terbuka, terkadang biomassa zooplankton (konsumen primer) bisa lebih besar daripada biomassa fitoplankton (produsen). Fenomena ini disebut...", options: ["Piramida terbalik", "Efisiensi trofik tinggi", "Ledakan populasi", "Anomali ekologis"], answer: "Piramida terbalik", explanation: "Piramida biomassa bisa terbalik di ekosistem pelagis karena produsen (fitoplankton) memiliki laju reproduksi yang sangat cepat dan masa hidup yang singkat. Meskipun biomassanya pada satu waktu rendah, produktivitasnya sangat tinggi dan dapat menopang biomassa konsumen yang lebih besar." },
+                    { question: "Kontrol 'Top-Down' dalam jaring makanan berarti bahwa kelimpahan populasi diatur oleh...", options: ["Ketersediaan sumber daya di tingkat bawah", "Faktor fisik seperti suhu", "Predasi dari tingkat trofik di atasnya", "Kompetisi intraspesifik"], answer: "Predasi dari tingkat trofik di atasnya", explanation: "Kontrol top-down terjadi ketika predator mengontrol kelimpahan mangsanya, yang pada gilirannya mempengaruhi tingkat trofik di bawahnya (trophic cascade)." },
+                    { question: "Kontrol 'Bottom-Up' dalam jaring makanan berarti bahwa kelimpahan populasi diatur oleh...", options: ["Jumlah predator", "Penyakit", "Ketersediaan produsen primer dan nutrien", "Migrasi"], answer: "Ketersediaan produsen primer dan nutrien", explanation: "Kontrol bottom-up terjadi ketika ketersediaan sumber daya di dasar jaring makanan (nutrien dan produsen primer) menentukan jumlah energi yang tersedia untuk seluruh ekosistem." },
+                    { question: "Organisme yang memakan detritus (materi organik mati) disebut...", options: ["Herbivora", "Karnivora", "Detritivor", "Autotrof"], answer: "Detritivor", explanation: "Detritivor, seperti teripang dan beberapa jenis cacing, memainkan peran penting dalam mendaur ulang nutrien dengan mengonsumsi partikel organik mati." },
+                    { question: "Dalam rantai makanan detritus, langkah pertama adalah penguraian materi organik mati oleh...", options: ["Herbivora", "Karnivora", "Bakteri dan jamur", "Fitoplankton"], answer: "Bakteri dan jamur", explanation: "Bakteri dan jamur adalah dekomposer utama yang memecah detritus menjadi senyawa yang lebih sederhana, melepaskan nutrien kembali ke lingkungan dan menjadi sumber makanan bagi detritivor." },
+                    { question: "Proses di mana polutan menjadi lebih terkonsentrasi pada organisme di tingkat trofik yang lebih tinggi disebut...", options: ["Bioakumulasi", "Biomagnifikasi", "Bioturbasi", "Biodegradasi"], answer: "Biomagnifikasi", explanation: "Biomagnifikasi terjadi ketika toksin yang persisten (seperti merkuri atau PCB) terakumulasi di jaringan organisme dan konsentrasinya meningkat di setiap level rantai makanan." },
+                    { question: "Kumpulan materi organik yang tenggelam dari permukaan ke laut dalam sering disebut sebagai...", options: ["Hujan nutrien", "Salju laut (Marine snow)", "Detritus pelagis", "Pompa karbonat"], answer: "Salju laut (Marine snow)", explanation: "Salju laut adalah agregat partikel organik yang terus-menerus jatuh dari zona atas lautan. Ini adalah sumber makanan utama bagi banyak organisme di laut dalam." },
+                    { question: "Produktivitas primer di sebagian besar lautan terbuka (jauh dari daratan) seringkali dibatasi oleh ketersediaan...", options: ["Cahaya", "Karbon dioksida", "Nitrogen dan Besi", "Silika"], answer: "Nitrogen dan Besi", explanation: "Di perairan oligotrofik laut terbuka, konsentrasi nitrogen seringkali sangat rendah. Selain itu, besi (Fe) adalah mikronutrien penting yang ketersediaannya sangat terbatas dan dapat membatasi pertumbuhan fitoplankton di area luas yang disebut 'High-Nutrient, Low-Chlorophyll' (HNLC)." }
+                ],
+                essay: [
+                    { question: "Jelaskan konsep 'pompa biologis' (biological pump) dan 'lingkaran mikroba' (microbial loop). Bagaimana kedua proses ini saling berhubungan dalam siklus karbon di lautan?", answer: "Pompa biologis adalah proses di mana karbon dioksida diubah menjadi biomassa organik oleh fitoplankton di permukaan dan kemudian diekspor ke laut dalam melalui partikel yang tenggelam (salju laut, fecal pellet). Ini mengisolasi karbon dari atmosfer untuk waktu yang lama. Lingkaran mikroba adalah jalur di mana karbon organik terlarut (DOC), yang tidak dapat tenggelam, dimanfaatkan oleh bakteri. Bakteri ini kemudian dimakan oleh protista, yang pada gilirannya dimakan oleh zooplankton, sehingga memasukkan kembali karbon yang tadinya 'hilang' ke dalam jaring makanan dan berpotensi masuk ke pompa biologis melalui fecal pellet zooplankton." },
+                     { question: "Jelaskan konsep 'efisiensi ekologis' dalam transfer energi antar tingkat trofik dan mengapa hal ini membatasi panjang rantai makanan.", answer: "Efisiensi ekologis adalah persentase energi yang berhasil ditransfer dari satu tingkat trofik ke tingkat trofik berikutnya. Rata-rata, efisiensi ini hanya sekitar 10%. Artinya, 90% energi hilang di setiap tingkatan, sebagian besar sebagai panas metabolik melalui respirasi. Karena kehilangan energi yang besar di setiap langkah, tidak ada cukup energi yang tersisa untuk mendukung populasi yang stabil pada tingkat trofik yang sangat tinggi. Inilah sebabnya mengapa rantai makanan jarang memiliki lebih dari 4 atau 5 tingkatan." },
+                     { question: "Apa yang dimaksud dengan produktivitas primer dan sekunder? Berikan contoh organisme yang bertanggung jawab untuk masing-masing tingkat produksi di ekosistem laut pelagis.", answer: "Produktivitas primer adalah laju pembentukan biomassa organik dari senyawa anorganik oleh produsen (autotrof). Di laut pelagis, ini terutama dilakukan oleh fitoplankton melalui fotosintesis. Produktivitas sekunder adalah laju pembentukan biomassa oleh konsumen (heterotrof) yang memakan produsen. Di laut pelagis, ini terutama dilakukan oleh zooplankton herbivora (konsumen primer) yang memakan fitoplankton." }
+                ]
+            },
+            "Ekosistem Pesisir": {
+                mcq: [
+                    { question: "Simbiosis antara polip karang dan alga mikroskopis yang hidup di dalam jaringannya disebut...", options: ["Parasitisme", "Komensalisme", "Mutualisme dengan zooxanthellae", "Predasi"], answer: "Mutualisme dengan zooxanthellae", explanation: "Polip karang dan zooxanthellae memiliki hubungan mutualisme. Zooxanthellae melakukan fotosintesis dan memberikan nutrisi kepada karang, sementara karang memberikan perlindungan dan senyawa anorganik." },
+                    { question: "Fenomena di mana karang kehilangan zooxanthellae akibat stres (misalnya suhu air yang terlalu tinggi) disebut...", options: ["Kalsifikasi", "Pemutihan karang (coral bleaching)", "Penyakit karang", "Eutrofikasi"], answer: "Pemutihan karang (coral bleaching)", explanation: "Coral bleaching terjadi ketika karang yang stres mengeluarkan zooxanthellae dari jaringannya, menyebabkan karang kehilangan warnanya dan menjadi putih. Jika stres berlanjut, karang bisa mati." },
+                    { question: "Metode monitoring kesehatan terumbu karang yang menggunakan foto kuadrat di sepanjang garis transek disebut...", options: ["Line Intercept Transect (LIT)", "Underwater Photo Transect (UPT)", "Belt Transect", "Visual Census"], answer: "Underwater Photo Transect (UPT)", explanation: "UPT adalah metode di mana foto-foto dasar perairan diambil pada interval tertentu di sepanjang garis transek. Foto-foto ini kemudian dianalisis untuk menentukan persentase tutupan karang hidup, karang mati, alga, dll." },
+                    { question: "Lamun (seagrass) diklasifikasikan sebagai...", options: ["Alga (rumput laut)", "Tumbuhan berbunga (Angiospermae)", "Lumut laut", "Paku-pakuan laut"], answer: "Tumbuhan berbunga (Angiospermae)", explanation: "Berbeda dengan alga, lamun adalah tumbuhan tingkat tinggi yang memiliki akar, rimpang (rhizoma), daun, bunga, dan biji sejati, serta telah beradaptasi sepenuhnya untuk hidup terendam di air laut." },
+                    { question: "Fungsi ekologis utama padang lamun adalah sebagai...", options: ["Penghasil utama oksigen global", "Habitat, tempat asuhan (nursery ground), dan penstabil sedimen", "Bahan baku industri farmasi", "Penahan gelombang tsunami"], answer: "Habitat, tempat asuhan (nursery ground), dan penstabil sedimen", explanation: "Padang lamun menyediakan habitat kompleks bagi banyak biota, berfungsi sebagai area pembesaran bagi larva ikan dan invertebrata, serta sistem akarnya yang padat membantu menstabilkan sedimen dan menjaga kejernihan air." },
+                    { question: "Mamalia laut herbivora yang sangat bergantung pada padang lamun sebagai sumber makanan utamanya adalah...", options: ["Lumba-lumba", "Paus bungkuk", "Dugong (duyung)", "Anjing laut"], answer: "Dugong (duyung)", explanation: "Dugong adalah spesialis pemakan lamun. Kesehatan populasi dugong sangat erat kaitannya dengan ketersediaan dan kesehatan ekosistem padang lamun." },
+                    { question: "Tumbuhan mangrove beradaptasi dengan lingkungan salin dan anaerobik melalui struktur akar khusus yang disebut...", options: ["Akar gantung dan akar papan", "Akar tunjang dan akar napas (pneumatofor)", "Rimpang dan stolon", "Holdfast"], answer: "Akar tunjang dan akar napas (pneumatofor)", explanation: "Akar tunjang (pada Rhizophora) memberikan stabilitas di lumpur lunak, sementara akar napas (pada Avicennia dan Sonneratia) tumbuh ke atas untuk mendapatkan oksigen dari udara karena sedimen mangrove bersifat anaerobik (miskin oksigen)." },
+                    { question: "Buah mangrove dari genus Rhizophora yang berbentuk seperti tombak dan bersifat vivipar disebut...", options: ["Biji", "Propagul", "Konifer", "Spora"], answer: "Propagul", explanation: "Propagul adalah embrio yang telah berkecambah dan tumbuh saat masih menempel pada pohon induk (vivipari). Bentuknya yang panjang dan berat membantunya menancap di lumpur saat jatuh." },
+                    { question: "Jenis mangrove yang memiliki getah putih beracun dan dapat menyebabkan kebutaan sementara adalah...", options: ["Rhizophora apiculata", "Avicennia marina", "Excoecaria agallocha", "Sonneratia alba"], answer: "Excoecaria agallocha", explanation: "Excoecaria agallocha dikenal sebagai pohon buta-buta karena getahnya yang beracun." },
+                    { question: "Jenis lamun yang memiliki daun berbentuk silinder seperti spaghetti adalah...", options: ["Thalassia hemprichii", "Enhalus acoroides", "Syringodium isoetifolium", "Halophila ovalis"], answer: "Syringodium isoetifolium", explanation: "Bentuk daun yang silindris adalah ciri khas dari Syringodium isoetifolium, membedakannya dari lamun lain yang umumnya berpita." },
+                    { question: "Bentuk pertumbuhan karang yang menyerupai semak atau pohon dengan banyak percabangan disebut...", options: ["Masif", "Encrusting", "Tabular", "Branching"], answer: "Branching", explanation: "Karang branching (bercabang) seperti Acropora tumbuh dengan cepat dan menyediakan habitat tiga dimensi yang kompleks bagi banyak ikan dan invertebrata." },
+                    { question: "Ancaman utama bagi ekosistem lamun secara global adalah...", options: ["Penyakit", "Predasi oleh dugong", "Penurunan kualitas air (sedimentasi dan eutrofikasi)", "Pemanasan global"], answer: "Penurunan kualitas air (sedimentasi dan eutrofikasi)", explanation: "Lamun sangat sensitif terhadap kejernihan air. Peningkatan sedimen dan nutrien dari daratan dapat menghalangi cahaya dan memicu pertumbuhan alga epifit yang menutupi daun lamun, menghambat fotosintesis." },
+                    { question: "Perangkat lunak yang umum digunakan untuk menganalisis foto dari metode Underwater Photo Transect (UPT) adalah...", options: ["Photoshop", "ArcGIS", "CPCe (Coral Point Count with Excel extensions)", "Microsoft Excel"], answer: "CPCe (Coral Point Count with Excel extensions)", explanation: "CPCe adalah perangkat lunak yang dirancang khusus untuk menganalisis tutupan bentik dari foto kuadrat dengan metode penempatan titik acak." },
+                    { question: "Jenis mangrove yang memiliki akar napas berbentuk kerucut tumpul adalah dari genus...", options: ["Rhizophora", "Bruguiera", "Sonneratia", "Xylocarpus"], answer: "Sonneratia", explanation: "Genus Sonneratia (pedada atau api-api) dicirikan oleh akar napasnya yang tebal dan berbentuk kerucut yang menonjol dari lumpur." },
+                    { question: "Jenis karang yang tidak membangun terumbu dan tidak memiliki zooxanthellae disebut...", options: ["Hermatipik", "Ahermatipik", "Karang lunak", "Karang api"], answer: "Ahermatipik", explanation: "Karang ahermatipik tidak bergantung pada cahaya matahari dan dapat ditemukan di perairan yang lebih dalam dan lebih dingin. Mereka mendapatkan makanan dengan menangkap partikel dari air." },
+                    { question: "Tipe terumbu karang yang tumbuh di sepanjang garis pantai dan dipisahkan oleh laguna yang dangkal disebut...", options: ["Terumbu karang tepi (fringing reef)", "Terumbu karang penghalang (barrier reef)", "Atol", "Terumbu karang paparan (patch reef)"], answer: "Terumbu karang tepi (fringing reef)", explanation: "Fringing reef adalah tipe terumbu karang yang paling umum, tumbuh langsung dari pantai atau dipisahkan oleh perairan sempit dan dangkal." },
+                    { question: "Contoh dari atol yang terkenal adalah...", options: ["Great Barrier Reef", "Maladewa (Maldives)", "Raja Ampat", "Florida Keys"], answer: "Maladewa (Maldives)", explanation: "Maladewa adalah negara kepulauan yang sebagian besar terdiri dari atol, yaitu terumbu karang berbentuk cincin yang mengelilingi laguna pusat, terbentuk dari terumbu yang tumbuh di sekitar pulau vulkanik yang tenggelam." },
+                    { question: "Bentuk reproduksi pada karang di mana mereka melepaskan sperma dan sel telur secara massal ke kolom air pada waktu yang bersamaan disebut...", options: ["Fragmentasi", "Budding", "Broadcast spawning", "Vivipari"], answer: "Broadcast spawning", explanation: "Broadcast spawning adalah strategi reproduksi sinkron yang meningkatkan peluang pembuahan. Peristiwa ini seringkali terkait dengan siklus bulan." },
+                    { question: "Kemampuan mangrove untuk mengeluarkan kelebihan garam dari jaringannya disebut...", options: ["Ultrafiltrasi", "Sekresi garam", "Osmoregulasi", "Ekskresi"], answer: "Sekresi garam", explanation: "Banyak spesies mangrove (seperti Avicennia) memiliki kelenjar garam pada daunnya yang secara aktif mengeluarkan kelebihan garam yang diserap dari air laut." },
+                    { question: "Hutan mangrove memiliki nilai penting sebagai 'blue carbon' karena...", options: ["Daunnya berwarna biru kehijauan", "Menyerap karbon dioksida lebih efisien daripada hutan darat", "Menyimpan sejumlah besar karbon dalam sedimen anaerobiknya", "Hidup di laut biru"], answer: "Menyimpan sejumlah besar karbon dalam sedimen anaerobiknya", explanation: "Ekosistem 'blue carbon' (mangrove, lamun, rawa garam) sangat efektif dalam menyerap dan menyimpan karbon dalam jangka panjang di dalam tanah atau sedimennya yang jenuh air dan miskin oksigen." },
+                    { question: "Organisme yang hidup menempel pada permukaan lain, seperti alga epifit yang tumbuh di daun lamun, disebut...", options: ["Infauna", "Epifauna", "Epifit", "Parasit"], answer: "Epifit", explanation: "Epifit adalah organisme (biasanya tumbuhan atau alga) yang tumbuh menumpang pada organisme lain tanpa merugikannya. Alga epifit pada daun lamun adalah sumber makanan penting bagi banyak hewan kecil." },
+                    { question: "Di ekosistem terumbu karang, ikan herbivora seperti ikan kakatua (parrotfish) dan jabing (surgeonfish) memiliki peran penting dalam...", options: ["Membersihkan parasit dari ikan lain", "Mengontrol populasi alga", "Membantu penyerbukan karang", "Membangun struktur terumbu"], answer: "Mengontrol populasi alga", explanation: "Ikan herbivora ini memakan alga yang tumbuh di terumbu. Tanpa mereka, alga dapat tumbuh berlebihan dan menutupi karang, menghambat pertumbuhan dan kesehatan terumbu secara keseluruhan." },
+                    { question: "Proses di mana hewan seperti ikan kakatua mengikis bio-karbonat dari terumbu karang saat makan, yang berkontribusi pada produksi pasir, disebut...", options: ["Bioturbasi", "Bioerosi", "Sedimentasi", "Kalsifikasi"], answer: "Bioerosi", explanation: "Bioerosi adalah pengikisan substrat keras oleh organisme hidup. Ikan kakatua adalah salah satu agen bioerosi terpenting di terumbu karang, membantu mengontrol alga dan mendaur ulang kalsium karbonat." },
+                    { question: "Sistem perakaran lamun yang kompleks dan saling berhubungan di bawah sedimen disebut...", options: ["Jaringan miselium", "Jaringan rimpang (rhizome)", "Sistem akar tunggang", "Sistem akar serabut"], answer: "Jaringan rimpang (rhizome)", explanation: "Rimpang adalah batang horizontal di bawah tanah yang memungkinkan lamun menyebar secara vegetatif, menstabilkan sedimen, dan menyimpan cadangan energi." },
+                    { question: "Bentuk pertumbuhan karang yang menyerupai meja disebut...", options: ["Mencabang (branching)", "Masif (massive)", "Lembaran (encrusting)", "Tabular"], answer: "Tabular", explanation: "Bentuk pertumbuhan tabular, seperti pada banyak karang Acropora, sangat efisien dalam menangkap cahaya matahari di lingkungan yang kompetitif." },
+                ],
+                essay: [
+                    { question: "Apa yang dimaksud dengan pemutihan karang (coral bleaching)? Jelaskan penyebab utamanya dan dampaknya terhadap ekosistem terumbu karang.", answer: "Pemutihan karang adalah proses di mana karang yang mengalami stres mengeluarkan alga simbionnya (zooxanthellae). Karena alga ini memberikan warna pada karang, karang yang ditinggalkan menjadi pucat atau putih. Penyebab utamanya adalah stres termal, yaitu suhu air laut yang terlalu hangat untuk periode yang lama. Dampaknya sangat merusak: karang yang memutih kehilangan sumber makanan utamanya dan jika kondisi stres tidak membaik, karang akan mati. Kematian karang massal menyebabkan hilangnya struktur terumbu, yang mengakibatkan hilangnya habitat bagi ribuan spesies lain dan penurunan fungsi perlindungan pantai." },
+                    { question: "Jelaskan tiga fungsi ekologis utama dari ekosistem padang lamun.", answer: "1. Sebagai habitat dan tempat asuhan (nursery): Struktur tiga dimensi padang lamun menyediakan tempat berlindung dan makanan bagi berbagai jenis ikan, krustasea, dan moluska, terutama pada tahap juvenil mereka. 2. Penstabil sedimen dan penjaga kualitas air: Sistem akar dan rimpang lamun yang padat mengikat sedimen dasar, mencegah erosi. Daunnya memperlambat aliran air, menyebabkan partikel tersuspensi mengendap, sehingga meningkatkan kejernihan air. 3. Produsen primer dan dasar jaring makanan: Lamun sangat produktif dan menjadi sumber makanan langsung bagi herbivora besar seperti dugong dan penyu hijau, serta menjadi dasar jaring makanan detritus ketika daunnya mati dan diuraikan." },
+                    { question: "Sebutkan dan jelaskan setidaknya tiga adaptasi unik mangrove untuk bertahan hidup di lingkungan pesisir yang ekstrem (salinitas tinggi, substrat lumpur anaerobik).", answer: "1. Akar Napas (Pneumatofor): Seperti pada Avicennia, akar ini tumbuh vertikal ke atas menembus lumpur untuk mengambil oksigen langsung dari atmosfer, mengatasi kondisi tanah yang anaerobik (tanpa oksigen). 2. Ultrafiltrasi & Sekresi Garam: Beberapa mangrove (misalnya Rhizophora) dapat menyaring sebagian besar garam di akarnya (ultrafiltrasi). Yang lain (misalnya Avicennia) menyerap air asin tetapi kemudian mengeluarkan kelebihan garam melalui kelenjar khusus di daunnya. 3. Vivipari (Propagul): Benih mangrove berkecambah dan tumbuh menjadi anakan (propagul) saat masih menempel di pohon induk. Propagul yang sudah berkembang ini memiliki peluang lebih besar untuk bertahan hidup dan menancap di lumpur saat jatuh." },
+                    { question: "Jelaskan konsep konektivitas antara ekosistem mangrove, padang lamun, dan terumbu karang. Mengapa ketiganya sering disebut sebagai satu kesatuan fungsional?", answer: "Ketiga ekosistem ini saling terhubung secara fisik dan biologis. Mangrove dan lamun berfungsi sebagai 'filter', menjebak sedimen dan menyerap nutrien berlebih dari daratan yang dapat merusak terumbu karang. Ketiganya juga terhubung oleh siklus hidup banyak spesies. Misalnya, beberapa spesies ikan menghabiskan masa larvanya di laut terbuka, masa remajanya di padang lamun atau mangrove (sebagai tempat asuhan yang aman), dan masa dewasanya di terumbu karang. Rusaknya salah satu ekosistem akan berdampak negatif pada kesehatan ekosistem lainnya." }
+                ]
+            }
+        };
+
+        // --- Logika Kuis ---
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const topicSelection = document.getElementById('topic-selection');
+        const quizTopicTitle = document.getElementById('quiz-topic-title');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const essayContainer = document.getElementById('essay-container');
+        const essayAnswer = document.getElementById('essay-answer');
+        const questionCounter = document.getElementById('question-counter');
+        const scoreElement = document.getElementById('score');
+        const topicScoresBreakdown = document.getElementById('topic-scores-breakdown');
+        const answersReview = document.getElementById('answers-review');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const modal = document.getElementById('explanationModal');
+        const navPanel = document.getElementById('nav-panel');
+        const navGrid = document.getElementById('nav-grid');
+        const progressBar = document.getElementById('progress-bar');
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let activeQuestions = [];
+        let selectedOptionElement = null;
+        let currentTopic = '';
+
+        function initializeTopicSelection() {
+            topicSelection.innerHTML = '';
+            const topics = Object.keys(quizDataCategorized);
+            topics.forEach(topic => {
+                const button = document.createElement('button');
+                button.textContent = topic;
+                button.classList.add('topic-button', 'w-full', 'p-4', 'bg-white', 'border-2', 'border-blue-300', 'rounded-lg', 'text-blue-700', 'font-semibold', 'hover:bg-blue-50');
+                button.onclick = () => startQuiz(topic);
+                topicSelection.appendChild(button);
+            });
+            const allButton = document.createElement('button');
+            allButton.textContent = 'Semua Topik';
+            allButton.classList.add('topic-button', 'w-full', 'p-4', 'bg-blue-600', 'text-white', 'font-bold', 'rounded-lg', 'md:col-span-2');
+            allButton.onclick = () => startQuiz('Semua Topik');
+            topicSelection.appendChild(allButton);
+        }
+
+        function startQuiz(topic) {
+            currentTopic = topic;
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            resultScreen.classList.add('hidden');
+            
+            if (topic === 'Semua Topik') {
+                activeQuestions = [];
+                Object.keys(quizDataCategorized).forEach(catName => {
+                    const category = quizDataCategorized[catName];
+                    activeQuestions.push(...category.mcq.map(q => ({...q, topic: catName})));
+                    activeQuestions.push(...category.essay.map(q => ({...q, topic: catName})));
+                });
+            } else {
+                const category = quizDataCategorized[topic];
+                activeQuestions = [
+                    ...category.mcq.map(q => ({...q, topic})),
+                    ...category.essay.map(q => ({...q, topic}))
+                ];
+            }
+            
+            activeQuestions = shuffleArray(activeQuestions);
+
+            quizTopicTitle.textContent = topic;
+            currentQuestionIndex = 0;
+            userAnswers = Array(activeQuestions.length).fill(null).map((_, i) => ({
+                question: activeQuestions[i].question,
+                userAnswer: null,
+                correctAnswer: activeQuestions[i].answer,
+                isCorrect: null,
+                explanation: activeQuestions[i].explanation,
+                type: activeQuestions[i].options ? 'mcq' : 'essay',
+                topic: activeQuestions[i].topic
+            }));
+            
+            populateNavPanel();
+            loadQuiz();
+        }
+        
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function populateNavPanel() {
+            navGrid.innerHTML = '';
+            activeQuestions.forEach((_, index) => {
+                const btn = document.createElement('button');
+                btn.innerHTML = `<span>${index + 1}</span>`;
+                btn.classList.add('nav-btn', 'p-2', 'rounded-md', 'transition-colors', 'duration-200', 'flex', 'items-center', 'justify-center');
+                btn.onclick = () => jumpToQuestion(index);
+                navGrid.appendChild(btn);
+            });
+        }
+
+        function updateNavPanel() {
+            const navButtons = navGrid.children;
+            const checkmarkSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-check-lg inline-block ml-1" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/></svg>`;
+
+            for (let i = 0; i < navButtons.length; i++) {
+                navButtons[i].classList.remove('current', 'answered');
+                navButtons[i].innerHTML = `<span>${i + 1}</span>`; 
+
+                if (userAnswers[i] && userAnswers[i].userAnswer !== null && userAnswers[i].userAnswer !== '') {
+                    navButtons[i].classList.add('answered');
+                    navButtons[i].innerHTML = `<span>${i + 1}</span>${checkmarkSVG}`;
+                }
+                if (i === currentQuestionIndex) {
+                    navButtons[i].classList.add('current');
+                }
+            }
+        }
+
+        function toggleNavPanel() {
+            navPanel.classList.toggle('hidden');
+            if (!navPanel.classList.contains('hidden')) {
+                updateNavPanel();
+            }
+        }
+
+        function jumpToQuestion(index) {
+            saveCurrentAnswer();
+            currentQuestionIndex = index;
+            loadQuiz();
+            toggleNavPanel();
+        }
+
+        function saveCurrentAnswer() {
+            const currentQuestion = activeQuestions[currentQuestionIndex];
+            let userAnswer = null;
+
+            if (currentQuestion.options) {
+                const selected = optionsContainer.querySelector('.selected');
+                if (selected) userAnswer = selected.textContent;
+            } else {
+                if (essayAnswer.value.trim() !== '') userAnswer = essayAnswer.value.trim();
+            }
+
+            userAnswers[currentQuestionIndex].userAnswer = userAnswer;
+            if (currentQuestion.options) {
+                userAnswers[currentQuestionIndex].isCorrect = (userAnswer === currentQuestion.answer);
+            }
+        }
+
+        function loadQuiz() {
+            deselectOptions();
+            const currentQuestionData = userAnswers[currentQuestionIndex];
+            questionText.textContent = currentQuestionData.question;
+            questionCounter.textContent = `Soal ${currentQuestionIndex + 1} / ${activeQuestions.length}`;
+            progressBar.style.width = `${((currentQuestionIndex + 1) / activeQuestions.length) * 100}%`;
+
+            if (currentQuestionData.type === 'mcq') {
+                optionsContainer.classList.remove('hidden');
+                essayContainer.classList.add('hidden');
+                optionsContainer.innerHTML = '';
+                const options = activeQuestions[currentQuestionIndex].options;
+                options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.classList.add('quiz-option', 'w-full', 'p-4', 'border-2', 'rounded-lg', 'text-left', 'hover:bg-blue-100', 'transition', 'duration-200');
+                    button.onclick = () => selectAnswer(button);
+                    if (option === currentQuestionData.userAnswer) {
+                        button.classList.add('selected');
+                        selectedOptionElement = button;
+                    }
+                    optionsContainer.appendChild(button);
+                });
+            } else {
+                optionsContainer.classList.add('hidden');
+                essayContainer.classList.remove('hidden');
+                essayAnswer.value = currentQuestionData.userAnswer || '';
+            }
+            
+            prevBtn.style.visibility = currentQuestionIndex === 0 ? 'hidden' : 'visible';
+            nextBtn.textContent = currentQuestionIndex === activeQuestions.length - 1 ? 'Selesai' : 'Selanjutnya';
+        }
+
+        function selectAnswer(buttonElement) {
+            deselectOptions();
+            selectedOptionElement = buttonElement;
+            buttonElement.classList.add('selected');
+        }
+
+        function deselectOptions() {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(option => option.classList.remove('selected'));
+            selectedOptionElement = null;
+        }
+        
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                saveCurrentAnswer();
+                currentQuestionIndex--;
+                loadQuiz();
+            }
+        }
+
+        function nextQuestion() {
+            saveCurrentAnswer();
+            if (currentQuestionIndex < activeQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuiz();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            saveCurrentAnswer();
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            const topicScores = {};
+            userAnswers.forEach(answer => {
+                if (answer.type !== 'mcq') return;
+                if (!topicScores[answer.topic]) {
+                    topicScores[answer.topic] = { correct: 0, total: 0 };
+                }
+                topicScores[answer.topic].total++;
+                if (answer.isCorrect) {
+                    topicScores[answer.topic].correct++;
+                }
+            });
+
+            topicScoresBreakdown.innerHTML = '<h3 class="text-xl font-bold mb-4">Rincian Skor per Topik (Pilihan Ganda)</h3>';
+            let totalCorrect = 0;
+            let totalQuestions = 0;
+
+            const sortedTopics = Object.keys(quizDataCategorized).sort();
+
+            sortedTopics.forEach(topic => {
+                if (topicScores[topic] && topicScores[topic].total > 0) {
+                    const score = topicScores[topic];
+                    totalCorrect += score.correct;
+                    totalQuestions += score.total;
+                    const percentage = score.total > 0 ? ((score.correct / score.total) * 100).toFixed(0) : 0;
+                    topicScoresBreakdown.innerHTML += `
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-semibold">${topic}</span>
+                            <span class="font-bold">${score.correct}/${score.total} (${percentage}%)</span>
+                        </div>
+                    `;
+                }
+            });
+
+            if (totalQuestions > 0) {
+                topicScoresBreakdown.innerHTML += `<hr class="my-2"><div class="flex justify-between items-center mt-2">
+                    <span class="font-bold text-lg text-blue-600">Skor Total</span>
+                    <span class="font-bold text-lg text-blue-600">${totalCorrect}/${totalQuestions}</span>
+                </div>`;
+            } else {
+                 topicScoresBreakdown.innerHTML += `<p>Tidak ada soal pilihan ganda yang dikerjakan.</p>`;
+            }
+
+
+            answersReview.innerHTML = '';
+            userAnswers.forEach((answer, index) => {
+                const reviewItem = document.createElement('div');
+                reviewItem.classList.add('p-4', 'mb-4', 'border', 'rounded-lg');
+                
+                let answerStatusHtml = '';
+                if (answer.type === 'mcq') {
+                    if (answer.isCorrect) {
+                        reviewItem.classList.add('bg-green-50', 'border-green-200');
+                        answerStatusHtml = `<p class="mt-2"><strong>Jawaban Anda:</strong> <span class="text-green-700">${answer.userAnswer} (Benar)</span></p>`;
+                    } else {
+                        reviewItem.classList.add('bg-red-50', 'border-red-200');
+                        answerStatusHtml = `
+                            <p class="mt-2"><strong>Jawaban Anda:</strong> <span class="text-red-700">${answer.userAnswer || '(Tidak dijawab)'} (Salah)</span></p>
+                            <p class="mt-1"><strong>Jawaban Benar:</strong> <span class="text-green-700">${answer.correctAnswer}</span></p>
+                        `;
+                    }
+                } else {
+                     reviewItem.classList.add('bg-blue-50', 'border-blue-200');
+                     answerStatusHtml = `
+                        <p class="mt-2"><strong>Jawaban Anda (Esai):</strong></p>
+                        <p class="italic text-gray-700 p-2 bg-white rounded">${answer.userAnswer || '(Tidak dijawab)'}</p>
+                     `;
+                }
+
+                reviewItem.innerHTML = `
+                    <p class="font-semibold">${index + 1}. ${answer.question}</p>
+                    <p class="text-xs text-gray-500">Topik: ${answer.topic}</p>
+                    ${answerStatusHtml}
+                    <button onclick="showExplanation(${index})" class="mt-2 text-sm text-blue-600 hover:underline">Lihat Penjelasan</button>
+                `;
+                answersReview.appendChild(reviewItem);
+            });
+        }
+        
+        function restartQuiz() {
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
+
+        function showExplanation(index) {
+            const answer = userAnswers[index];
+            document.getElementById('modal-question').textContent = answer.question;
+            document.getElementById('modal-correct-answer').textContent = answer.correctAnswer;
+            document.getElementById('modal-explanation').textContent = answer.explanation || "Penjelasan untuk soal esai didasarkan pada kunci jawaban yang tersedia.";
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.querySelector('div').classList.remove('scale-95'), 10);
+        }
+
+        function closeModal() {
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // Initialize
+        window.onload = initializeTopicSelection;
+
+    </script>
+</body>
+</html>
