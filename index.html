@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kuis Interaktif Oseanografi Biologi</title>
+    <title>Kuis Osbio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -34,6 +34,567 @@
             font-weight: bold;
         }
         .topic-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .topic-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
+    <div id="quiz-container" class="w-full max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+        <!-- Layar Awal (Pemilihan Topik) -->
+        <div id="start-screen">
+            <h1 class="text-3xl sm:text-4xl font-bold text-center text-blue-600 mb-4">Kuis Biologi & Oseanografi</h1>
+            <p class="text-center text-gray-600 mb-8">Pilih topik untuk memulai kuis.</p>
+            <div id="topic-selection" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Tombol topik akan di-generate oleh JavaScript -->
+            </div>
+        </div>
+
+        <!-- Layar Kuis -->
+        <div id="quiz-screen" class="hidden">
+            <div class="flex justify-between items-start mb-2">
+                 <div>
+                    <h2 id="quiz-topic-title" class="text-2xl font-bold text-blue-600"></h2>
+                    <button id="nav-toggle-btn" onclick="toggleNavPanel()" class="text-sm text-blue-600 hover:underline mt-1">
+                        Navigasi Soal
+                    </button>
+                </div>
+                <span id="question-counter" class="text-lg font-semibold text-gray-500 text-right"></span>
+            </div>
+            
+             <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"></div>
+            </div>
+            
+            <div id="question-card" class="bg-blue-50 border-2 border-blue-200 p-6 rounded-xl min-h-[150px] flex items-center justify-center mb-6">
+                <p id="question-text" class="text-center text-lg sm:text-xl"></p>
+            </div>
+
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
+            <div id="essay-container" class="hidden mb-6">
+                 <textarea id="essay-answer" class="w-full p-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" rows="6" placeholder="Ketik jawaban esai Anda di sini..."></textarea>
+            </div>
+
+            <div class="flex justify-between items-center mt-8">
+                 <button id="prev-btn" onclick="prevQuestion()" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition duration-300">Sebelumnya</button>
+                 <button onclick="showResults()" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition duration-300">Lihat Hasil</button>
+                 <button id="next-btn" onclick="nextQuestion()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300">Selanjutnya</button>
+            </div>
+        </div>
+
+        <!-- Layar Hasil -->
+        <div id="result-screen" class="hidden text-center">
+            <h2 class="text-3xl font-bold text-blue-600 mb-4">Hasil Kuis</h2>
+            <div id="topic-scores-breakdown" class="mb-8 text-left border rounded-lg p-4">
+                <!-- Rincian skor per topik akan ditampilkan di sini -->
+            </div>
+            <p class="text-lg mb-6">Tinjau jawaban Anda di bawah ini:</p>
+            <div id="answers-review" class="text-left max-h-[40vh] overflow-y-auto p-4 bg-gray-50 rounded-lg border"></div>
+            <div class="mt-8 flex justify-center space-x-4">
+                <button onclick="restartQuiz()" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300">
+                    Kembali ke Awal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Navigasi -->
+    <div id="nav-panel" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-40" onclick="toggleNavPanel()">
+        <div class="bg-white rounded-2xl p-6 max-w-3xl w-full shadow-2xl" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-bold mb-4">Lompat ke Soal</h3>
+            <div id="nav-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2 max-h-[60vh] overflow-y-auto p-2"></div>
+            <div class="mt-6 text-right">
+                <button onclick="toggleNavPanel()" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Penjelasan -->
+    <div id="explanationModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50" onclick="closeModal()">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl transform transition-transform duration-300 scale-95" onclick="event.stopPropagation()">
+            <h3 class="text-2xl font-bold text-blue-600 mb-4" id="modal-question"></h3>
+            <p class="text-lg mb-2 font-semibold">Jawaban yang Benar:</p>
+            <p class="text-green-600 bg-green-100 p-3 rounded-lg mb-4" id="modal-correct-answer"></p>
+            <p class="text-lg mb-2 font-semibold">Penjelasan:</p>
+            <p id="modal-explanation" class="text-gray-700"></p>
+            <div class="mt-6 text-right">
+                <button onclick="closeModal()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Data Kuis (Dikelompokkan per Topik) ---
+        const quizDataCategorized = {
+            "Pendahuluan Oseanografi Biologi": {
+                mcq: [
+                    { question: "Bidang ilmu yang mempelajari distribusi organisme berdasarkan letak geografisnya adalah...", options: ["Biokimia", "Biofisika", "Biogeografi", "Bioekonomi"], answer: "Biogeografi", explanation: "Biogeografi adalah cabang ilmu yang menggabungkan biologi dan geografi untuk mempelajari distribusi spasial organisme hidup." },
+                    { question: "Menurut Steve Jobs, inovasi terbesar abad ke-21 akan berada di persimpangan antara biologi dan...", options: ["Seni", "Teknologi", "Ekonomi", "Sejarah"], answer: "Teknologi", explanation: "Steve Jobs memprediksi bahwa kombinasi biologi dan teknologi akan mendorong inovasi-inovasi besar di era modern, seperti yang terlihat pada bioinformatika dan bioteknologi." },
+                    { question: "Pemanfaatan mikroorganisme untuk membersihkan polutan dari lingkungan, seperti tumpahan minyak, disebut...", options: ["Bioaugmentasi", "Biostimulasi", "Bioremediasi", "Biomagnifikasi"], answer: "Bioremediasi", explanation: "Bioremediasi adalah penggunaan organisme hidup, terutama mikroba, untuk mendegradasi atau menetralisir zat pencemar menjadi bentuk yang kurang beracun." },
+                    { question: "Salmon yang dimodifikasi secara genetik (GM Salmon) dapat tumbuh lebih cepat karena disisipkan gen hormon pertumbuhan dari...", options: ["Ikan Tuna dan Ikan Pout", "Ikan Salmon Chinook dan Ikan Pout", "Ikan Kod dan Udang", "Alga dan Bakteri"], answer: "Ikan Salmon Chinook dan Ikan Pout", explanation: "AquAdvantage salmon adalah salmon Atlantik yang disisipi gen hormon pertumbuhan dari salmon Chinook dan promoter gen dari ocean pout agar hormon tersebut aktif sepanjang tahun." },
+                    { question: "Produksi biofuel dari mikroalga dianggap sebagai energi terbarukan karena alga menggunakan proses apa untuk menghasilkan biomassa?", options: ["Respirasi seluler", "Fotosintesis", "Kemosintesis", "Glikolisis"], answer: "Fotosintesis", explanation: "Mikroalga menggunakan energi matahari dan CO2 melalui fotosintesis untuk menghasilkan biomassa kaya lipid, yang kemudian dapat diubah menjadi biodiesel." },
+                    { question: "Ara-A dan Ara-C adalah produk turunan dari biota laut yang digunakan sebagai obat...", options: ["Antibiotik", "Antivirus dan Antikanker", "Penurun kolesterol", "Pereda nyeri"], answer: "Antivirus dan Antikanker", explanation: "Senyawa Ara-A (antivirus) dan Ara-C (antikanker untuk leukemia) berasal dari spons laut (marine sponge) dan merupakan contoh penting produk farmasi dari laut." },
+                    { question: "Studi biologi yang menggunakan pendekatan holistik dengan analisis komputasi dan matematika untuk memahami interaksi kompleks dalam sistem biologis disebut...", options: ["Biologi Molekuler", "Genomik", "Sistem Biologi", "Ekologi"], answer: "Sistem Biologi", explanation: "Sistem Biologi berfokus pada pemahaman sistem secara keseluruhan (holisme) daripada hanya komponen-komponen individualnya (reduksionisme)." },
+                    { question: "Istilah 'in silico' dalam penelitian biologi merujuk pada studi yang dilakukan...", options: ["Di dalam organisme hidup", "Di dalam tabung reaksi", "Melalui simulasi komputer", "Di lapangan"], answer: "Melalui simulasi komputer", explanation: "'In silico' berarti dilakukan di komputer atau melalui simulasi komputasi, berbeda dengan 'in vivo' (dalam organisme hidup) dan 'in vitro' (dalam lingkungan terkontrol seperti lab)." },
+                    { question: "Contoh aplikasi pengetahuan biologi dalam rekayasa adalah pengembangan spidroin (protein jaring laba-laba) sebagai material untuk...", options: ["Bahan bakar", "Rekayasa jaringan (tissue engineering)", "Layar komputer", "Pupuk"], answer: "Rekayasa jaringan (tissue engineering)", explanation: "Spidroin dipelajari untuk digunakan sebagai perancah (scaffold) dalam rekayasa jaringan karena sifatnya yang kuat, biokompatibel, dan dapat terurai secara hayati." },
+                    { question: "Organisme yang dimodifikasi secara genetik (GMO) seperti Golden Rice dirancang untuk meningkatkan kandungan nutrisi berupa...", options: ["Protein", "Zat Besi", "Vitamin A (beta-karoten)", "Vitamin C"], answer: "Vitamin A (beta-karoten)", explanation: "Golden Rice adalah varietas padi yang direkayasa secara genetik untuk menghasilkan beta-karoten, prekursor Vitamin A, untuk mengatasi defisiensi vitamin A di negara berkembang." },
+                    { question: "Sel yang belum terspesialisasi dan memiliki potensi untuk berkembang menjadi berbagai jenis sel khusus disebut...", options: ["Sel Saraf", "Sel Induk (Stem Cell)", "Sel Otot", "Sel Darah Merah"], answer: "Sel Induk (Stem Cell)", explanation: "Sel induk memiliki dua karakteristik utama: kemampuan untuk memperbarui diri (self-renewal) dan kemampuan untuk berdiferensiasi menjadi sel-sel terspesialisasi." },
+                    { question: "CRISPR adalah teknologi revolusioner yang berfungsi sebagai alat untuk...", options: ["Mengurutkan DNA", "Mengedit genom (genome engineering)", "Mengkloning organisme", "Membuat vaksin"], answer: "Mengedit genom (genome engineering)", explanation: "CRISPR-Cas9 adalah sistem yang memungkinkan para ilmuwan untuk memotong, menghapus, atau mengganti sekuens DNA tertentu dengan presisi tinggi." },
+                    { question: "Pembentukan lapisan biofilm pada permukaan benda di laut yang diawali oleh bakteri dan diatom disebut...", options: ["Makrofouling", "Bioakumulasi", "Mikrofouling", "Bioremediasi"], answer: "Mikrofouling", explanation: "Biofouling dimulai dengan tahap mikrofouling, yaitu pembentukan lapisan lendir (biofilm) oleh mikroorganisme, yang kemudian memfasilitasi penempelan organisme yang lebih besar (makrofouling)." },
+                    { question: "Enzim Taq DNA polymerase yang sangat penting untuk reaksi PCR diisolasi dari bakteri yang hidup di...", options: ["Laut dalam", "Sumber air panas (hidrotermal)", "Gurun pasir", "Kutub utara"], answer: "Sumber air panas (hidrotermal)", explanation: "Bakteri Thermus aquaticus (Taq) hidup di suhu yang sangat tinggi, sehingga enzim polimerasenya stabil pada suhu tinggi yang digunakan dalam siklus denaturasi PCR." },
+                    { question: "Green Fluorescent Protein (GFP), yang banyak digunakan sebagai penanda genetik, berasal dari...", options: ["Ubur-ubur (Aequorea victoria)", "Spons laut", "Alga merah", "Bakteri hidrotermal"], answer: "Green Fluorescent Protein (GFP)", explanation: "GFP adalah protein dari ubur-ubur Aequorea victoria yang berpendar hijau di bawah cahaya biru, menjadikannya alat yang sangat berguna dalam biologi molekuler untuk melacak ekspresi gen." }
+                ],
+                essay: [
+                    { question: "Jelaskan mengapa biologi disebut sebagai ilmu interdisipliner. Berikan dua contoh bagaimana biologi berinteraksi dengan disiplin ilmu lain seperti kimia dan fisika.", answer: "Biologi disebut ilmu interdisipliner karena mempelajari kehidupan yang merupakan sistem yang sangat kompleks, sehingga pemahamannya memerlukan prinsip dan metode dari berbagai cabang ilmu lain. Contoh interaksi: 1. Dengan Kimia (Biokimia): Proses fundamental seperti fotosintesis dan respirasi seluler adalah reaksi kimia yang kompleks. Studi tentang struktur dan fungsi makromolekul seperti DNA, protein, dan lipid juga merupakan ranah biokimia. 2. Dengan Fisika (Biofisika): Pergerakan otot dan tulang dapat dianalisis menggunakan prinsip mekanika. Proses transpor zat melintasi membran sel melibatkan konsep gradien konsentrasi dan potensial listrik, yang merupakan konsep fisika." },
+                    { question: "Apa yang dimaksud dengan Genetically Modified Organism (GMO)? Berikan satu contoh GMO di bidang pangan dan jelaskan tujuan dari modifikasi genetik tersebut.", answer: "GMO adalah organisme (hewan, tumbuhan, atau mikroba) yang materi genetiknya (DNA) telah diubah menggunakan teknik rekayasa genetika. Perubahan ini tidak terjadi secara alami melalui perkawinan atau rekombinasi. Contoh: Jagung Bt (Bacillus thuringiensis). Tujuan modifikasi ini adalah untuk membuat tanaman jagung tahan terhadap hama serangga tertentu. Gen dari bakteri Bacillus thuringiensis yang mengkode protein toksin bagi serangga disisipkan ke dalam genom jagung. Akibatnya, tanaman jagung dapat menghasilkan protein toksinnya sendiri, sehingga mengurangi kebutuhan penggunaan pestisida kimia." }
+                ]
+            },
+            "Sel dan Makromolekul": {
+                mcq: [
+                    { question: "Struktur yang membedakan sel tumbuhan dari sel hewan adalah...", options: ["Membran plasma dan mitokondria", "Nukleus dan ribosom", "Dinding sel, kloroplas, dan vakuola sentral", "Retikulum endoplasma dan badan Golgi"], answer: "Dinding sel, kloroplas, dan vakuola sentral", explanation: "Sel tumbuhan memiliki dinding sel kaku untuk struktur, kloroplas untuk fotosintesis, dan vakuola sentral besar untuk menyimpan air dan menjaga tekanan turgor, yang semuanya tidak dimiliki sel hewan." },
+                    { question: "Organel yang berfungsi sebagai pusat pembangkit tenaga sel melalui respirasi seluler adalah...", options: ["Nukleus", "Ribosom", "Mitokondria", "Lisosom"], answer: "Mitokondria", explanation: "Mitokondria adalah tempat terjadinya sebagian besar tahap respirasi seluler yang menghasilkan ATP, molekul energi utama sel." },
+                    { question: "Perbedaan utama antara sel prokariotik dan eukariotik adalah...", options: ["Sel eukariotik memiliki ribosom, sedangkan prokariotik tidak", "Sel prokariotik tidak memiliki nukleus yang terbungkus membran", "Sel prokariotik lebih besar dari sel eukariotik", "Sel eukariotik tidak memiliki membran plasma"], answer: "Sel prokariotik tidak memiliki nukleus yang terbungkus membran", explanation: "Ciri khas sel eukariotik adalah adanya organel yang terikat membran, terutama nukleus yang melindungi materi genetik. Sel prokariotik (seperti bakteri) memiliki DNA di wilayah yang disebut nukleoid, tetapi tidak terbungkus membran." },
+                    { question: "Monomer atau unit dasar penyusun protein adalah...", options: ["Nukleotida", "Asam amino", "Monosakarida", "Asam lemak"], answer: "Asam amino", explanation: "Protein adalah polimer yang terbentuk dari rantai asam amino yang dihubungkan oleh ikatan peptida. Ada 20 jenis asam amino esensial yang menyusun protein dalam organisme hidup." },
+                    { question: "Struktur protein tingkat primer (primary structure) ditentukan oleh...", options: ["Lipatan heliks alfa dan lembaran beta", "Interaksi antar gugus R", "Urutan spesifik asam amino", "Gabungan beberapa subunit polipeptida"], answer: "Urutan spesifik asam amino", explanation: "Struktur primer adalah sekuens linear asam amino dalam rantai polipeptida, yang menjadi dasar bagi semua tingkat struktur protein yang lebih tinggi." },
+                    { question: "Enzim adalah protein yang berfungsi untuk...", options: ["Menyimpan energi", "Menjadi komponen struktural", "Mempercepat reaksi biokimia", "Membawa oksigen"], answer: "Mempercepat reaksi biokimia", explanation: "Enzim bertindak sebagai katalis biologis yang menurunkan energi aktivasi suatu reaksi, sehingga reaksi dapat berlangsung lebih cepat tanpa enzim itu sendiri ikut bereaksi." },
+                    { question: "Contoh polisakarida yang berfungsi sebagai penyimpan energi pada tumbuhan adalah...", options: ["Selulosa", "Glikogen", "Kitin", "Pati (amilum)"], answer: "Pati (amilum)", explanation: "Tumbuhan menyimpan kelebihan glukosa (hasil fotosintesis) dalam bentuk pati, terutama di akar dan biji. Glikogen adalah molekul penyimpan energi pada hewan." },
+                    { question: "Molekul lipid yang merupakan komponen utama membran sel adalah...", options: ["Trigliserida", "Steroid", "Fosfolipid", "Lilin"], answer: "Fosfolipid", explanation: "Fosfolipid memiliki kepala hidrofilik (suka air) dan dua ekor hidrofobik (benci air), yang memungkinkannya membentuk lapisan ganda (bilayer) sebagai dasar struktur membran sel." },
+                    { question: "Lemak tak jenuh (unsaturated fats) biasanya berwujud cair pada suhu ruang karena...", options: ["Memiliki rantai karbon yang lebih panjang", "Adanya ikatan rangkap pada rantai asam lemaknya yang menyebabkan lekukan", "Tidak memiliki gliserol", "Berasal dari hewan"], answer: "Adanya ikatan rangkap pada rantai asam lemaknya yang menyebabkan lekukan", explanation: "Ikatan rangkap menciptakan 'lekukan' pada rantai asam lemak, sehingga molekul-molekulnya tidak dapat tersusun rapat, menjadikannya cair pada suhu ruang (misalnya, minyak nabati)." },
+                    { question: "Kolesterol adalah prekursor untuk sintesis...", options: ["Semua jenis protein", "Hormon steroid seperti testosteron dan estrogen", "Karbohidrat kompleks", "Asam nukleat"], answer: "Hormon steroid seperti testosteron dan estrogen", explanation: "Kolesterol, selain menjadi komponen membran sel hewan, juga merupakan molekul dasar dari mana hormon-hormon steroid disintesis oleh tubuh." },
+                    { question: "Pergerakan air melintasi membran semipermeabel dari area konsentrasi air tinggi ke konsentrasi air rendah disebut...", options: ["Transpor aktif", "Difusi terfasilitasi", "Endositosis", "Osmosis"], answer: "Osmosis", explanation: "Osmosis adalah tipe khusus dari difusi yang hanya melibatkan pergerakan molekul air untuk menyeimbangkan konsentrasi zat terlarut di kedua sisi membran." },
+                    { question: "Ikan air tawar cenderung untuk...", options: ["Kehilangan air ke lingkungan dan menyerap garam secara aktif", "Memperoleh air dari lingkungan dan mengeluarkan garam secara aktif", "Memperoleh air dari lingkungan dan menyerap garam secara aktif", "Kehilangan air dan garam ke lingkungan"], answer: "Memperoleh air dari lingkungan dan menyerap garam secara aktif", explanation: "Karena cairan tubuh ikan lebih asin daripada air tawar di sekitarnya, air cenderung masuk ke tubuhnya melalui osmosis. Untuk mengatasinya, mereka menghasilkan banyak urin encer dan secara aktif menyerap garam melalui insangnya." },
+                    { question: "Sebaliknya, ikan air laut harus terus-menerus...", options: ["Mengeluarkan air dan menyerap garam", "Minum air laut dan mengeluarkan kelebihan garam melalui insang", "Menghasilkan urin yang sangat encer", "Menyerap air melalui kulitnya"], answer: "Minum air laut dan mengeluarkan kelebihan garam melalui insang", explanation: "Ikan air laut cenderung kehilangan air ke lingkungan yang lebih asin. Untuk mengganti cairan, mereka meminum air laut dan memiliki sel-sel khusus di insang (sel klorida) untuk secara aktif memompa keluar kelebihan garam." },
+                    { question: "Bagian sel yang bertanggung jawab untuk sintesis protein adalah...", options: ["Mitokondria", "Lisosom", "Ribosom", "Vakuola"], answer: "Ribosom", explanation: "Ribosom membaca informasi dari mRNA dan merakit asam amino menjadi rantai polipeptida sesuai dengan instruksi genetik." },
+                    { question: "Serat (fiber) dalam makanan, seperti selulosa, adalah jenis karbohidrat yang tidak dapat dicerna oleh manusia karena...", options: ["Terlalu besar untuk diserap", "Manusia tidak memiliki enzim untuk memecah ikatannya", "Bersifat beracun", "Tidak larut dalam air"], answer: "Manusia tidak memiliki enzim untuk memecah ikatannya", explanation: "Selulosa terdiri dari unit glukosa yang dihubungkan oleh ikatan beta-glikosidik. Manusia tidak menghasilkan enzim selulase yang diperlukan untuk memecah ikatan ini." }
+                ],
+                essay: [
+                    { question: "Jelaskan struktur dasar fosfolipid dan bagaimana struktur tersebut memungkinkannya membentuk lapisan ganda (bilayer) pada membran sel.", answer: "Fosfolipid adalah molekul amfifatik, yang berarti memiliki bagian yang suka air (hidrofilik) dan bagian yang benci air (hidrofobik). Strukturnya terdiri dari: 1. Kepala (Head): Terdiri dari gugus fosfat yang bermuatan negatif. Bagian ini bersifat hidrofilik dan akan berinteraksi dengan air. 2. Ekor (Tails): Terdiri dari dua rantai asam lemak yang bersifat non-polar dan hidrofobik. Di lingkungan berair seperti di dalam dan di luar sel, fosfolipid secara spontan akan menyusun diri menjadi lapisan ganda (bilayer). Kepala hidrofilik akan menghadap ke luar, berinteraksi dengan air di sitosol dan di lingkungan ekstraseluler. Sementara itu, ekor hidrofobik akan saling berhadapan di bagian dalam lapisan ganda, 'bersembunyi' dari air. Susunan ini membentuk penghalang yang efektif dan semipermeabel yang menjadi dasar dari semua membran biologis." },
+                    { question: "Bandingkan tiga makromolekul utama (protein, karbohidrat, lipid) berdasarkan monomer penyusunnya dan berikan satu fungsi utama dari masing-masing di dalam sel.", answer: "1. Protein: Monomernya adalah asam amino. Fungsi utamanya sangat beragam, salah satu yang terpenting adalah sebagai enzim (katalis biologis) yang mempercepat hampir semua reaksi kimia di dalam sel. 2. Karbohidrat: Monomernya adalah monosakarida (contoh: glukosa). Fungsi utamanya adalah sebagai sumber energi utama yang cepat bagi sel melalui proses respirasi seluler. 3. Lipid: Tidak memiliki monomer sejati, tetapi umumnya tersusun dari gliserol dan asam lemak. Fungsi utamanya adalah sebagai penyimpan energi jangka panjang dan sebagai komponen struktural utama pembentuk membran sel (dalam bentuk fosfolipid)." }
+                ]
+            },
+            "Nutrisi dan Transpor": {
+                mcq: [
+                    { question: "Enam kelas nutrien utama yang dibutuhkan tubuh adalah...", options: ["Karbohidrat, Lemak, Protein, Oksigen, Karbon dioksida, Air", "Karbohidrat, Lemak, Protein, Vitamin, Mineral, Air", "Gula, Pati, Serat, Asam amino, Enzim, Hormon", "Kalsium, Besi, Sodium, Kalium, Klorida, Fosfor"], answer: "Karbohidrat, Lemak, Protein, Vitamin, Mineral, Air", explanation: "Ini adalah enam kategori nutrien esensial yang dibutuhkan tubuh untuk energi, pertumbuhan, perbaikan, dan regulasi proses tubuh." },
+                    { question: "Kelebihan glukosa dalam tubuh manusia akan disimpan di hati dan otot dalam bentuk...", options: ["Pati", "Selulosa", "Glikogen", "Asam laktat"], answer: "Glikogen", explanation: "Glikogen adalah polisakarida bercabang yang berfungsi sebagai bentuk penyimpanan glukosa jangka pendek pada hewan." },
+                    { question: "LDL (Low-Density Lipoprotein) sering disebut sebagai kolesterol 'jahat' karena berfungsi untuk...", options: ["Mengangkut kolesterol dari sel kembali ke hati", "Mengangkut kolesterol dari hati ke sel-sel tubuh", "Membantu pencernaan lemak", "Menghasilkan energi"], answer: "Mengangkut kolesterol dari hati ke sel-sel tubuh", explanation: "Tingkat LDL yang tinggi dapat menyebabkan penumpukan kolesterol di dinding arteri (aterosklerosis), sehingga meningkatkan risiko penyakit jantung." },
+                    { question: "Penyakit Rickets (tulang melunak) disebabkan oleh kekurangan vitamin...", options: ["A", "C", "D", "K"], answer: "D", explanation: "Vitamin D sangat penting untuk penyerapan kalsium dan fosfor, yang diperlukan untuk mineralisasi dan penguatan tulang." },
+                    { question: "Zat besi (Fe) adalah contoh mineral renik (trace mineral) yang merupakan komponen penting dari molekul...", options: ["Klorofil", "Hemoglobin", "Kolagen", "ATP"], answer: "Hemoglobin", explanation: "Hemoglobin adalah protein dalam sel darah merah yang mengandung zat besi. Besi inilah yang mengikat oksigen untuk diangkut ke seluruh tubuh." },
+                    { question: "Rasio Redfield (C:N:P = 106:16:1) menggambarkan rasio atom rata-rata dari unsur-unsur ini dalam...", options: ["Air laut dalam", "Sedimen laut", "Plankton laut", "Batuan di kerak bumi"], answer: "Plankton laut", explanation: "Rasio Redfield mencerminkan komposisi unsur rata-rata biomassa fitoplankton dan menjadi dasar untuk memahami siklus nutrien di lautan." },
+                    { question: "Nutrien yang sering menjadi faktor pembatas (limiting factor) utama bagi pertumbuhan fitoplankton di sebagian besar lautan adalah...", options: ["Silika dan Kalsium", "Nitrogen dan Fosfor", "Kalium dan Sulfur", "Oksigen dan Karbon"], answer: "Nitrogen dan Fosfor", explanation: "Meskipun dibutuhkan dalam jumlah besar, ketersediaan nitrogen (dalam bentuk nitrat, amonium) dan fosfor (fosfat) di lapisan permukaan laut seringkali rendah, sehingga membatasi pertumbuhan alga." },
+                    { question: "Proses konversi gas nitrogen (N₂) di atmosfer menjadi amonia (NH₃) yang dapat digunakan oleh organisme disebut...", options: ["Denitrifikasi", "Nitrifikasi", "Asimilasi", "Fiksasi Nitrogen"], answer: "Fiksasi Nitrogen", explanation: "Fiksasi nitrogen, yang sebagian besar dilakukan oleh bakteri (seperti cyanobacteria di laut), adalah langkah krusial yang memasukkan nitrogen baru ke dalam siklus biogeokimia." },
+                    { question: "Diatom adalah kelompok fitoplankton yang membutuhkan nutrien spesifik untuk membangun cangkang (frustule) mereka, yaitu...", options: ["Kalsium Karbonat", "Nitrogen", "Fosfor", "Silikat"], answer: "Silikat", explanation: "Dinding sel diatom yang unik dan rumit terbuat dari silika (kaca), sehingga pertumbuhan mereka sangat bergantung pada ketersediaan asam silikat terlarut di air laut." },
+                    { question: "Proses 'upwelling' penting bagi produktivitas primer di lautan karena...", options: ["Membawa air hangat ke permukaan", "Meningkatkan penetrasi cahaya matahari", "Mengangkat air dingin yang kaya nutrien dari kedalaman ke permukaan", "Mengurangi salinitas permukaan"], answer: "Mengangkat air dingin yang kaya nutrien dari kedalaman ke permukaan", explanation: "Lapisan permukaan laut seringkali kehabisan nutrien. Upwelling membawa kembali nutrien yang telah tenggelam dan ter-remineralisasi di kedalaman, sehingga 'menyuburkan' zona fotik." },
+                    { question: "Pada tumbuhan, jaringan yang berfungsi mengangkut air dan mineral dari akar ke daun adalah...", options: ["Floem", "Xilem", "Kambium", "Epidermis"], answer: "Xilem", explanation: "Xilem membentuk sistem pipa kontinu dari akar hingga daun untuk transportasi air dan mineral terlarut." },
+                    { question: "Jaringan yang berfungsi mengangkut hasil fotosintesis (gula) dari daun ke seluruh bagian tumbuhan adalah...", options: ["Xilem", "Floem", "Sklerenkim", "Parenkim"], answer: "Floem", explanation: "Floem mendistribusikan gula (makanan) yang diproduksi di daun ke bagian lain seperti akar, batang, dan buah yang membutuhkannya untuk energi dan pertumbuhan." },
+                    { question: "Di dalam tubuh manusia, pertukaran gas (O₂ dan CO₂) antara darah dan udara terjadi di...", options: ["Jantung", "Kapiler jaringan", "Alveoli paru-paru", "Arteri"], answer: "Alveoli paru-paru", explanation: "Alveoli adalah kantung-kantung udara kecil di paru-paru yang dikelilingi oleh jaring-jaring kapiler darah, tempat terjadinya difusi gas antara udara yang dihirup dan darah." },
+                    { question: "Pada sistem sirkulasi terbuka seperti pada serangga, cairan sirkulasi yang disebut hemolimfa mengalir...", options: ["Selalu di dalam pembuluh darah tertutup", "Langsung membasahi organ-organ di dalam rongga tubuh", "Hanya di sekitar sistem pernapasan", "Dari jantung ke insang"], answer: "Langsung membasahi organ-organ di dalam rongga tubuh", explanation: "Sistem terbuka tidak memiliki jaringan kapiler yang rumit. Jantung memompa hemolimfa ke dalam rongga tubuh (hemosol), tempat pertukaran zat terjadi secara langsung dengan sel." },
+                    { question: "Ikan memiliki jantung dengan... ruang.", options: ["Satu", "Dua (satu atrium, satu ventrikel)", "Tiga (dua atrium, satu ventrikel)", "Empat (dua atrium, dua ventrikel)"], answer: "Dua (satu atrium, satu ventrikel)", explanation: "Jantung dua ruang pada ikan memompa darah dalam satu sirkuit tunggal: dari jantung ke insang (untuk mengambil oksigen), lalu ke seluruh tubuh, dan kembali ke jantung." }
+                ],
+                essay: [
+                    { question: "Jelaskan proses 'biological pump' di lautan dan mengapa proses ini penting untuk iklim global.", answer: "'Biological pump' adalah proses di mana organisme laut, terutama fitoplankton di permukaan, memindahkan karbon dari atmosfer ke laut dalam. Prosesnya sebagai berikut: 1. Fiksasi Karbon: Fitoplankton melakukan fotosintesis, mengubah CO2 terlarut (yang berasal dari atmosfer) menjadi materi organik. 2. Rantai Makanan & Sinking: Fitoplankton ini dimakan oleh zooplankton, atau mati secara alami. Feses dari zooplankton dan sisa-sisa organisme yang mati (disebut 'marine snow') kemudian tenggelam ke lapisan laut yang lebih dalam. 3. Sekuestrasi: Di laut dalam, sebagian besar karbon organik ini di-remineralisasi (diurai kembali menjadi CO2) oleh bakteri. Namun, sebagian kecil berhasil mencapai dasar laut dan terkubur dalam sedimen. Proses ini penting untuk iklim global karena secara efektif 'memompa' karbon dioksida dari atmosfer dan menyimpannya di laut dalam untuk jangka waktu yang sangat lama (ratusan hingga ribuan tahun), sehingga membantu mengatur konsentrasi CO2 di atmosfer dan memoderasi efek rumah kaca." },
+                    { question: "Bandingkan sistem osmoregulasi (pengaturan keseimbangan air dan garam) pada ikan air laut dan ikan air tawar. Jelaskan adaptasi utama pada masing-masing ikan.", answer: "Osmoregulasi pada kedua jenis ikan sangat berbeda karena perbedaan konsentrasi garam antara tubuh mereka dan lingkungan. 1. Ikan Air Laut: Lingkungannya hiperosmotik (lebih asin dari tubuh ikan). Masalah utama adalah kehilangan air dan kelebihan garam. Adaptasinya: a) Minum banyak air laut untuk mengganti air yang hilang. b) Memiliki sel-sel khusus di insang (sel klorida) yang secara aktif memompa keluar kelebihan ion (Na+, Cl-). c) Menghasilkan urin yang sangat sedikit dan pekat untuk menghemat air. 2. Ikan Air Tawar: Lingkungannya hipotonik (lebih tawar dari tubuh ikan). Masalah utama adalah kelebihan air dan kehilangan garam. Adaptasinya: a) Tidak minum air. b) Insang secara aktif menyerap ion (Na+, Cl-) dari air. c) Ginjal bekerja keras untuk menghasilkan urin yang sangat banyak dan encer untuk membuang kelebihan air." }
+                ]
+            },
+            "Sistem Respirasi": {
+                mcq: [
+                    { question: "Pertukaran gas pada tumbuhan tingkat tinggi sebagian besar terjadi melalui struktur kecil di daun yang disebut...", options: ["Lentisel", "Stomata", "Akar napas", "Kloroplas"], answer: "Stomata", explanation: "Stomata adalah pori-pori kecil (biasanya di bagian bawah daun) yang dapat membuka dan menutup untuk mengatur pertukaran CO2, O2, dan uap air." },
+                    { question: "Pada batang tumbuhan berkayu, pertukaran gas terjadi melalui pori-pori yang disebut...", options: ["Stomata", "Pneumatofor", "Hidatoda", "Lentisel"], answer: "Lentisel", explanation: "Lentisel adalah area pada periderm (kulit kayu) yang memiliki sel-sel yang tersusun longgar, memungkinkan pertukaran gas antara jaringan internal batang dengan atmosfer." },
+                    { question: "Akar napas (pneumatofor) yang tumbuh ke atas adalah adaptasi respirasi yang umum ditemukan pada...", options: ["Kaktus gurun", "Tumbuhan mangrove", "Pohon pinus", "Rumput laut"], answer: "Tumbuhan mangrove", explanation: "Mangrove hidup di lumpur anoksik (rendah oksigen). Pneumatofor tumbuh ke atas permukaan untuk menyerap oksigen langsung dari udara." },
+                    { question: "Pada manusia, tempat utama terjadinya pertukaran oksigen dan karbon dioksida antara udara dan darah adalah di...", options: ["Trakea", "Bronkus", "Alveolus", "Laring"], answer: "Alveolus", explanation: "Alveoli adalah jutaan kantung udara kecil di ujung saluran pernapasan di paru-paru, yang dindingnya sangat tipis dan dikelilingi kapiler darah, memungkinkan difusi gas yang efisien." },
+                    { question: "Proses pertukaran gas di alveolus dan jaringan tubuh terjadi melalui mekanisme fisika yang disebut...", options: ["Transpor aktif", "Osmosis", "Difusi", "Filtrasi"], answer: "Difusi", explanation: "Gas bergerak secara pasif dari area bertekanan parsial tinggi ke area bertekanan parsial rendah. Oksigen berdifusi dari alveolus ke darah, dan CO2 berdifusi dari darah ke alveolus." },
+                    { question: "Ikan melakukan pertukaran gas dengan sangat efisien menggunakan sistem aliran berlawanan yang disebut...", options: ["Aliran searah (concurrent)", "Aliran silang (crosscurrent)", "Aliran berlawanan (countercurrent)", "Sirkulasi ganda"], answer: "Aliran berlawanan (countercurrent)", explanation: "Dalam sistem countercurrent, air mengalir melintasi lamela insang dalam arah yang berlawanan dengan aliran darah. Ini menjaga gradien tekanan parsial oksigen yang konstan di seluruh permukaan insang, memaksimalkan transfer oksigen dari air ke darah." },
+                    { question: "Struktur pernapasan pada serangga terdiri dari jaringan tabung udara yang bercabang di seluruh tubuh yang disebut...", options: ["Sistem paru-paru buku", "Sistem insang", "Sistem trakea", "Sistem sirkulasi terbuka"], answer: "Sistem trakea", explanation: "Sistem trakea mengantarkan oksigen langsung ke sel-sel tubuh melalui tabung-tabung kecil (trakeol), sehingga tidak bergantung pada sistem sirkulasi untuk mengangkut gas." },
+                    { question: "Udara masuk ke dalam sistem trakea serangga melalui lubang-lubang di sisi tubuhnya yang disebut...", options: ["Stomata", "Operkulum", "Spirakel", "Alveoli"], answer: "Spirakel", explanation: "Spirakel adalah bukaan eksternal dari sistem pernapasan serangga yang dapat membuka dan menutup untuk mengatur aliran udara dan mengurangi kehilangan air." },
+                    { question: "Organisme seperti cacing pipih (planaria) tidak memiliki organ pernapasan khusus dan melakukan pertukaran gas melalui...", options: ["Insang internal", "Paru-paru sederhana", "Difusi langsung melalui permukaan tubuhnya", "Sistem trakea"], answer: "Difusi langsung melalui permukaan tubuhnya", explanation: "Bentuk tubuhnya yang pipih memaksimalkan rasio luas permukaan terhadap volume, sehingga setiap sel cukup dekat dengan lingkungan luar untuk pertukaran gas secara difusi." },
+                    { question: "Pada spons (Porifera), pertukaran gas terjadi saat air yang mengandung oksigen mengalir melalui pori-pori dan...", options: ["Difusi terjadi di setiap sel yang kontak dengan air", "Oksigen diikat oleh hemoglobin", "Air dipompa ke paru-paru internal", "Gas disimpan dalam spongocoel"], answer: "Difusi terjadi di setiap sel yang kontak dengan air", explanation: "Spons tidak memiliki sistem pernapasan atau sirkulasi. Setiap sel secara individual melakukan pertukaran gas dengan air yang terus mengalir melalui tubuhnya." },
+                    { question: "Penyakit paru-paru di mana alveoli rusak dan menyatu menjadi kantung udara yang lebih besar, sehingga mengurangi luas permukaan untuk pertukaran gas, adalah...", options: ["Asma", "Bronkitis", "Emfisema", "Pneumonia"], answer: "Emfisema", explanation: "Emfisema, yang sering disebabkan oleh merokok, secara permanen merusak alveoli, menyebabkan sesak napas yang parah." },
+                    { question: "Asma adalah kondisi di mana terjadi...", options: ["Infeksi bakteri pada alveoli", "Peradangan dan penyempitan saluran udara (bronkiolus)", "Penumpukan cairan di paru-paru", "Kerusakan permanen pada insang"], answer: "Peradangan dan penyempitan saluran udara (bronkiolus)", explanation: "Selama serangan asma, otot-otot di sekitar bronkiolus menegang (bronkospasme) dan saluran udara membengkak serta menghasilkan lendir berlebih, sehingga menyulitkan pernapasan." },
+                    { question: "Apa fungsi utama diafragma dalam sistem pernapasan manusia?", options: ["Menyaring udara yang masuk", "Menghasilkan suara", "Memisahkan rongga dada dan perut serta mengontrol volume paru-paru", "Menghangatkan udara"], answer: "Memisahkan rongga dada dan perut serta mengontrol volume paru-paru", explanation: "Diafragma adalah otot utama pernapasan. Saat berkontraksi (menarik napas), ia bergerak ke bawah, memperbesar volume rongga dada dan menarik udara masuk ke paru-paru." },
+                    { question: "Dalam sistem 'countercurrent exchange' pada insang ikan, efisiensi transfer oksigen bisa mencapai lebih dari...", options: ["25%", "50%", "80%", "100%"], answer: "80%", explanation: "Sistem aliran berlawanan ini jauh lebih efisien daripada sistem aliran searah (concurrent), yang hanya dapat mencapai kesetimbangan sekitar 50%." },
+                    { question: "Fitoplankton melakukan respirasi untuk...", options: ["Menghasilkan oksigen", "Menghasilkan energi (ATP) dari gula yang mereka buat saat fotosintesis", "Menyerap nitrogen dari air", "Membangun cangkang silika"], answer: "Menghasilkan energi (ATP) dari gula yang mereka buat saat fotosintesis", explanation: "Seperti semua organisme aerobik, fitoplankton juga melakukan respirasi seluler untuk mendapatkan energi bagi proses kehidupannya, yang mengonsumsi oksigen dan melepaskan CO2. Proses ini terjadi baik siang maupun malam." }
+                ],
+                essay: [
+                    { question: "Jelaskan mengapa sistem pertukaran 'countercurrent' pada insang ikan lebih efisien daripada sistem 'concurrent' (aliran searah).", answer: "Efisiensi sistem countercurrent terletak pada kemampuannya untuk mempertahankan gradien konsentrasi (perbedaan tekanan parsial oksigen) di sepanjang permukaan pertukaran gas. Dalam sistem countercurrent, darah yang paling sedikit oksigennya bertemu dengan air yang oksigennya sudah banyak terambil, dan darah yang paling banyak oksigennya bertemu dengan air yang masih segar dan kaya oksigen. Ini memastikan bahwa di setiap titik di sepanjang lamela insang, air selalu memiliki konsentrasi oksigen yang sedikit lebih tinggi daripada darah, sehingga difusi oksigen dari air ke darah terus terjadi secara efisien di seluruh permukaan. Sebaliknya, pada sistem concurrent (aliran searah), darah dan air mengalir ke arah yang sama. Gradien konsentrasi awalnya besar, tetapi dengan cepat menurun hingga mencapai titik kesetimbangan (sekitar 50%), di mana tidak ada lagi difusi bersih yang terjadi. Akibatnya, sistem countercurrent dapat mengekstraksi jauh lebih banyak oksigen (lebih dari 80%) dari air dibandingkan sistem concurrent." },
+                    { question: "Bandingkan sistem pernapasan pada serangga (sistem trakea) dan manusia (sistem paru-paru) dalam hal bagaimana oksigen diangkut ke sel-sel tubuh.", answer: "Perbedaan mendasar terletak pada peran sistem sirkulasi. Pada manusia, sistem pernapasan (paru-paru) dan sistem sirkulasi (darah) bekerja sama. Oksigen masuk ke paru-paru, berdifusi ke dalam darah di alveoli, diikat oleh hemoglobin dalam sel darah merah, dan kemudian darah memompanya ke seluruh tubuh untuk dilepaskan ke sel-sel. Pada serangga, kedua sistem ini terpisah. Sistem trakea adalah jaringan pipa udara yang bercabang ke seluruh tubuh, berakhir di trakeol yang sangat halus. Oksigen masuk melalui spirakel dan diangkut langsung melalui pipa-pipa ini hingga mencapai sel-sel target. Dengan kata lain, sistem trakea mengantarkan gas secara langsung, tanpa memerlukan medium pengangkut seperti darah." }
+                ]
+            },
+            "Reproduksi dan Genetika": {
+                mcq: [
+                    { question: "Reproduksi aseksual di mana individu membelah diri menjadi dua atau lebih bagian, dan setiap bagian meregenerasi bagian yang hilang, disebut...", options: ["Bertunas (Budding)", "Partenogenesis", "Fisi (Pembelahan)", "Ginogenesis"], answer: "Fisi (Pembelahan)", explanation: "Fisi, atau sering disebut fragmentasi diikuti regenerasi, adalah metode reproduksi aseksual yang umum pada organisme seperti planaria dan beberapa anemon laut." },
+                    { question: "Perkembangan sel telur menjadi individu baru tanpa dibuahi oleh sperma disebut...", options: ["Hermafrodit", "Fertilisasi eksternal", "Partenogenesis", "Vivipar"], answer: "Partenogenesis", explanation: "Partenogenesis adalah bentuk reproduksi aseksual di mana betina menghasilkan keturunan tanpa keterlibatan genetik dari jantan. Ini terjadi pada beberapa serangga, reptil, dan ikan." },
+                    { question: "Hewan yang meletakkan telur yang berkembang dan menetas di luar tubuh induknya disebut...", options: ["Vivipar", "Ovipar", "Ovovivipar", "Hermafrodit"], answer: "Ovipar", explanation: "Ovipar adalah strategi reproduksi di mana embrio berkembang di dalam telur setelah dikeluarkan dari tubuh induk, seperti pada burung, reptil, dan sebagian besar ikan." },
+                    { question: "Strategi reproduksi di mana telur berkembang di dalam tubuh induk tetapi embrio tidak mendapatkan nutrisi langsung dari induk (hanya dari kuning telur) disebut...", options: ["Vivipar", "Ovipar", "Ovovivipar", "Partenogenesis"], answer: "Ovovivipar", explanation: "Pada ovovivipar, telur menetas di dalam saluran reproduksi betina, dan anak-anaknya kemudian 'dilahirkan' hidup-hidup. Contohnya adalah beberapa jenis hiu dan ikan guppy." },
+                    { question: "Organisme yang memiliki organ reproduksi jantan dan betina disebut...", options: ["Gonokoris", "Hermafrodit", "Aseksual", "Partenogenetik"], answer: "Hermafrodit", explanation: "Hermafrodit, seperti cacing tanah dan beberapa jenis siput, memiliki kemampuan untuk menghasilkan sperma dan sel telur." },
+                    { question: "Siapakah yang dianggap sebagai 'Bapak Genetika'?", options: ["Charles Darwin", "Alfred Russel Wallace", "Gregor Mendel", "James Watson"], answer: "Gregor Mendel", explanation: "Melalui eksperimennya dengan tanaman kacang polong, Gregor Mendel meletakkan dasar-dasar hukum pewarisan sifat." },
+                    { question: "Organisme dengan dua alel yang identik untuk suatu sifat (misalnya, PP atau pp) disebut...", options: ["Heterozigot", "Homozigot", "Hibrida", "Resesif"], answer: "Homozigot", explanation: "Homo berarti 'sama'. Individu homozigot memiliki dua salinan alel yang sama untuk gen tertentu." },
+                    { question: "Penampilan fisik atau sifat yang dapat diamati dari suatu organisme disebut...", options: ["Genotipe", "Fenotipe", "Alel", "Kromosom"], answer: "Fenotipe", explanation: "Fenotipe adalah ekspresi dari genotipe suatu organisme, yang juga dapat dipengaruhi oleh lingkungan." },
+                    { question: "Jika alel untuk bunga ungu (P) dominan terhadap alel untuk bunga putih (p), genotipe manakah yang akan menghasilkan fenotipe bunga putih?", options: ["PP", "Pp", "PP dan Pp", "pp"], answer: "pp", explanation: "Sifat resesif (bunga putih) hanya akan muncul pada fenotipe jika individu tersebut homozigot resesif (pp), artinya tidak ada alel dominan (P) yang menutupinya." },
+                    { question: "Ketika persilangan antara bunga merah (RR) dan bunga putih (rr) menghasilkan keturunan bunga merah muda (Rr), ini adalah contoh dari...", options: ["Dominansi penuh", "Kodominansi", "Dominansi tidak sempurna (Incomplete Dominance)", "Epistasis"], answer: "Dominansi tidak sempurna (Incomplete Dominance)", explanation: "Pada dominansi tidak sempurna, fenotipe heterozigot merupakan perpaduan atau antara dari fenotipe kedua homozigot." },
+                    { question: "Golongan darah AB pada manusia adalah contoh klasik dari...", options: ["Dominansi tidak sempurna", "Kodominansi", "Alel ganda", "Kodominansi dan Alel ganda"], answer: "Kodominansi dan Alel ganda", explanation: "Ini adalah contoh alel ganda (ada tiga alel: Iᴬ, Iᴮ, dan i). Alel Iᴬ dan Iᴮ bersifat kodominan, artinya keduanya diekspresikan sepenuhnya pada individu heterozigot (IᴬIᴮ), menghasilkan golongan darah AB." },
+                    { question: "Sifat seperti warna kulit dan tinggi badan manusia yang dikendalikan oleh banyak gen disebut...", options: ["Sifat resesif", "Sifat poligenik", "Pleiotropi", "Epistasis"], answer: "Sifat poligenik", explanation: "Pewarisan poligenik melibatkan kontribusi aditif dari beberapa gen, yang menghasilkan variasi fenotipe yang berkelanjutan (kontinu)." },
+                    { question: "Teknik laboratorium untuk memperbanyak (mengamplifikasi) segmen DNA tertentu secara eksponensial adalah...", options: ["Elektroforesis", "PCR (Polymerase Chain Reaction)", "Kloning", "DNA Sequencing"], answer: "PCR (Polymerase Chain Reaction)", explanation: "PCR menggunakan siklus pemanasan dan pendinginan untuk secara berulang kali menyalin fragmen DNA target, menghasilkan miliaran salinan dalam waktu singkat." },
+                    { question: "Langkah pertama dalam satu siklus PCR adalah denaturasi, di mana...", options: ["Primer menempel pada DNA target", "DNA polimerase mensintesis untai baru", "Untai ganda DNA dipisahkan menjadi untai tunggal dengan pemanasan", "Fragmen DNA dipisahkan berdasarkan ukuran"], answer: "Untai ganda DNA dipisahkan menjadi untai tunggal dengan pemanasan", explanation: "Pemanasan hingga suhu tinggi (sekitar 95°C) memutus ikatan hidrogen antara untai DNA, menyiapkannya untuk penempelan primer." },
+                    { question: "Metode untuk menentukan urutan nukleotida (A, T, C, G) dalam sebuah molekul DNA disebut...", options: ["PCR", "Metagenomik", "DNA Sequencing", "Transkripsi"], answer: "DNA Sequencing", explanation: "DNA sequencing adalah proses mendasar dalam genomik yang memungkinkan kita 'membaca' informasi genetik yang dikodekan dalam DNA." }
+                ],
+                essay: [
+                    { question: "Jelaskan perbedaan antara reproduksi seksual dan aseksual dalam hal keragaman genetik keturunan. Apa keuntungan dan kerugian dari masing-masing metode?", answer: "Reproduksi Seksual melibatkan fusi dua gamet dari dua induk yang berbeda, menghasilkan keturunan dengan kombinasi gen yang unik dan berbeda dari kedua induknya. Ini menciptakan keragaman genetik yang tinggi. Keuntungannya adalah keragaman ini memungkinkan populasi untuk beradaptasi dengan perubahan lingkungan. Kerugiannya adalah prosesnya lebih lambat, membutuhkan energi untuk mencari pasangan, dan tidak semua individu dapat bereproduksi. Reproduksi Aseksual hanya melibatkan satu induk dan menghasilkan keturunan yang secara genetik identik dengan induknya (klon). Ini menghasilkan keragaman genetik yang sangat rendah (hanya melalui mutasi acak). Keuntungannya adalah prosesnya cepat, efisien, dan tidak memerlukan pasangan, memungkinkan populasi berkembang pesat di lingkungan yang stabil. Kerugiannya adalah kurangnya keragaman genetik membuat populasi sangat rentan terhadap perubahan lingkungan atau wabah penyakit." },
+                    { question: "Jelaskan perbedaan antara Dominansi Tidak Sempurna (Incomplete Dominance) dan Kodominansi. Berikan satu contoh untuk masing-masing.", answer: "Keduanya adalah pola pewarisan non-Mendelian di mana alel dominan tidak sepenuhnya menutupi alel resesif. Perbedaannya terletak pada bagaimana fenotipe heterozigot diekspresikan. Pada Dominansi Tidak Sempurna, fenotipe heterozigot adalah campuran atau perpaduan dari dua fenotipe homozigot. Contoh: Bunga Snapdragon merah (RR) disilangkan dengan putih (rr) menghasilkan bunga merah muda (Rr). Pada Kodominansi, kedua alel diekspresikan secara penuh dan terpisah pada individu heterozigot. Fenotipenya tidak bercampur, melainkan kedua sifat muncul bersamaan. Contoh: Golongan darah AB pada manusia, di mana alel A dan alel B keduanya diekspresikan, menghasilkan sel darah merah yang memiliki antigen A dan antigen B di permukaannya." }
+                ]
+            },
+            "Keanekaragaman Hayati": {
+                mcq: [
+                    { question: "Tingkat keanekaragaman hayati yang mengacu pada variasi gen dalam suatu spesies disebut...", options: ["Keanekaragaman spesies", "Keanekaragaman ekosistem", "Keanekaragaman genetik", "Keanekaragaman fungsional"], answer: "Keanekaragaman genetik", explanation: "Keanekaragaman genetik adalah fondasi dari semua keanekaragaman hayati dan penting untuk kemampuan adaptasi dan kelangsungan hidup jangka panjang suatu spesies." },
+                    { question: "Jumlah spesies yang berbeda di suatu area disebut...", options: ["Kemerataan spesies", "Kelimpahan relatif", "Kekayaan spesies (species richness)", "Spesies dominan"], answer: "Kekayaan spesies (species richness)", explanation: "Kekayaan spesies adalah komponen dari keanekaragaman spesies, yang juga mencakup kemerataan atau kelimpahan relatif spesies." },
+                    { question: "Proses perubahan karakteristik genetik suatu populasi dari waktu ke waktu yang mendorong keanekaragaman hayati disebut...", options: ["Siklus nutrisi", "Aliran energi", "Evolusi biologis", "Susesi ekologis"], answer: "Evolusi biologis", explanation: "Evolusi melalui mekanisme seperti seleksi alam, mutasi, dan hanyutan genetik adalah mesin utama yang menghasilkan keanekaragaman spesies di Bumi." },
+                    { question: "Menurut teori evolusi, perubahan acak pada urutan DNA yang menjadi sumber utama variasi genetik baru adalah...", options: ["Seleksi alam", "Migrasi", "Mutasi", "Hanyutan genetik (Genetic Drift)"], answer: "Mutasi", explanation: "Mutasi adalah perubahan permanen pada DNA. Meskipun sebagian besar netral atau berbahaya, beberapa mutasi dapat menghasilkan sifat baru yang menguntungkan." },
+                    { question: "Ketika dua populasi dari spesies yang sama terisolasi secara geografis dan akhirnya berevolusi menjadi dua spesies yang berbeda, proses ini disebut...", options: ["Seleksi buatan", "Spesiasi alopatrik", "Hibridisasi", "Aliran gen"], answer: "Spesiasi alopatrik", explanation: "Spesiasi alopatrik terjadi ketika penghalang fisik (seperti gunung atau laut) memisahkan populasi, mencegah aliran gen dan memungkinkan mereka untuk berevolusi secara independen." },
+                    { question: "Ekosistem transisi antara lingkungan darat dan laut, seperti hutan mangrove dan estuaria, sering diklasifikasikan sebagai...", options: ["Lahan kering", "Gurun", "Lahan basah (wetlands)", "Padang rumput"], answer: "Lahan basah (wetlands)", explanation: "Lahan basah pesisir adalah ekosistem yang sangat produktif dan penting secara ekologis yang berada di antarmuka antara darat dan laut." },
+                    { question: "Zonasi mangrove dari arah laut ke darat yang paling umum adalah...", options: ["Rhizophora, Bruguiera, Avicennia", "Avicennia/Sonneratia, Rhizophora, Bruguiera/Xylocarpus", "Bruguiera, Avicennia, Rhizophora", "Xylocarpus, Sonneratia, Rhizophora"], answer: "Avicennia/Sonneratia, Rhizophora, Bruguiera/Xylocarpus", explanation: "Spesies Avicennia dan Sonneratia biasanya paling toleran terhadap genangan dan salinitas sehingga berada di garis depan, diikuti oleh Rhizophora, dan kemudian Bruguiera di zona yang lebih ke arah darat." },
+                    { question: "Garis imajiner yang memisahkan fauna tipe Asiatis di barat dan fauna tipe Australasia di timur Indonesia adalah...", options: ["Garis Khatulistiwa", "Garis Weber", "Garis Wallace", "Garis Lydekker"], answer: "Garis Wallace", explanation: "Garis Wallace, yang membentang antara Kalimantan/Bali dan Sulawesi/Lombok, menandai batas biogeografis yang signifikan antara fauna benua Asia dan Australia." },
+                    { question: "Hutan hujan tropis dataran rendah di Sumatra dan Kalimantan didominasi oleh kelompok pohon dari famili...", options: ["Fagaceae (Berangan)", "Pinaceae (Pinus)", "Dipterocarpaceae (Meranti)", "Arecaceae (Palem)"], answer: "Dipterocarpaceae (Meranti)", explanation: "Hutan Dipterocarpa adalah ciri khas hutan hujan dataran rendah di Asia Tenggara, termasuk Indonesia bagian barat." },
+                    { question: "Hutan yang tumbuh di atas substrat batu gamping (limestone) dengan tingkat endemisitas yang seringkali tinggi disebut...", options: ["Hutan Kerangas", "Hutan Gambut", "Hutan Karst", "Hutan Monsoon"], answer: "Hutan Karst", explanation: "Hutan karst memiliki kondisi tanah yang unik (tipis, drainase cepat) yang mendukung flora dan fauna spesialis." },
+                    { question: "Kondisi di mana keberadaan, kelimpahan, dan distribusi suatu spesies dibatasi oleh faktor fisik atau kimia tertentu disebut...", options: ["Hukum toleransi", "Prinsip kompetisi", "Efek pendiri (Founder effect)", "Siklus biogeokimia"], answer: "Hukum toleransi", explanation: "Setiap organisme memiliki rentang toleransi (minimum, optimum, maksimum) untuk setiap faktor lingkungan, seperti suhu, salinitas, dan pH." },
+                    { question: "Perubahan frekuensi gen dalam suatu populasi karena faktor kebetulan, bukan seleksi alam, disebut...", options: ["Mutasi", "Aliran gen", "Hanyutan genetik (Genetic drift)", "Seleksi disruptif"], answer: "Hanyutan genetik (Genetic drift)", explanation: "Hanyutan genetik memiliki dampak yang lebih signifikan pada populasi kecil, di mana peristiwa acak dapat menyebabkan hilangnya alel tertentu." },
+                    { question: "Hutan gambut (peat swamp forest) memiliki ciri khas berupa...", options: ["Tanah berpasir dan miskin hara", "pH air yang basa dan jernih", "Endapan serasah organik tebal dan pH air sangat asam (<4)", "Curah hujan yang rendah"], answer: "Endapan serasah organik tebal dan pH air sangat asam (<4)", explanation: "Kondisi tergenang dan asam menghambat dekomposisi, menyebabkan penumpukan bahan organik (gambut). Airnya yang berwarna gelap sering disebut sebagai 'air hitam'." },
+                    { question: "Jasa ekosistem yang disediakan oleh hutan mangrove meliputi...", options: ["Hanya sebagai sumber kayu", "Perlindungan pantai dari abrasi, tempat pemijahan ikan, dan penyerapan karbon", "Meningkatkan salinitas air laut", "Menjadi sumber polusi nutrien"], answer: "Perlindungan pantai dari abrasi, tempat pemijahan ikan, dan penyerapan karbon", explanation: "Mangrove menyediakan berbagai jasa ekosistem vital, termasuk sebagai benteng alami, habitat penting bagi biota laut, dan penyimpan karbon yang sangat efektif." },
+                    { question: "Semakin tinggi keanekaragaman genetik dalam suatu populasi, maka...", options: ["Semakin rentan terhadap penyakit", "Semakin rendah kemampuannya untuk beradaptasi", "Semakin tinggi potensi untuk bertahan hidup dalam jangka panjang", "Semakin cepat akan punah"], answer: "Semakin tinggi potensi untuk bertahan hidup dalam jangka panjang", explanation: "Keanekaragaman genetik yang tinggi menyediakan 'bahan baku' bagi seleksi alam untuk bekerja, meningkatkan peluang bahwa beberapa individu akan memiliki sifat yang memungkinkan mereka bertahan dari perubahan lingkungan." }
+                ],
+                essay: [
+                    { question: "Jelaskan tiga tingkatan utama keanekaragaman hayati dan berikan contoh untuk masing-masing tingkatan.", answer: "Tiga tingkatan utama keanekaragaman hayati adalah: 1. Keanekaragaman Genetik: Ini adalah variasi materi genetik (gen) di dalam satu spesies. Contoh: Variasi warna dan corak pada cangkang siput dalam satu populasi, atau berbagai jenis varietas padi (seperti IR64, Ciherang, Rojolele) yang semuanya termasuk spesies Oryza sativa. 2. Keanekaragaman Spesies: Ini adalah variasi spesies yang berbeda di suatu habitat atau wilayah. Ini mencakup kekayaan spesies (jumlah jenis) dan kemerataan spesies (kelimpahan relatif). Contoh: Di ekosistem terumbu karang, terdapat berbagai spesies ikan, karang, moluska, dan krustasea yang hidup bersama. 3. Keanekaragaman Ekosistem: Ini adalah variasi habitat, komunitas biotik, dan proses ekologis yang berbeda di suatu wilayah. Contoh: Di Indonesia, terdapat berbagai macam ekosistem seperti hutan hujan tropis, hutan mangrove, padang lamun, terumbu karang, dan sabana." },
+                    { question: "Apa yang dimaksud dengan 'seleksi alam' dan bagaimana proses ini dapat mendorong terjadinya evolusi?", answer: "Seleksi alam adalah mekanisme utama evolusi yang dikemukakan oleh Charles Darwin. Proses ini terjadi berdasarkan tiga prinsip: 1. Variasi: Ada variasi sifat yang dapat diwariskan di antara individu-individu dalam suatu populasi. 2. Seleksi: Lingkungan 'menyeleksi' individu. Individu dengan sifat yang lebih sesuai (adaptif) dengan kondisi lingkungan saat itu memiliki peluang lebih besar untuk bertahan hidup dan bereproduksi. 3. Pewarisan: Individu yang berhasil bertahan hidup dan bereproduksi akan mewariskan sifat-sifat unggul tersebut kepada keturunannya. Seiring berjalannya waktu (banyak generasi), frekuensi sifat-sifat yang menguntungkan ini akan meningkat dalam populasi, sementara sifat yang kurang menguntungkan akan berkurang. Akumulasi perubahan-perubahan ini secara bertahap dapat menyebabkan populasi tersebut menjadi sangat berbeda dari nenek moyangnya, atau bahkan membentuk spesies baru. Dengan demikian, seleksi alam mendorong evolusi dengan 'memilih' adaptasi yang meningkatkan kelangsungan hidup dan keberhasilan reproduksi." }
+                ]
+            }
+        };
+
+        // --- Logika Kuis ---
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const topicSelection = document.getElementById('topic-selection');
+        const quizTopicTitle = document.getElementById('quiz-topic-title');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const essayContainer = document.getElementById('essay-container');
+        const essayAnswer = document.getElementById('essay-answer');
+        const questionCounter = document.getElementById('question-counter');
+        const scoreElement = document.getElementById('score');
+        const topicScoresBreakdown = document.getElementById('topic-scores-breakdown');
+        const answersReview = document.getElementById('answers-review');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const modal = document.getElementById('explanationModal');
+        const navPanel = document.getElementById('nav-panel');
+        const navGrid = document.getElementById('nav-grid');
+        const progressBar = document.getElementById('progress-bar');
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let activeQuestions = [];
+        let selectedOptionElement = null;
+        let currentTopic = '';
+
+        function initializeTopicSelection() {
+            topicSelection.innerHTML = '';
+            const topics = Object.keys(quizDataCategorized);
+            topics.forEach(topic => {
+                const button = document.createElement('button');
+                button.textContent = topic;
+                button.classList.add('topic-button', 'w-full', 'p-4', 'bg-white', 'border-2', 'border-blue-300', 'rounded-lg', 'text-blue-700', 'font-semibold', 'hover:bg-blue-50');
+                button.onclick = () => startQuiz(topic);
+                topicSelection.appendChild(button);
+            });
+            const allButton = document.createElement('button');
+            allButton.textContent = 'Semua Topik (110 Soal)';
+            allButton.classList.add('topic-button', 'w-full', 'p-4', 'bg-blue-600', 'text-white', 'font-bold', 'rounded-lg', 'md:col-span-2');
+            allButton.onclick = () => startQuiz('Semua Topik');
+            topicSelection.appendChild(allButton);
+        }
+
+        function startQuiz(topic) {
+            currentTopic = topic;
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            resultScreen.classList.add('hidden');
+            
+            if (topic === 'Semua Topik') {
+                activeQuestions = [];
+                Object.keys(quizDataCategorized).forEach(catName => {
+                    const category = quizDataCategorized[catName];
+                    activeQuestions.push(...category.mcq.map(q => ({...q, topic: catName})));
+                    activeQuestions.push(...category.essay.map(q => ({...q, topic: catName})));
+                });
+            } else {
+                const category = quizDataCategorized[topic];
+                activeQuestions = [
+                    ...category.mcq.map(q => ({...q, topic})),
+                    ...category.essay.map(q => ({...q, topic}))
+                ];
+            }
+            
+            activeQuestions = shuffleArray(activeQuestions);
+
+            quizTopicTitle.textContent = topic;
+            currentQuestionIndex = 0;
+            userAnswers = Array(activeQuestions.length).fill(null).map((_, i) => ({
+                question: activeQuestions[i].question,
+                userAnswer: null,
+                correctAnswer: activeQuestions[i].answer,
+                isCorrect: null,
+                explanation: activeQuestions[i].explanation,
+                type: activeQuestions[i].options ? 'mcq' : 'essay',
+                topic: activeQuestions[i].topic
+            }));
+            
+            populateNavPanel();
+            loadQuiz();
+        }
+        
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function populateNavPanel() {
+            navGrid.innerHTML = '';
+            activeQuestions.forEach((_, index) => {
+                const btn = document.createElement('button');
+                btn.innerHTML = `<span>${index + 1}</span>`;
+                btn.classList.add('nav-btn', 'p-2', 'rounded-md', 'transition-colors', 'duration-200', 'flex', 'items-center', 'justify-center');
+                btn.onclick = () => jumpToQuestion(index);
+                navGrid.appendChild(btn);
+            });
+        }
+
+        function updateNavPanel() {
+            const navButtons = navGrid.children;
+            const checkmarkSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-check-lg inline-block ml-1" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/></svg>`;
+
+            for (let i = 0; i < navButtons.length; i++) {
+                navButtons[i].classList.remove('current', 'answered');
+                navButtons[i].innerHTML = `<span>${i + 1}</span>`; 
+
+                if (userAnswers[i] && userAnswers[i].userAnswer !== null && userAnswers[i].userAnswer.trim() !== '') {
+                    navButtons[i].classList.add('answered');
+                    navButtons[i].innerHTML = `<span>${i + 1}</span>${checkmarkSVG}`;
+                }
+                if (i === currentQuestionIndex) {
+                    navButtons[i].classList.add('current');
+                }
+            }
+        }
+
+        function toggleNavPanel() {
+            navPanel.classList.toggle('hidden');
+            if (!navPanel.classList.contains('hidden')) {
+                updateNavPanel();
+            }
+        }
+
+        function jumpToQuestion(index) {
+            saveCurrentAnswer();
+            currentQuestionIndex = index;
+            loadQuiz();
+            toggleNavPanel();
+        }
+
+        function saveCurrentAnswer() {
+            const currentQuestion = activeQuestions[currentQuestionIndex];
+            let userAnswer = null;
+
+            if (currentQuestion.options) {
+                const selected = optionsContainer.querySelector('.selected');
+                if (selected) userAnswer = selected.textContent;
+            } else {
+                if (essayAnswer.value.trim() !== '') userAnswer = essayAnswer.value.trim();
+            }
+
+            userAnswers[currentQuestionIndex].userAnswer = userAnswer;
+            if (currentQuestion.options) {
+                userAnswers[currentQuestionIndex].isCorrect = (userAnswer === currentQuestion.answer);
+            }
+        }
+
+        function loadQuiz() {
+            deselectOptions();
+            const currentQuestionData = userAnswers[currentQuestionIndex];
+            questionText.textContent = currentQuestionData.question;
+            questionCounter.textContent = `Soal ${currentQuestionIndex + 1} / ${activeQuestions.length}`;
+            progressBar.style.width = `${((currentQuestionIndex + 1) / activeQuestions.length) * 100}%`;
+
+            if (currentQuestionData.type === 'mcq') {
+                optionsContainer.classList.remove('hidden');
+                essayContainer.classList.add('hidden');
+                optionsContainer.innerHTML = '';
+                const options = shuffleArray([...activeQuestions[currentQuestionIndex].options]);
+                options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.classList.add('quiz-option', 'w-full', 'p-4', 'border-2', 'rounded-lg', 'text-left', 'hover:bg-blue-100', 'transition', 'duration-200');
+                    button.onclick = () => selectAnswer(button);
+                    if (option === currentQuestionData.userAnswer) {
+                        button.classList.add('selected');
+                        selectedOptionElement = button;
+                    }
+                    optionsContainer.appendChild(button);
+                });
+            } else {
+                optionsContainer.classList.add('hidden');
+                essayContainer.classList.remove('hidden');
+                essayAnswer.value = currentQuestionData.userAnswer || '';
+            }
+            
+            prevBtn.style.visibility = currentQuestionIndex === 0 ? 'hidden' : 'visible';
+            nextBtn.textContent = currentQuestionIndex === activeQuestions.length - 1 ? 'Selesai' : 'Selanjutnya';
+        }
+
+        function selectAnswer(buttonElement) {
+            deselectOptions();
+            selectedOptionElement = buttonElement;
+            buttonElement.classList.add('selected');
+        }
+
+        function deselectOptions() {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(option => option.classList.remove('selected'));
+            selectedOptionElement = null;
+        }
+        
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                saveCurrentAnswer();
+                currentQuestionIndex--;
+                loadQuiz();
+            }
+        }
+
+        function nextQuestion() {
+            saveCurrentAnswer();
+            if (currentQuestionIndex < activeQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuiz();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            saveCurrentAnswer();
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            const topicScores = {};
+            userAnswers.forEach(answer => {
+                if (answer.type !== 'mcq') return;
+                if (!topicScores[answer.topic]) {
+                    topicScores[answer.topic] = { correct: 0, total: 0 };
+                }
+                topicScores[answer.topic].total++;
+                if (answer.isCorrect) {
+                    topicScores[answer.topic].correct++;
+                }
+            });
+
+            topicScoresBreakdown.innerHTML = '<h3 class="text-xl font-bold mb-4">Rincian Skor per Topik (Pilihan Ganda)</h3>';
+            let totalCorrect = 0;
+            let totalQuestions = 0;
+
+            const sortedTopics = Object.keys(quizDataCategorized).sort();
+
+            sortedTopics.forEach(topic => {
+                if (topicScores[topic] && topicScores[topic].total > 0) {
+                    const score = topicScores[topic];
+                    totalCorrect += score.correct;
+                    totalQuestions += score.total;
+                    const percentage = score.total > 0 ? ((score.correct / score.total) * 100).toFixed(0) : 0;
+                    topicScoresBreakdown.innerHTML += `
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-semibold">${topic}</span>
+                            <span class="font-bold">${score.correct}/${score.total} (${percentage}%)</span>
+                        </div>
+                    `;
+                }
+            });
+
+            if (totalQuestions > 0) {
+                const totalPercentage = ((totalCorrect / totalQuestions) * 100).toFixed(0);
+                topicScoresBreakdown.innerHTML += `<hr class="my-2"><div class="flex justify-between items-center mt-2">
+                    <span class="font-bold text-lg text-blue-600">Skor Total</span>
+                    <span class="font-bold text-lg text-blue-600">${totalCorrect}/${totalQuestions} (${totalPercentage}%)</span>
+                </div>`;
+            } else {
+                 topicScoresBreakdown.innerHTML += `<p>Tidak ada soal pilihan ganda yang dikerjakan.</p>`;
+            }
+
+
+            answersReview.innerHTML = '';
+            userAnswers.forEach((answer, index) => {
+                const reviewItem = document.createElement('div');
+                reviewItem.classList.add('p-4', 'mb-4', 'border', 'rounded-lg');
+                
+                let answerStatusHtml = '';
+                if (answer.type === 'mcq') {
+                    if (answer.isCorrect) {
+                        reviewItem.classList.add('bg-green-50', 'border-green-200');
+                        answerStatusHtml = `<p class="mt-2"><strong>Jawaban Anda:</strong> <span class="text-green-700 font-semibold">${answer.userAnswer || '(Tidak dijawab)'} (Benar)</span></p>`;
+                    } else {
+                        reviewItem.classList.add('bg-red-50', 'border-red-200');
+                        answerStatusHtml = `
+                            <p class="mt-2"><strong>Jawaban Anda:</strong> <span class="text-red-700 font-semibold">${answer.userAnswer || '(Tidak dijawab)'} (Salah)</span></p>
+                            <p class="mt-1"><strong>Jawaban Benar:</strong> <span class="text-green-700 font-semibold">${answer.correctAnswer}</span></p>
+                        `;
+                    }
+                } else { // Essay
+                     reviewItem.classList.add('bg-blue-50', 'border-blue-200');
+                     answerStatusHtml = `
+                        <p class="mt-2"><strong>Jawaban Anda (Esai):</strong></p>
+                        <p class="italic text-gray-700 p-2 bg-white rounded">${answer.userAnswer || '(Tidak dijawab)'}</p>
+                        <p class="mt-2"><strong>Kunci Jawaban:</strong></p>
+                        <p class="text-gray-800 p-2 bg-gray-100 rounded">${answer.correctAnswer}</p>
+                     `;
+                }
+
+                reviewItem.innerHTML = `
+                    <p class="font-semibold">${index + 1}. ${answer.question}</p>
+                    <p class="text-xs text-gray-500">Topik: ${answer.topic}</p>
+                    ${answerStatusHtml}
+                    ${answer.type === 'mcq' ? `<button onclick="showExplanation(${index})" class="mt-2 text-sm text-blue-600 hover:underline">Lihat Penjelasan</button>` : ''}
+                `;
+                answersReview.appendChild(reviewItem);
+            });
+        }
+        
+        function restartQuiz() {
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
+
+        function showExplanation(index) {
+            const answer = userAnswers[index];
+            document.getElementById('modal-question').textContent = answer.question;
+            document.getElementById('modal-correct-answer').textContent = answer.correctAnswer;
+            document.getElementById('modal-explanation').textContent = answer.explanation || "Penjelasan tidak tersedia.";
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.querySelector('div').classList.remove('scale-95'), 10);
+        }
+
+        function closeModal() {
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // Initialize
+        window.onload = initializeTopicSelection;
+
+    </script>
+</body>
+</html>
+
             transition: all 0.2s ease-in-out;
         }
         .topic-button:hover {
@@ -723,4 +1284,5 @@
     </script>
 </body>
 </html>
+
 
