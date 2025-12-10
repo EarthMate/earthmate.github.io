@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kuis Interaktif Oseanografi Lingkungan</title>
+    </title> UAP Oseanografi Biologi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -21,12 +21,6 @@
         .nav-btn {
             border: 1px solid #d1d5db;
             background-color: #f9fafb;
-            min-width: 35px; /* Ensure buttons have a minimum width */
-            min-height: 35px; /* Ensure buttons have a minimum height */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.875rem; /* text-sm */
         }
         .nav-btn.answered {
             background-color: #dbeafe; /* bg-blue-100 */
@@ -46,30 +40,14 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        /* Ensure text in modal is visible */
-        #modal-question, #modal-correct-answer, #modal-explanation {
-             color: #1f2937; /* text-gray-800 */
-        }
-        #modal-correct-answer {
-             color: #059669; /* text-green-700 */
-        }
-         /* Checkmark styling */
-        .checkmark-svg {
-             width: 12px;
-             height: 12px;
-             fill: currentColor;
-             display: inline-block;
-             margin-left: 4px;
-             vertical-align: middle;
-        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
-    <div id="quiz-container" class="w-full max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+    <div id="quiz-container" class="w-full max-w-5xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
         <!-- Layar Awal (Pemilihan Topik) -->
         <div id="start-screen">
-            <h1 class="text-3xl sm:text-4xl font-bold text-center text-blue-600 mb-4">Kuis Oseanografi Lingkungan</h1>
-            <p class="text-center text-gray-600 mb-8">Pilih topik berdasarkan materi kuliah atau kerjakan semua soal.</p>
+            <h1 class="text-3xl sm:text-4xl font-bold text-center text-blue-600 mb-2">UAP Oseanografi Biologi</h1>
+            <p class="text-center text-gray-600 mb-8">100 Soal Isian Singkat</p>
             <div id="topic-selection" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Tombol topik akan di-generate oleh JavaScript -->
             </div>
@@ -84,40 +62,43 @@
                         Navigasi Soal
                     </button>
                 </div>
-                <span id="question-counter" class="text-lg font-semibold text-gray-500 text-right whitespace-nowrap"></span>
+                <span id="question-counter" class="text-lg font-semibold text-gray-500 text-right"></span>
             </div>
-
+            
              <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
                 <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"></div>
             </div>
-
+            
             <div id="question-card" class="bg-blue-50 border-2 border-blue-200 p-6 rounded-xl min-h-[150px] flex items-center justify-center mb-6">
-                <p id="question-text" class="text-center text-lg sm:text-xl"></p>
+                <p id="question-text" class="text-center text-lg sm:text-xl font-medium"></p>
             </div>
 
-            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
-            <div id="essay-container" class="hidden mb-6">
-                 <textarea id="essay-answer" class="w-full p-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" rows="6" placeholder="Ketik jawaban esai Anda di sini..."></textarea>
+            <!-- Container Jawaban Isian Singkat -->
+            <div id="essay-container" class="mb-6">
+                 <label class="block text-gray-700 text-sm font-bold mb-2" for="essay-answer">Jawaban Anda:</label>
+                 <textarea id="essay-answer" class="w-full p-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-lg" rows="3" placeholder="Ketik jawaban singkat di sini..."></textarea>
             </div>
 
-            <div class="flex flex-col sm:flex-row justify-between items-center mt-8 space-y-4 sm:space-y-0">
-                 <button id="prev-btn" onclick="prevQuestion()" class="w-full sm:w-auto bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition duration-300">Sebelumnya</button>
-                 <button onclick="showResults()" class="w-full sm:w-auto bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition duration-300">Lihat Hasil</button>
-                 <button id="next-btn" onclick="nextQuestion()" class="w-full sm:w-auto bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300">Selanjutnya</button>
+            <!-- Container Opsi (Disembunyikan karena fokus isian singkat, tapi disiapkan jika needed) -->
+            <div id="options-container" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
+
+            <div class="flex justify-between items-center mt-8">
+                 <button id="prev-btn" onclick="prevQuestion()" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition duration-300">Sebelumnya</button>
+                 <button onclick="showResults()" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition duration-300">Selesai & Lihat Kunci</button>
+                 <button id="next-btn" onclick="nextQuestion()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300">Selanjutnya</button>
             </div>
         </div>
 
         <!-- Layar Hasil -->
         <div id="result-screen" class="hidden text-center">
-            <h2 class="text-3xl font-bold text-blue-600 mb-4">Hasil Kuis</h2>
-            <div id="topic-scores-breakdown" class="mb-8 text-left border rounded-lg p-4 bg-gray-50">
-                <!-- Rincian skor per topik akan ditampilkan di sini -->
-            </div>
-            <p class="text-lg mb-6">Tinjau jawaban Anda di bawah ini:</p>
-            <div id="answers-review" class="text-left max-h-[40vh] overflow-y-auto p-4 bg-gray-50 rounded-lg border"></div>
+            <h2 class="text-3xl font-bold text-blue-600 mb-4">Kunci Jawaban & Review</h2>
+            <p class="text-lg mb-6 text-gray-600">Bandingkan jawaban Anda dengan kunci jawaban komprehensif di bawah ini.</p>
+            
+            <div id="answers-review" class="text-left max-h-[60vh] overflow-y-auto p-4 bg-gray-50 rounded-lg border space-y-4"></div>
+            
             <div class="mt-8 flex justify-center space-x-4">
                 <button onclick="restartQuiz()" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300">
-                    Kembali ke Awal
+                    Kembali ke Menu Utama
                 </button>
             </div>
         </div>
@@ -125,220 +106,170 @@
 
     <!-- Modal Navigasi -->
     <div id="nav-panel" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-40" onclick="toggleNavPanel()">
-        <div class="bg-white rounded-2xl p-6 max-w-3xl w-full max-h-[80vh] flex flex-col shadow-2xl" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-4">
-                 <h3 class="text-xl font-bold">Lompat ke Soal</h3>
-                 <button onclick="toggleNavPanel()" class="text-gray-500 hover:text-gray-700">&times;</button>
-            </div>
-            <div id="nav-grid" class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 overflow-y-auto p-2 flex-grow"></div>
-            <div class="mt-6 text-right border-t pt-4">
+        <div class="bg-white rounded-2xl p-6 max-w-3xl w-full shadow-2xl" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-bold mb-4">Navigasi Soal</h3>
+            <div id="nav-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2 max-h-[60vh] overflow-y-auto p-2"></div>
+            <div class="mt-6 text-right">
                 <button onclick="toggleNavPanel()" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600">Tutup</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Penjelasan -->
-    <div id="explanationModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50" onclick="closeModal()">
-        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl transform transition-transform duration-300 scale-95" onclick="event.stopPropagation()">
-             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-2xl font-bold text-blue-600" id="modal-question-title">Penjelasan Jawaban</h3>
-                 <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            <p class="text-lg mb-2 font-semibold">Pertanyaan:</p>
-            <p class="bg-blue-50 p-3 rounded-lg mb-4" id="modal-question"></p>
-            <p class="text-lg mb-2 font-semibold">Jawaban yang Benar:</p>
-            <p class="text-green-700 bg-green-100 p-3 rounded-lg mb-4" id="modal-correct-answer"></p>
-            <p class="text-lg mb-2 font-semibold">Penjelasan:</p>
-            <p id="modal-explanation" class="text-gray-700"></p>
-            <div class="mt-6 text-right">
-                <button onclick="closeModal()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition">Tutup</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // --- Data Kuis (Dikelompokkan per Topik Berdasarkan File PDF) ---
+        // --- Data Kuis 100 Soal Isian Singkat ---
+        // Mencakup Modul 1 (Nekton), 2 (Klorofil-a), 3 (Sel), 4 (Fitoplankton), 5 (Zooplankton), 6 (NPP)
+        // Fokus: Teori Dasar (Bab 2), Metodologi (Bab 3), Hasil/Analisis (Bab 4)
+        
         const quizDataCategorized = {
-            "Pendahuluan Oseanografi Lingkungan": {
-                // Typo fixed: mcboq -> mcq
-                mcq: [
-                    // MCQs (16 soal)
-                    { question: "Senyawa kimia yang asing bagi kehidupan hewan (tidak alami) dan dapat mencakup pestisida, obat-obatan, serta polutan industri disebut...", options: ["Nutrien", "Xenobiotik", "Biomassa", "Isotop"], answer: "Xenobiotik", explanation: "Xenobiotik adalah istilah umum untuk zat kimia asing bagi sistem biologis." },
-                    { question: "Menurut materi, sekitar berapa persen toksisitas akibat bahan kimia pada populasi manusia disebabkan oleh xenobiotik organik?", options: ["10-20%", "30-40%", "50-60%", "80-90%"], answer: "80-90%", explanation: "Materi menyebutkan bahwa xenobiotik organik bertanggung jawab atas sebagian besar toksisitas akibat bahan kimia pada manusia." },
-                    { question: "Zona laut dangkal dengan kedalaman antara 150 hingga 200 meter disebut zona...", options: ["Litoral", "Epipelagis", "Neritik", "Batial"], answer: "Neritik", explanation: "Zona neritik mencakup wilayah laut dangkal di atas landas kontinen." },
-                    { question: "Zona laut yang masih dapat ditembus oleh sinar matahari sehingga memungkinkan fotosintesis disebut zona...", options: ["Afotik", "Disfotik (Twilight zone)", "Fotik (Eufotik)", "Abisal"], answer: "Fotik (Eufotik)", explanation: "Zona fotik adalah lapisan permukaan laut yang menerima cukup sinar matahari untuk fotosintesis." },
-                    { question: "Wilayah ekologis di dasar badan air, termasuk permukaan sedimen dan beberapa lapisan di bawahnya, disebut zona...", options: ["Pelagis", "Bentik", "Neritik", "Oseanik"], answer: "Bentik", explanation: "Zona bentik merujuk pada dasar laut dan organisme yang hidup di sana." },
-                    { question: "Menurut materi, lebih dari berapa persen populasi manusia tinggal di zona pesisir (sekitar 200 m dari permukaan laut)?", options: ["10%", "25%", "50%", "75%"], answer: "50%", explanation: "Zona pesisir merupakan area dengan konsentrasi populasi manusia yang tinggi." },
-                    { question: "Wilayah Indonesia dikenal sebagai pusat 'Segitiga Terumbu Karang'. Berapa persen spesies karang dunia yang diperkirakan ada di wilayah ini?", options: ["Sekitar 10%", "Sekitar 25%", "Sekitar 50%", "Sekitar 76%"], answer: "Sekitar 76%", explanation: "Indonesia memiliki keanekaragaman hayati laut yang sangat tinggi, termasuk sebagian besar spesies karang dunia." },
-                    { question: "Pemanasan global disebabkan oleh peningkatan konsentrasi gas-gas tertentu di atmosfer yang memerangkap panas. Fenomena ini disebut...", options: ["Efek Albedo", "Efek Rumah Kaca", "Siklus Milankovitch", "Osilasi Selatan"], answer: "Efek Rumah Kaca", explanation: "Gas rumah kaca seperti CO₂ menyerap dan memancarkan kembali radiasi inframerah, menghangatkan permukaan bumi." },
-                    { question: "Salah satu dampak utama pemanasan global terhadap lautan adalah...", options: ["Penurunan salinitas global", "Peningkatan kadar oksigen terlarut", "Kenaikan muka air laut", "Pendinginan arus laut dalam"], answer: "Kenaikan muka air laut", explanation: "Kenaikan muka air laut disebabkan oleh ekspansi termal air laut dan pencairan gletser serta lapisan es." },
-                    { question: "Fenomena pemutihan karang (coral bleaching) sering kali dipicu oleh...", options: ["Peningkatan nutrien", "Penurunan salinitas", "Peningkatan suhu air laut akibat stres panas", "Peningkatan sedimentasi"], answer: "Peningkatan suhu air laut akibat stres panas", explanation: "Suhu air yang terlalu tinggi menyebabkan karang mengeluarkan alga simbiotik (zooxanthellae) yang memberinya warna dan makanan, sehingga karang tampak putih (memutih)." },
-                    { question: "Peningkatan konsentrasi polutan seiring naiknya tingkatan trofik dalam rantai makanan disebut...", options: ["Bioakumulasi", "Bioremediasi", "Biomagnifikasi", "Biodegradasi"], answer: "Biomagnifikasi", explanation: "Biomagnifikasi terjadi ketika toksin yang terakumulasi dalam organisme dimakan oleh organisme lain, dan konsentrasinya meningkat di tingkat trofik yang lebih tinggi." },
-                    { question: "Sebagian besar sampah laut (marine debris) terdiri dari bahan...", options: ["Logam", "Kaca", "Plastik", "Organik"], answer: "Plastik", explanation: "Sifat plastik yang tahan lama dan penggunaannya yang luas menjadikannya komponen utama sampah di lingkungan laut." },
-                    { question: "Contoh pencemaran laut alami adalah...", options: ["Tumpahan minyak dari kapal tanker", "Pembuangan limbah industri", "Fenomena 'Red Tide' (pasang merah)", "Sampah plastik dari daratan"], answer: "Fenomena 'Red Tide' (pasang merah)", explanation: "'Red Tide' adalah ledakan populasi alga tertentu yang terjadi secara alami, meskipun dapat diperparah oleh input nutrien dari aktivitas manusia." },
-                    { question: "Apa yang dimaksud dengan zona 'Ocean Dead Zone'?", options: ["Area laut yang sangat dalam tanpa cahaya", "Area dengan aktivitas vulkanik bawah laut", "Area dengan kadar oksigen terlarut sangat rendah (hipoksia/anoksia) yang tidak dapat mendukung kehidupan laut", "Area konservasi laut yang dilarang untuk penangkapan ikan"], answer: "Area dengan kadar oksigen terlarut sangat rendah (hipoksia/anoksia) yang tidak dapat mendukung kehidupan laut", explanation: "'Dead Zone' biasanya disebabkan oleh eutrofikasi yang berlebihan, di mana dekomposisi biomassa alga menghabiskan oksigen di kolom air bawah." },
-                    { question: "Simulasi rendaman air laut di Pantai Utara Jawa Barat menunjukkan bahwa faktor utama yang berkontribusi terhadap perluasan rendaman selain kenaikan muka air laut adalah...", options: ["Aktivitas penangkapan ikan", "Peningkatan curah hujan", "Penurunan tanah (Land Subsidence)", "Pembangunan pelabuhan"], answer: "Penurunan tanah (Land Subsidence)", explanation: "Studi kasus menunjukkan bahwa kombinasi kenaikan muka air laut dan penurunan tanah secara signifikan memperparah potensi rendaman di wilayah pesisir." },
-                     { question: "Sistem arus global yang mengangkut panas dari daerah tropis ke lintang yang lebih tinggi, yang dikhawatirkan dapat melambat akibat pemanasan global, dikenal sebagai...", options: ["Arus Lintas Indonesia (Arlindo)", "Sirkulasi Gyre Subtropis", "Sirkulasi Termohalin (Ocean Conveyor Belt)", "Arus Ekuatorial"], answer: "Sirkulasi Termohalin (Ocean Conveyor Belt)", explanation: "Sirkulasi ini didorong oleh perbedaan densitas air laut (suhu dan salinitas) dan memainkan peran penting dalam distribusi panas global." }
+            "Modul 1: Nekton": {
+                essay: [
+                    { question: "Apa definisi Nekton?", answer: "Organisme hewani laut penghuni zona pelagis yang mampu berenang dan bergerak aktif tanpa terpengaruh oleh hambatan arus atau pergerakan massa air." },
+                    { question: "Sebutkan 3 filum utama yang termasuk dalam kelompok Nekton!", answer: "Chordata (ikan, mamalia laut), Mollusca (cephalopoda), dan Arthropoda (dekapoda)." },
+                    { question: "Apa nama zona kedalaman laut 0-200 meter yang memiliki intensitas cahaya matahari tertinggi?", answer: "Zona Epipelagis." },
+                    { question: "Sebutkan adaptasi khusus yang dimiliki nekton di zona mesopelagis ('zona senja')!", answer: "Bioluminesensi (untuk menarik mangsa/komunikasi) dan migrasi vertikal harian." },
+                    { question: "Apa istilah untuk sirip ekor ikan yang bentuknya simetris antara bagian atas dan bawah?", answer: "Homocercal." },
+                    { question: "Fungsi utama dari linea lateralis (gurat sisi) pada ikan adalah?", answer: "Mendeteksi gerakan dan getaran di dalam air (navigasi dan deteksi mangsa/predator)." },
+                    { question: "Pada anatomi ikan, organ apa yang berfungsi mengatur daya apung agar ikan bisa melayang di berbagai kedalaman?", answer: "Gelembung renang (Swim Bladder)." },
+                    { question: "Apa fungsi operkulum pada ikan bertulang sejati (Osteichthyes)?", answer: "Melindungi insang dan membantu memompa air melewati insang untuk pernapasan." },
+                    { question: "Sebutkan perbedaan utama antara Chondrichthyes dan Osteichthyes dari segi penyusun rangkanya!", answer: "Chondrichthyes memiliki rangka tulang rawan, sedangkan Osteichthyes memiliki rangka tulang keras." },
+                    { question: "Apa fungsi dari insisi (sayatan) berbentuk jendela pada dinding perut saat melakukan diseksi ikan?", answer: "Untuk memperlihatkan dan mengamati organ-organ internal ikan tanpa merusak strukturnya." },
+                    { question: "Mengapa ikan yang hidup di zona batipelagis cenderung memiliki metabolisme yang rendah?", answer: "Karena sumber makanan sangat terbatas dan kondisi lingkungan yang ekstrem (dingin, tekanan tinggi)." },
+                    { question: "Apa fungsi sirip pektoral (dada) pada pergerakan ikan?", answer: "Mengarahkan, mengontrol gerakan, melakukan belokan tajam, dan pengereman." },
+                    { question: "Sebutkan tipe bentuk tubuh ikan yang ideal untuk perenang cepat di perairan terbuka!", answer: "Fusiform atau bentuk torpedo (streamline)." },
+                    { question: "Apa yang dimaksud dengan 'suspensi rahang autodiastylic' pada Placodermi?", answer: "Rahang bawah terhubung langsung dengan tengkorak, memberikan keleluasaan lebih dalam membuka mulut." },
+                    { question: "Organ apa yang biasanya diamati pertama kali saat membuka operkulum ikan?", answer: "Insang (Gill filaments, gill rakers, gill arches)." }
                 ],
-                essay: [
-                    // Essays (2 soal)
-                    { question: "Jelaskan setidaknya tiga dampak negatif potensial dari kenaikan muka air laut terhadap wilayah pesisir Indonesia.", answer: "1. Banjir Rob (Inundasi): Wilayah pesisir dataran rendah akan lebih sering dan lebih parah tergenang air laut, merusak pemukiman, infrastruktur (jalan, pelabuhan), dan lahan pertanian/tambak. 2. Erosi Pantai: Kenaikan muka air laut meningkatkan energi gelombang yang mencapai pantai, mempercepat pengikisan garis pantai dan hilangnya lahan. 3. Intrusi Air Laut: Air laut dapat merembes lebih jauh ke dalam akuifer air tawar di pesisir, mencemari sumber air minum dan irigasi bagi masyarakat." },
-                    { question: "Apa yang dimaksud dengan biomagnifikasi dan mengapa hal ini menjadi perhatian khusus terkait polutan seperti PCB atau merkuri di lingkungan laut?", answer: "Biomagnifikasi adalah proses peningkatan konsentrasi suatu zat kimia (polutan) pada organisme di setiap tingkatan trofik yang lebih tinggi dalam rantai makanan. Polutan seperti PCB atau metilmerkuri bersifat persisten (tidak mudah terurai) dan bioakumulatif (tertimbun dalam jaringan organisme, terutama lemak). Ketika organisme yang terkontaminasi dimakan oleh predator, polutan tersebut berpindah dan terakumulasi lebih lanjut. Akibatnya, predator puncak (seperti ikan besar, mamalia laut, atau manusia) dapat memiliki konsentrasi polutan ribuan hingga jutaan kali lebih tinggi daripada konsentrasi di air atau di dasar rantai makanan. Hal ini menjadi perhatian serius karena konsentrasi tinggi tersebut dapat menyebabkan efek toksik yang parah, termasuk gangguan saraf, reproduksi, dan sistem kekebalan." }
-                ]
+                mcq: [] 
             },
-             "Ekosistem Laut": {
-                mcq: [
-                    // MCQs (17 soal)
-                    { question: "Suatu daerah dari alam dimana makhluk hidup dan benda mati saling berinteraksi untuk menghasilkan perubahan zat dari bahan hidup ke bahan mati atau sebaliknya disebut...", options: ["Bioma", "Habitat", "Ekosistem", "Komunitas"], answer: "Ekosistem", explanation: "Ekosistem mencakup semua komponen biotik (hidup) dan abiotik (tak hidup) serta interaksinya di suatu area tertentu." },
-                    { question: "Organisme yang menghasilkan makanannya sendiri melalui fotosintesis atau kemosintesis dalam ekosistem disebut...", options: ["Konsumen", "Dekomposer", "Produsen", "Detritivor"], answer: "Produsen", explanation: "Produsen, seperti fitoplankton dan alga, membentuk dasar jaring makanan." },
-                    { question: "Perairan semi tertutup yang berhubungan bebas dengan laut, di mana air tawar dari sungai bercampur dengan air laut, disebut...", options: ["Laguna", "Teluk", "Estuari", "Selat"], answer: "Estuari", explanation: "Estuari adalah zona transisi antara lingkungan sungai dan laut, ditandai dengan gradien salinitas." },
-                    { question: "Zona estuari dengan salinitas antara 5 hingga 18 per mil (‰) menurut klasifikasi Segerstrale disebut...", options: ["Oligohaline", "Mesohaline", "Polyhaline", "Euhaline"], answer: "Mesohaline", explanation: "Klasifikasi Segerstrale membagi estuari berdasarkan rentang salinitas tertentu." },
-                    { question: "Organisme laut yang dapat mentolerir rentang salinitas yang luas disebut...", options: ["Stenohaline", "Euryhaline", "Oligohaline", "Polyhaline"], answer: "Euryhaline", explanation: "Kemampuan mentolerir perubahan salinitas (euryhalinity) adalah adaptasi penting bagi organisme yang hidup di estuari." },
-                    { question: "Proses penumpukan polutan dalam jaringan suatu organisme sepanjang hidupnya disebut...", options: ["Biomagnifikasi", "Bioakumulasi", "Biodegradasi", "Bioremediasi"], answer: "Bioakumulasi", explanation: "Bioakumulasi terjadi ketika laju penyerapan polutan lebih cepat daripada laju pengeluarannya oleh organisme." },
-                    { question: "Jenis estuari yang ditandai dengan percampuran vertikal yang kuat akibat dominasi pasang surut dan aliran sungai yang lemah, sehingga salinitas hampir seragam dari permukaan ke dasar, disebut...", options: ["Estuari baji garam (Salt wedge)", "Estuari berstratifikasi kuat (Highly stratified)", "Estuari tercampur sempurna (Vertically mixed)", "Estuari berstratifikasi sebagian (Slightly stratified)"], answer: "Estuari tercampur sempurna (Vertically mixed)", explanation: "Percampuran kuat oleh pasang surut mencegah terbentuknya lapisan salinitas yang jelas." },
-                    { question: "Hutan pasang surut yang didominasi oleh pohon atau semak yang beradaptasi dengan kondisi salin dan tanah tergenang disebut...", options: ["Hutan Hujan Tropis", "Hutan Mangrove", "Hutan Rawa Gambut", "Sabana"], answer: "Hutan Mangrove", explanation: "Mangrove adalah ekosistem pesisir khas daerah tropis dan subtropis." },
-                    { question: "Salah satu fungsi ekologis penting hutan mangrove adalah sebagai...", options: ["Sumber utama produksi pasir pantai", "Daerah pemijahan dan asuhan (nursery ground) bagi banyak jenis ikan dan udang", "Penghalang angin untuk pembangkit listrik tenaga bayu", "Lokasi budidaya rumput laut secara alami"], answer: "Daerah pemijahan dan asuhan (nursery ground) bagi banyak jenis ikan dan udang", explanation: "Struktur akar mangrove yang kompleks menyediakan perlindungan dan sumber makanan bagi organisme muda." },
-                    { question: "Jenis mangrove yang sering ditemukan di zona terdepan (paling dekat laut) dan memiliki akar tunjang (prop roots) yang khas adalah...", options: ["Avicennia (Api-api)", "Rhizophora (Bakau)", "Sonneratia (Perepat)", "Bruguiera (Tancang)"], answer: "Rhizophora (Bakau)", explanation: "Akar tunjang Rhizophora membantu menopang pohon di lumpur lunak dan berperan dalam pertukaran gas." },
-                    { question: "Padang lamun (seagrass beds) terdiri dari...", options: ["Alga makro yang menempel di dasar laut", "Tumbuhan berbunga (angiospermae) yang hidup terendam di air laut", "Koloni lumut kerak di zona intertidal", "Fitoplankton yang melayang di kolom air"], answer: "Tumbuhan berbunga (angiospermae) yang hidup terendam di air laut", explanation: "Lamun adalah satu-satunya kelompok tumbuhan berbunga yang sepenuhnya beradaptasi dengan kehidupan di bawah air laut." },
-                    { question: "Faktor lingkungan utama yang paling membatasi kedalaman pertumbuhan padang lamun adalah...", options: ["Salinitas", "Suhu", "Ketersediaan nutrien", "Penetrasi cahaya"], answer: "Penetrasi cahaya", explanation: "Seperti tumbuhan lainnya, lamun membutuhkan cahaya matahari untuk fotosintesis." },
-                    { question: "Struktur masif yang terbentuk dari endapan kalsium karbonat oleh hewan karang dan alga berkapur disebut...", options: ["Gunung bawah laut (seamount)", "Terumbu karang (coral reef)", "Nodul mangan", "Gosong pasir (sandbar)"], answer: "Terumbu karang (coral reef)", explanation: "Terumbu karang adalah ekosistem kompleks yang dibangun oleh organisme." },
-                    { question: "Suhu optimal untuk pertumbuhan sebagian besar terumbu karang adalah sekitar...", options: ["10-15°C", "18-22°C", "25-29°C", "32-35°C"], answer: "25-29°C", explanation: "Karang pembentuk terumbu umumnya terbatas pada perairan tropis yang hangat." },
-                    { question: "Jenis terumbu karang yang tumbuh sejajar dengan garis pantai tetapi dipisahkan oleh laguna yang relatif lebar dan dalam disebut...", options: ["Terumbu karang tepi (fringing reef)", "Terumbu karang penghalang (barrier reef)", "Atol (atoll)", "Terumbu karang datar (patch reef)"], answer: "Terumbu karang penghalang (barrier reef)", explanation: "Contoh paling terkenal adalah Great Barrier Reef di Australia." },
-                     { question: "Organisme mikroskopis uniseluler yang hidup bersimbiosis di dalam jaringan polip karang dan melakukan fotosintesis disebut...", options: ["Fitoplankton", "Zooplankton", "Zooxanthellae", "Bakteri kemosintetik"], answer: "Zooxanthellae", explanation: "Zooxanthellae (umumnya dinoflagellata) menyediakan sebagian besar makanan bagi karang melalui fotosintesis, dan karang menyediakan tempat tinggal dan nutrien bagi alga." },
-                    { question: "Komunitas organisme yang hidup di dasar laut dalam, seringkali di sekitar rembesan metana atau ventilasi hidrotermal, yang energinya berasal dari proses kimia (kemosintesis) disebut...", options: ["Komunitas padang lamun", "Komunitas terumbu karang", "Komunitas mangrove", "Komunitas Cold Seep atau Hydrothermal Vent"], answer: "Komunitas Cold Seep atau Hydrothermal Vent", explanation: "Komunitas ini unik karena tidak bergantung pada energi matahari, melainkan pada energi kimia yang dimanfaatkan oleh bakteri kemosintetik." }
-                 ],
+            "Modul 2: Klorofil-a": {
                 essay: [
-                    // Essays (1 soal)
-                    { question: "Jelaskan setidaknya tiga fungsi atau manfaat penting ekosistem terumbu karang, baik secara ekologis maupun ekonomis.", answer: "1. Keanekaragaman Hayati Tinggi (Ekologis): Terumbu karang sering disebut 'hutan hujan lautan' karena menjadi habitat bagi sekitar 25% dari seluruh spesies laut, menyediakan tempat berlindung, mencari makan, dan berkembang biak. 2. Pelindung Pantai (Ekologis/Ekonomis): Struktur terumbu yang kokoh berfungsi sebagai pemecah gelombang alami, mengurangi energi gelombang yang sampai ke pantai, sehingga melindungi garis pantai dari erosi dan kerusakan akibat badai. 3. Sumber Perikanan dan Pariwisata (Ekonomis): Terumbu karang mendukung industri perikanan tangkap skala kecil maupun besar karena banyaknya ikan yang hidup di sana. Keindahannya juga menjadi daya tarik utama pariwisata bahari (snorkeling, diving), memberikan pendapatan bagi masyarakat pesisir." }
-                 ]
-            },
-            "Pencemaran Laut & Pesisir": {
-                mcq: [
-                    // MCQs (17 soal)
-                    { question: "Definisi pencemaran lingkungan laut menurut PP No. 19 Tahun 1999 menekankan bahwa kualitas lingkungan laut turun akibat...", options: ["Proses alami saja", "Kegiatan manusia saja", "Kegiatan manusia atau proses alami", "Perubahan iklim global"], answer: "Kegiatan manusia", explanation: "Definisi hukum pencemaran biasanya fokus pada dampak aktivitas manusia yang menyebabkan penurunan kualitas lingkungan hingga tidak sesuai baku mutu atau fungsinya." },
-                    { question: "Williams (1979) mengelompokkan bahan pencemar yang menyebabkan perubahan lingkungan tidak nyaman bagi indera (mata, telinga, hidung) sebagai pencemar...", options: ["Patogenik", "Estetik", "Ekomorfik", "Toksik"], answer: "Estetik", explanation: "Pencemaran estetik berkaitan dengan gangguan visual (sampah), bau (limbah busuk), atau suara (kebisingan kapal)." },
-                    { question: "Pencemaran yang berasal dari lokasi spesifik yang mudah diidentifikasi seperti pipa pembuangan disebut...", options: ["Nonpoint source", "Point source", "Diffuse source", "Natural source"], answer: "Point source", explanation: "Sumber titik lebih mudah diatur karena asal polutannya jelas." },
-                    { question: "Contoh pencemaran 'nonpoint source' di lingkungan laut adalah...", options: ["Tumpahan minyak dari kapal", "Limbah cair pabrik", "Limpasan air hujan dari area pertanian yang membawa pupuk", "Pembuangan air bahang PLTU"], answer: "Limpasan air hujan dari area pertanian yang membawa pupuk", explanation: "Sumber non-titik berasal dari area luas dan terbawa oleh aliran air permukaan." },
-                    { question: "Kondisi perairan yang menjadi terlalu subur akibat kelebihan nutrien (N dan P) disebut...", options: ["Oligotrofikasi", "Eutrofikasi", "Asidifikasi", "Hipoksia"], answer: "Eutrofikasi", explanation: "Eutrofikasi memicu pertumbuhan alga berlebihan (blooming)." },
-                    { question: "Blooming alga akibat eutrofikasi dapat menyebabkan kondisi anoksia (kehabisan oksigen) pada malam hari karena...", options: ["Alga mengonsumsi banyak oksigen untuk fotosintesis di malam hari", "Alga melepaskan racun yang membunuh bakteri pengurai", "Respirasi oleh alga dan dekomposisi biomassa alga oleh bakteri mengonsumsi oksigen", "Suhu air meningkat drastis di malam hari"], answer: "Respirasi oleh alga dan dekomposisi biomassa alga oleh bakteri mengonsumsi oksigen", explanation: "Fotosintesis hanya terjadi di siang hari (menghasilkan O₂), tetapi respirasi (mengonsumsi O₂) terjadi siang dan malam. Dekomposisi juga mengonsumsi O₂." },
-                    { question: "Fenomena 'red tides' yang berbahaya sering disebabkan oleh blooming jenis alga...", options: ["Diatom", "Alga hijau", "Dinoflagellata", "Lamun"], answer: "Dinoflagellata", explanation: "Beberapa spesies dinoflagellata dapat menghasilkan neurotoksin yang berbahaya bagi biota laut dan manusia." },
-                    { question: "Menurut sumber yang dikutip, persentase terbesar fosfat yang masuk ke permukaan air berasal dari...", options: ["Proses alamiah", "Industri", "Deterjen", "Limbah peternakan"], answer: "Limbah peternakan", explanation: "Studi Morse et al. (1993) yang dikutip menunjukkan limbah peternakan sebagai kontributor fosfat terbesar (32%)." },
-                    { question: "Lapisan di kolom air yang membatasi percampuran antara lapisan permukaan dan lapisan dalam karena perbedaan densitas yang tajam disebut...", options: ["Termoklin", "Haloklin", "Piknoklin", "Nekton"], answer: "Piknoklin", explanation: "Piknoklin adalah gradien densitas yang kuat, yang bisa disebabkan oleh termoklin (gradien suhu) atau haloklin (gradien salinitas) atau keduanya." },
-                    { question: "Di 'dead zone', proses dekomposisi bahan organik di dasar laut menyebabkan...", options: ["Peningkatan pH", "Penurunan suhu", "Konsumsi oksigen terlarut", "Peningkatan salinitas"], answer: "Konsumsi oksigen terlarut", explanation: "Bakteri pengurai menggunakan oksigen terlarut saat menguraikan bahan organik yang tenggelam, menyebabkan hipoksia atau anoksia di lapisan bawah." },
-                    { question: "Salah satu dampak negatif eutrofikasi selain deplesi oksigen adalah...", options: ["Peningkatan keanekaragaman hayati", "Peningkatan kejernihan air", "Produksi toksin oleh beberapa jenis alga (misalnya Cyanobacteria)", "Penurunan suhu air"], answer: "Produksi toksin oleh beberapa jenis alga (misalnya Cyanobacteria)", explanation: "Beberapa alga yang blooming saat eutrofikasi dapat menghasilkan racun yang berbahaya bagi hewan dan manusia." },
-                    { question: "Intrusi air laut ke akuifer air tawar di daerah pesisir seringkali diperparah oleh...", options: ["Peningkatan curah hujan", "Pengambilan air tanah (groundwater) secara berlebihan", "Penurunan suhu udara", "Peningkatan aliran sungai"], answer: "Pengambilan air tanah (groundwater) secara berlebihan", explanation: "Pengambilan air tawar dari sumur mengurangi tekanan air tawar, memungkinkan air laut yang lebih padat masuk ke dalam akuifer." },
-                    { question: "Limbah domestik merupakan sumber utama pencemaran...", options: ["Logam berat", "Radioaktif", "Bakteri patogen dan bahan organik", "Pestisida"], answer: "Bakteri patogen dan bahan organik", explanation: "Limbah domestik (kotoran manusia, sisa makanan, deterjen) kaya akan bahan organik dan mikroorganisme." },
-                    { question: "BOD (Biochemical Oxygen Demand) yang tinggi dalam air limbah menunjukkan...", options: ["Kandungan oksigen terlarut yang tinggi", "Kandungan bahan organik biodegradable yang tinggi", "Kandungan logam berat yang tinggi", "Suhu air yang rendah"], answer: "Kandungan bahan organik biodegradable yang tinggi", explanation: "BOD mengukur jumlah oksigen yang dibutuhkan mikroba untuk mengurai bahan organik tersebut." },
-                    { question: "Spesies eksotik (spesies asing) dapat menjadi bentuk pencemaran biologis jika...", options: ["Mereka meningkatkan keanekaragaman hayati lokal", "Mereka menjadi invasif dan mengganggu ekosistem asli", "Mereka menyediakan sumber makanan baru", "Mereka berukuran sangat kecil"], answer: "Mereka menjadi invasif dan mengganggu ekosistem asli", explanation: "Spesies invasif dapat mengalahkan spesies asli dalam kompetisi sumber daya, menyebarkan penyakit, atau mengubah struktur habitat." },
-                    { question: "Konsentrasi polutan yang dibutuhkan untuk membunuh 50% organisme uji dalam waktu tertentu disebut...", options: ["Batas deteksi", "Konsentrasi ambang batas", "LC₅₀ (Median Lethal Concentration)", "Dosis efektif"], answer: "LC₅₀ (Median Lethal Concentration)", explanation: "LC₅₀ adalah ukuran standar toksisitas akut suatu zat terhadap organisme." },
-                    { question: "Dampak sublethal dari polusi dapat mencakup...", options: ["Kematian langsung organisme", "Penurunan laju pertumbuhan atau keberhasilan reproduksi", "Peningkatan keanekaragaman spesies", "Peningkatan kadar oksigen"], answer: "Penurunan laju pertumbuhan atau keberhasilan reproduksi", explanation: "Efek sublethal tidak langsung membunuh tetapi mengganggu fungsi fisiologis atau perilaku normal organisme, yang dapat berdampak pada populasi jangka panjang." }
+                    { question: "Apa rumus kimia dari Klorofil-a?", answer: "C55H72MgN4O5." },
+                    { question: "Logam apa yang menjadi pusat aktif pada struktur cincin porfirin klorofil-a?", answer: "Magnesium (Mg)." },
+                    { question: "Mengapa klorofil-a digunakan sebagai indikator utama produktivitas primer perairan?", answer: "Karena klorofil-a merupakan pigmen utama fotosintesis yang ada pada semua fitoplankton, sehingga konsentrasinya mencerminkan biomassa fitoplankton." },
+                    { question: "Pada analisis spektrofotometri, hukum apa yang menyatakan bahwa absorbansi sebanding dengan konsentrasi zat?", answer: "Hukum Lambert-Beer." },
+                    { question: "Apa fungsi penambahan larutan aseton 90% pada kertas filter GF/F saat preparasi sampel?", answer: "Untuk mengekstraksi (melarutkan) pigmen klorofil-a dari sel-sel fitoplankton yang tertahan di kertas filter." },
+                    { question: "Mengapa sampel klorofil-a harus dibungkus aluminium foil dan disimpan dalam suhu dingin?", answer: "Untuk mencegah degradasi klorofil akibat paparan cahaya (fotodegradasi) dan panas." },
+                    { question: "Berapa lama waktu inkubasi sampel klorofil-a dalam aseton di lemari es sebelum diukur?", answer: "24 jam." },
+                    { question: "Apa tujuan pengukuran absorbansi pada panjang gelombang 750 nm?", answer: "Sebagai koreksi terhadap turbiditas (kekeruhan) sampel, karena klorofil tidak menyerap cahaya pada 750 nm." },
+                    { question: "Sebutkan 3 panjang gelombang utama selain 750 nm yang diukur dalam metode trichromatic untuk klorofil-a!", answer: "664 nm, 647 nm, dan 630 nm." },
+                    { question: "Jika nilai klorofil-a di suatu perairan > 50 µg/L, perairan tersebut dikategorikan sebagai?", answer: "Hiper-eutrofik." },
+                    { question: "Bagaimana pengaruh tingginya nutrien (nitrat dan fosfat) dari daratan terhadap konsentrasi klorofil-a di pesisir?", answer: "Meningkatkan konsentrasi klorofil-a karena nutrien memicu pertumbuhan fitoplankton." },
+                    { question: "Apa fungsi syringe filter PTFE 0.2 mikrometer pada tahap akhir preparasi?", answer: "Untuk menyaring ekstrak sampel dari partikel-partikel kecil sebelum dimasukkan ke dalam kuvet agar tidak mengganggu pembacaan spektrofotometer." },
+                    { question: "Apa yang dimaksud dengan 'blanko' dalam pengukuran spektrofotometri klorofil-a?", answer: "Larutan pelarut murni (aseton 90%) tanpa sampel, digunakan untuk mengkalibrasi alat (menol-kan absorbansi)." },
+                    { question: "Alat apa yang digunakan untuk memisahkan cahaya polikromatik menjadi monokromatik pada spektrofotometer?", answer: "Monokromator (prisma atau kisi difraksi)." },
+                    { question: "Mengapa konsentrasi klorofil-a biasanya lebih tinggi di perairan pantai dibanding laut lepas?", answer: "Karena adanya suplai nutrien yang tinggi dari limpasan sungai (run-off) di wilayah pantai." }
                 ],
-                essay: [
-                    // Essays (2 soal)
-                    { question: "Jelaskan proses terjadinya eutrofikasi di perairan pesisir dan sebutkan setidaknya dua dampak negatif utamanya.", answer: "Eutrofikasi dimulai dengan masuknya nutrien berlebih (terutama nitrogen dan fosfor) ke perairan pesisir, biasanya dari limpasan pertanian, limbah domestik, atau industri. Nutrien ini merangsang pertumbuhan alga mikroskopis (fitoplankton) secara cepat dan berlebihan (algal bloom). Ketika alga ini mati, mereka tenggelam ke dasar dan diuraikan oleh bakteri. Proses dekomposisi ini mengonsumsi sejumlah besar oksigen terlarut di lapisan air bawah. Dampak negatif utamanya adalah: 1. Hipoksia/Anoksia (Deplesi Oksigen): Kadar oksigen menjadi sangat rendah sehingga ikan dan organisme dasar lainnya tidak dapat bertahan hidup, menciptakan 'dead zone'. 2. Penurunan Kualitas Air: Blooming alga dapat mengurangi kejernihan air, menyumbat insang ikan, dan beberapa jenis alga menghasilkan racun yang berbahaya bagi biota laut dan manusia (Harmful Algal Blooms/HABs)." },
-                    { question: "Apa yang dimaksud dengan pencemaran termal dan mengapa ini menjadi masalah bagi ekosistem perairan?", answer: "Pencemaran termal adalah masuknya air dengan suhu yang lebih tinggi (atau kadang lebih rendah) dari suhu normal ke dalam badan air, biasanya berasal dari air pendingin pembangkit listrik atau industri. Ini menjadi masalah karena: 1. Menurunkan Kelarutan Oksigen: Air hangat menampung lebih sedikit oksigen terlarut daripada air dingin, padahal organisme air membutuhkannya untuk respirasi. 2. Meningkatkan Metabolisme Organisme: Suhu yang lebih tinggi meningkatkan laju metabolisme organisme air (ikan, invertebrata), yang berarti mereka membutuhkan lebih banyak oksigen, sementara ketersediaannya justru berkurang. 3. Stres Fisiologis dan Perubahan Perilaku: Banyak organisme memiliki rentang suhu optimal yang sempit. Perubahan suhu yang tiba-tiba atau persisten dapat menyebabkan stres, mengganggu reproduksi, meningkatkan kerentanan terhadap penyakit, atau memaksa organisme untuk pindah." }
-                 ]
+                mcq: []
             },
-            "Tumpahan Minyak (Oil Spill)": {
-                mcq: [
-                    // MCQs (17 soal)
-                    { question: "Minyak bumi sebagian besar terdiri dari senyawa...", options: ["Karbohidrat", "Protein", "Hidrokarbon", "Asam Nukleat"], answer: "Hidrokarbon", explanation: "Hidrokarbon (senyawa hidrogen dan karbon) merupakan komponen utama minyak mentah, berkisar 50-98%." },
-                    { question: "Tumpahan minyak besar yang terjadi di Alaska pada tahun 1989 disebabkan oleh kapal tanker...", options: ["Torrey Canyon", "Amoco Cadiz", "Exxon Valdez", "Deepwater Horizon"], answer: "Exxon Valdez", explanation: "Kecelakaan Exxon Valdez menumpahkan minyak mentah dalam jumlah besar ke Prince William Sound, Alaska." },
-                    { question: "Salah satu dampak langsung minyak pada burung laut adalah...", options: ["Meningkatkan kemampuan terbang", "Merusak lapisan kedap air pada bulu, menyebabkan hipotermia", "Memberikan lapisan pelindung dari predator", "Meningkatkan daya apung"], answer: "Merusak lapisan kedap air pada bulu, menyebabkan hipotermia", explanation: "Minyak menghilangkan minyak alami pada bulu yang membuatnya kedap air dan berfungsi sebagai insulasi, sehingga burung kedinginan dan bisa tenggelam." },
-                    { question: "Proses alami di mana komponen minyak yang lebih ringan menguap ke atmosfer setelah tumpahan disebut...", options: ["Dispersi", "Emulsifikasi", "Evaporasi", "Sedimentasi"], answer: "Evaporasi", explanation: "Evaporasi adalah salah satu proses 'weathering' utama yang menghilangkan sebagian massa minyak, terutama fraksi ringannya, dalam beberapa jam hingga hari pertama." },
-                    { question: "Proses terbentuknya emulsi air dalam minyak yang kental dan berwarna kecoklatan setelah tumpahan minyak disebut...", options: ["Pembentukan tar ball", "Pembentukan sheen", "Emulsifikasi (membentuk 'chocolate mousse')", "Biodegradasi"], answer: "Emulsifikasi (membentuk 'chocolate mousse')", explanation: "Emulsi ini meningkatkan volume minyak dan membuatnya lebih persisten serta sulit dibersihkan." },
-                    { question: "Metode pembersihan tumpahan minyak yang menggunakan penghalang mengapung untuk mengurung minyak disebut...", options: ["Penggunaan skimmer", "Penggunaan sorbent", "Penggunaan oil boom", "Penggunaan dispersan"], answer: "Penggunaan oil boom", explanation: "Oil boom digunakan untuk membatasi penyebaran minyak dan mengarahkannya ke area pengumpulan." },
-                    { question: "Alat mekanis yang digunakan untuk mengumpulkan atau menyedot minyak dari permukaan air disebut...", options: ["Oil boom", "Skimmer", "Dispersan", "Sorbent"], answer: "Skimmer", explanation: "Ada berbagai jenis skimmer yang bekerja dengan prinsip berbeda (oleofilik, weir) untuk memisahkan minyak dari air." },
-                    { question: "Bahan kimia yang disemprotkan pada tumpahan minyak untuk memecahnya menjadi tetesan-tetesan kecil agar lebih mudah terdispersi di kolom air disebut...", options: ["Sorbent", "Oil boom", "Dispersan", "Bioremediator"], answer: "Dispersan", explanation: "Penggunaan dispersan bertujuan mengurangi dampak minyak di permukaan dan mempercepat biodegradasi, namun memiliki kontroversi terkait toksisitasnya sendiri." },
-                    { question: "Sumber kontaminasi minyak terbesar di lingkungan laut secara global berasal dari...", options: ["Kecelakaan tanker besar", "Operasi normal kapal (air bilga, deballasting)", "Rembesan alami dari dasar laut", "Limpasan dari darat dan pembuangan limbah kota/industri"], answer: "Limpasan dari darat dan pembuangan limbah kota/industri", explanation: "Meskipun tumpahan besar dramatis, input minyak kronis dari sumber-sumber darat dan aktivitas rutin kapal secara total lebih signifikan." },
-                    { question: "Air yang dipompa ke dalam atau keluar dari tangki kapal untuk menjaga stabilitas saat muatan berubah disebut...", options: ["Air bilga", "Air ballast", "Air pendingin", "Air limbah"], answer: "Air ballast", explanation: "Pembuangan air ballast yang tidak tepat dapat memindahkan spesies invasif antar pelabuhan dan juga dapat mengandung sisa minyak." },
-                    { question: "Viskositas minyak adalah ukuran...", options: ["Densitasnya", "Resistansinya terhadap aliran", "Kemudahannya menguap", "Toksisitasnya"], answer: "Resistansinya terhadap aliran", explanation: "Minyak dengan viskositas tinggi lebih kental dan sulit mengalir serta menyebar dibandingkan minyak berviskositas rendah." },
-                    { question: "Mengapa minyak umumnya mengapung di atas air laut?", options: ["Karena minyak lebih asin", "Karena minyak lebih dingin", "Karena minyak memiliki densitas lebih rendah daripada air laut", "Karena tegangan permukaan air"], answer: "Karena minyak memiliki densitas lebih rendah daripada air laut", explanation: "Sebagian besar jenis minyak mentah dan produk olahannya lebih ringan (kurang padat) daripada air." },
-                    { question: "Proses pemecahan hidrokarbon minyak oleh mikroorganisme (bakteri, jamur) disebut...", options: ["Fotodegradasi", "Emulsifikasi", "Biodegradasi", "Sedimentasi"], answer: "Biodegradasi", explanation: "Biodegradasi adalah proses alami penting yang mengurai minyak di lingkungan, meskipun bisa berlangsung lambat tergantung jenis minyak dan kondisi lingkungan." },
-                    { question: "Minyak yang terdampar di pantai dan terpapar udara serta sinar matahari dalam waktu lama dapat membentuk gumpalan keras berwarna hitam yang disebut...", options: ["Sheen", "Chocolate mousse", "Tar ball", "Slick"], answer: "Tar ball", explanation: "Tar ball adalah residu minyak yang telah mengalami weathering berat." },
-                     { question: "Proses penambahan nutrien atau mikroorganisme tertentu untuk mempercepat biodegradasi minyak di lingkungan disebut...", options: ["Penggunaan dispersan", "Penggunaan sorbent", "Bioremediasi", "Pembakaran in-situ"], answer: "Bioremediasi", explanation: "Bioremediasi bertujuan meningkatkan aktivitas mikroba pengurai minyak alami atau menambahkan mikroba yang lebih efisien." },
-                    { question: "Studi kasus tumpahan minyak Balongan menunjukkan bahwa arah pergerakan minyak sangat dipengaruhi oleh...", options: ["Salinitas air laut", "Suhu air laut", "Arus laut dan angin", "Keberadaan terumbu karang"], answer: "Arus laut dan angin", explanation: "Model simulasi menunjukkan kombinasi arus dan angin sebagai faktor utama yang menentukan lintasan dan penyebaran tumpahan minyak." },
-                    { question: "Salah satu upaya pencegahan tumpahan minyak dari kapal tanker adalah dengan mendesain kapal yang memiliki...", options: ["Kecepatan lebih tinggi", "Lambung tunggal (single hull) yang lebih tebal", "Lambung ganda (double hull)", "Warna cerah agar mudah terlihat"], answer: "Lambung ganda (double hull)", explanation: "Lambung ganda memberikan lapisan perlindungan tambahan jika terjadi tabrakan atau kandas, mengurangi risiko kebocoran tangki kargo." }
+            "Modul 3: Pengamatan Sel": {
+                essay: [
+                    { question: "Sebutkan perbedaan utama struktur sel tumbuhan laut dibanding sel hewan laut!", answer: "Sel tumbuhan memiliki dinding sel, kloroplas, dan vakuola besar, sedangkan sel hewan tidak." },
+                    { question: "Apa fungsi larutan fiksatif (seperti formalin atau etanol) pada pembuatan preparat awetan?", answer: "Menghentikan aktivitas biologis, mencegah pembusukan, dan mempertahankan struktur sel agar mirip kondisi aslinya." },
+                    { question: "Mengapa eritrosit (sel darah merah) ikan berbeda dengan eritrosit mamalia/manusia?", answer: "Eritrosit ikan memiliki inti sel (nukleus) dan berbentuk oval, sedangkan eritrosit mamalia tidak berinti dan berbentuk cakram bikonkaf." },
+                    { question: "Apa fungsi pirenoid pada sel alga hijau (Chlorophyta)?", answer: "Menyimpan cadangan makanan hasil fotosintesis (seperti pati/amilum)." },
+                    { question: "Apa nama dinding sel khas pada Diatom yang terbuat dari silika?", answer: "Frustule." },
+                    { question: "Zat pewarna apa yang umum digunakan untuk memperjelas inti sel dan sitoplasma pada preparat sel darah?", answer: "Giemsa atau Wright." },
+                    { question: "Apa fungsi vakuola kontraktil pada organisme uniseluler laut?", answer: "Osmoregulasi (mengatur tekanan osmotik dengan memompa air keluar sel)." },
+                    { question: "Sebutkan organel sel yang berfungsi sebagai tempat respirasi seluler (penghasil energi)!", answer: "Mitokondria." },
+                    { question: "Pada Dinoflagellata, struktur apa yang digunakan untuk pergerakan?", answer: "Flagela (biasanya memiliki dua flagela)." },
+                    { question: "Mengapa pengamatan sel darah ikan penting dalam oseanografi biologi?", answer: "Sebagai indikator kesehatan ikan dan adaptasi fisiologis terhadap kondisi lingkungan (misal: kadar oksigen rendah)." },
+                    { question: "Apa fungsi 'Knob fokus halus' pada mikroskop?", answer: "Untuk memperjelas/mempertajam bayangan spesimen setelah fokus awal didapatkan." },
+                    { question: "Apa ciri khas morfologi sel Spirogyra (Chlorophyta) di bawah mikroskop?", answer: "Kloroplas berbentuk pita spiral." },
+                    { question: "Apa peran sentriol pada sel hewan?", answer: "Berperan dalam proses pembelahan sel." },
+                    { question: "Dalam preparat awetan, media perekat apa yang biasa digunakan untuk menutup kaca penutup (cover glass)?", answer: "Gliserin atau resin kanada (Canada Balsam)." },
+                    { question: "Struktur sel apa yang mengatur keluar-masuknya zat dari dan ke dalam sel?", answer: "Membran plasma (membran sel)." }
                 ],
-                essay: [
-                     // Essays (1 soal)
-                    { question: "Jelaskan setidaknya tiga proses 'weathering' utama yang dialami minyak setelah tumpah di laut dan bagaimana proses tersebut mengubah sifat minyak.", answer: "1. Penyebaran (Spreading): Minyak akan menyebar di permukaan air membentuk lapisan tipis (slick), didorong oleh gravitasi, tegangan permukaan, dan viskositas. Proses ini meningkatkan area kontak minyak dengan air dan udara. 2. Evaporasi (Penguapan): Komponen minyak yang ringan dan volatil (mudah menguap) akan menguap ke atmosfer. Proses ini paling cepat terjadi di awal tumpahan dan menyebabkan minyak yang tersisa menjadi lebih kental dan padat. 3. Emulsifikasi: Minyak dapat bercampur dengan air membentuk emulsi. Emulsi air-dalam-minyak ('chocolate mousse') sangat kental, meningkatkan volume tumpahan, dan lebih persisten di lingkungan. Emulsi minyak-dalam-air menyebabkan minyak terdispersi sebagai tetesan kecil di kolom air." }
-                 ]
+                mcq: []
             },
-            "Logam Berat": {
-                mcq: [
-                    // MCQs (17 soal)
-                    { question: "Logam berat secara umum didefinisikan berdasarkan...", options: ["Warna dan kilapnya", "Massa atom dan densitasnya yang tinggi", "Kemampuannya menghantarkan listrik", "Kelangkaannya di alam"], answer: "Massa atom dan densitasnya yang tinggi", explanation: "Logam berat biasanya memiliki densitas lebih dari 5 g/cm³ dan seringkali bersifat toksik." },
-                    { question: "Meskipun beberapa logam berat dibutuhkan tubuh dalam jumlah kecil (elemen jejak), dalam konsentrasi tinggi mereka dapat menjadi...", options: ["Sumber energi", "Racun (toksik)", "Antibiotik", "Vitamin"], answer: "Racun (toksik)", explanation: "Banyak logam berat mengganggu proses biologis normal jika konsentrasinya melebihi ambang batas toleransi." },
-                    { question: "Proses akumulasi logam berat dalam organisme karena laju penyerapan lebih cepat dari laju ekskresi disebut...", options: ["Biomagnifikasi", "Bioakumulasi", "Bioremediasi", "Biodegradasi"], answer: "Bioakumulasi", explanation: "Ini menyebabkan konsentrasi logam dalam organisme bisa jauh lebih tinggi daripada di lingkungannya." },
-                    { question: "Peningkatan konsentrasi logam berat pada tingkatan trofik yang lebih tinggi dalam rantai makanan disebut...", options: ["Bioakumulasi", "Biomagnifikasi", "Detoksifikasi", "Eutrofikasi"], answer: "Biomagnifikasi", explanation: "Predator mengakumulasi logam dari mangsa yang mereka konsumsi." },
-                    { question: "Contoh logam berat yang tidak memiliki fungsi biologis yang diketahui dan beracun bahkan dalam konsentrasi sangat rendah adalah...", options: ["Besi (Fe)", "Seng (Zn)", "Merkuri (Hg) dan Timbal (Pb)", "Tembaga (Cu)"], answer: "Merkuri (Hg) dan Timbal (Pb)", explanation: "Merkuri dan timbal adalah contoh logam berat non-esensial yang sangat toksik." },
-                    { question: "Sumber utama pencemaran merkuri (Hg) antropogenik secara global adalah...", options: ["Penggunaan pupuk", "Pembakaran bahan bakar fosil (terutama batu bara)", "Industri tekstil", "Limbah domestik"], answer: "Pembakaran bahan bakar fosil (terutama batu bara)", explanation: "Batu bara secara alami mengandung merkuri yang dilepaskan ke atmosfer saat pembakaran." },
-                    { question: "Bentuk merkuri yang paling berbahaya karena mudah masuk ke rantai makanan dan bersifat neurotoksin kuat adalah...", options: ["Merkuri elemental (Hg⁰)", "Garam merkuri (HgCl₂)", "Metilmerkuri (CH₃Hg⁺)", "Cinnabar (HgS)"], answer: "Metilmerkuri (CH₃Hg⁺)", explanation: "Bakteri di sedimen dapat mengubah merkuri anorganik menjadi metilmerkuri yang bioakumulatif dan biomagnifikatif." },
-                    { question: "Penyakit Minamata di Jepang disebabkan oleh keracunan...", options: ["Timbal (Pb)", "Kadmium (Cd)", "Merkuri (Hg)", "Arsenik (As)"], answer: "Merkuri (Hg)", explanation: "Pembuangan limbah industri yang mengandung metilmerkuri mencemari ikan dan kerang yang dikonsumsi penduduk." },
-                    { question: "Paparan kadmium (Cd) kronis dapat menyebabkan kerusakan pada organ...", options: ["Otak", "Jantung", "Ginjal", "Paru-paru"], answer: "Ginjal", explanation: "Ginjal adalah target organ utama akumulasi dan toksisitas kadmium." },
-                    { question: "Penyakit 'Itai-itai' yang menyebabkan tulang rapuh dan nyeri hebat di Jepang terkait dengan pencemaran...", options: ["Merkuri (Hg)", "Timbal (Pb)", "Kadmium (Cd)", "Kromium (Cr)"], answer: "Kadmium (Cd)", explanation: "Pencemaran kadmium dari aktivitas pertambangan menyebabkan penyakit tulang yang parah ini." },
-                    { question: "Sumber paparan kadmium (Cd) yang signifikan bagi perokok adalah...", options: ["Filter rokok", "Kertas rokok", "Tembakau itu sendiri", "Asap dari korek api"], answer: "Tembakau itu sendiri", explanation: "Tanaman tembakau dapat mengakumulasi kadmium dari tanah, dan kadmium ini terhirup saat rokok dibakar." },
-                    { question: "Sebelum penggunaannya dibatasi, sumber utama pencemaran timbal (Pb) di lingkungan perkotaan adalah...", options: ["Cat berbahan dasar timbal", "Pipa air dari timbal", "Aditif bensin (tetraetil timbal)", "Industri baterai"], answer: "Aditif bensin (tetraetil timbal)", explanation: "Pembakaran bensin bertimbal melepaskan timbal ke atmosfer dalam jumlah besar." },
-                    { question: "Anak-anak sangat rentan terhadap toksisitas timbal (Pb), yang dapat menyebabkan gangguan...", options: ["Pertumbuhan tulang", "Sistem pencernaan", "Perkembangan sistem saraf dan kemampuan kognitif", "Sistem pernapasan"], answer: "Perkembangan sistem saraf dan kemampuan kognitif", explanation: "Timbal adalah neurotoksin yang dapat menyebabkan kerusakan otak permanen pada anak-anak." },
-                    { question: "Logam berat dapat diangkut jarak jauh melalui atmosfer dalam bentuk...", options: ["Gas terlarut dalam awan", "Partikel aerosol", "Ion bebas", "Molekul organik kompleks"], answer: "Partikel aerosol", explanation: "Logam yang terikat pada partikel debu atau partikel hasil pembakaran dapat terbawa angin melintasi benua dan lautan." },
-                    { question: "Di lingkungan perairan, logam berat cenderung terikat pada...", options: ["Permukaan air", "Kolom air bagian tengah", "Sedimen di dasar perairan", "Organisme pelagis"], answer: "Sedimen di dasar perairan", explanation: "Banyak logam berat yang tidak larut atau teradsorpsi pada partikel sedimen dan terakumulasi di dasar." },
-                    { question: "Aktivitas pengerukan (dredging) di pelabuhan atau muara sungai yang terkontaminasi dapat menyebabkan...", options: ["Peningkatan kadar oksigen", "Penurunan kekeruhan", "Pelepasan kembali logam berat dari sedimen ke kolom air", "Pertumbuhan terumbu karang"], answer: "Pelepasan kembali logam berat dari sedimen ke kolom air", explanation: "Pengerukan mengganggu lapisan sedimen yang terkontaminasi, melepaskan polutan yang terperangkap." },
-                     { question: "Mamalia laut seperti lumba-lumba seringkali memiliki kadar merkuri yang sangat tinggi karena...", options: ["Mereka aktif menyerap merkuri dari air", "Mereka berada di puncak rantai makanan dan berumur panjang", "Mereka hidup di dekat sumber pencemaran", "Kulit mereka mudah menyerap merkuri"], answer: "Mereka berada di puncak rantai makanan dan berumur panjang", explanation: "Kombinasi dari biomagnifikasi melalui rantai makanan dan bioakumulasi sepanjang umur mereka yang panjang menyebabkan kadar merkuri yang tinggi pada predator puncak." }
-                 ],
+            "Modul 4: Fitoplankton": {
                 essay: [
-                     // Essays (2 soal)
-                    { question: "Jelaskan perbedaan antara elemen logam esensial dan non-esensial dalam konteks toksisitas logam berat. Berikan contoh untuk masing-masing.", answer: "Elemen logam esensial adalah logam yang dibutuhkan oleh organisme dalam jumlah kecil untuk fungsi biologis normal. Contohnya termasuk Besi (Fe) untuk hemoglobin, Seng (Zn) untuk enzim, dan Tembaga (Cu) untuk beberapa enzim dan pigmen pernapasan. Meskipun esensial, logam-logam ini dapat menjadi toksik jika konsentrasinya dalam tubuh terlalu tinggi. Elemen logam non-esensial adalah logam yang tidak memiliki fungsi biologis yang diketahui dalam organisme dan seringkali bersifat toksik bahkan pada konsentrasi yang sangat rendah. Contohnya termasuk Merkuri (Hg), Timbal (Pb), dan Kadmium (Cd). Tubuh biasanya tidak memiliki mekanisme efisien untuk mengatur atau mengeluarkan logam non-esensial ini, sehingga mereka cenderung berakumulasi." },
-                    { question: "Mengapa penting untuk memantau kadar logam berat dalam seafood yang dikonsumsi manusia? Sebutkan satu contoh logam berat dan potensi risiko kesehatannya.", answer: "Penting untuk memantau kadar logam berat dalam seafood karena proses bioakumulasi dan biomagnifikasi dapat menyebabkan konsentrasi logam beracun menjadi sangat tinggi pada ikan atau kerang yang berada di tingkat trofik lebih tinggi. Manusia yang mengonsumsi seafood ini dapat terpapar logam berat dalam kadar yang berbahaya. Contoh: Merkuri (khususnya metilmerkuri). Risiko kesehatannya meliputi kerusakan sistem saraf (neurotoksisitas), terutama pada janin dan anak-anak yang sedang berkembang, yang dapat menyebabkan gangguan kognitif, masalah motorik, dan cacat lahir. Pada orang dewasa, dapat menyebabkan masalah neurologis, gangguan penglihatan, dan masalah kardiovaskular." }
-                 ]
-            },
-            "Overfishing & Overhunting": {
-                mcq: [
-                    // MCQs (17 soal)
-                    { question: "Overfishing didefinisikan sebagai...", options: ["Penangkapan ikan di luar musim", "Pengambilan sumber daya ikan melebihi potensi produksinya atau kemampuan pulihnya", "Penggunaan alat tangkap yang dilarang", "Penangkapan ikan di wilayah negara lain"], answer: "Pengambilan sumber daya ikan melebihi potensi produksinya atau kemampuan pulihnya", explanation: "Overfishing terjadi ketika laju penangkapan lebih tinggi daripada laju reproduksi dan pertumbuhan stok ikan." },
-                    { question: "Istilah 'ghost fishing' merujuk pada...", options: ["Penangkapan ikan di malam hari", "Penangkapan ikan oleh kapal tak berawak", "Alat tangkap yang hilang atau dibuang di laut tetapi terus menangkap ikan atau biota laut lainnya", "Penangkapan ikan spesies langka secara ilegal"], answer: "Alat tangkap yang hilang atau dibuang di laut tetapi terus menangkap ikan atau biota laut lainnya", explanation: "Jaring atau perangkap yang hilang dapat terus 'menangkap' dan membunuh biota laut tanpa ada yang mengambil hasilnya." },
-                    { question: "Sekitar berapa persen makanan manusia berasal dari laut?", options: ["1%", "10%", "25%", "50%"], answer: "1%", explanation: "Meskipun laut sangat produktif, kontribusinya terhadap total konsumsi pangan manusia secara global relatif kecil, namun merupakan sumber protein penting." },
-                    { question: "Kelompok ikan yang paling banyak ditangkap secara global adalah...", options: ["Tuna dan ikan berparuh", "Herring, sarden, dan menhaden", "Cod dan haddock", "Salmon dan trout"], answer: "Herring, sarden, dan menhaden", explanation: "Ikan-ikan pelagis kecil ini sering ditangkap dalam jumlah besar, sebagian besar untuk diolah menjadi tepung ikan dan minyak ikan." },
-                    { question: "Perjanjian internasional yang menetapkan Zona Ekonomi Eksklusif (ZEE) sejauh 200 mil laut dari garis pantai adalah...", options: ["Konvensi Ramsar", "Konvensi CITES", "Konvensi PBB tentang Hukum Laut (UNCLOS)", "Protokol Kyoto"], answer: "Konvensi PBB tentang Hukum Laut (UNCLOS)", explanation: "UNCLOS 1982 memberikan hak eksklusif kepada negara pantai untuk mengelola sumber daya alam di ZEE mereka." },
-                    { question: "Tujuan utama penetapan ZEE adalah untuk...", options: ["Mendorong penangkapan ikan tak terbatas", "Mempromosikan konservasi dan pengelolaan sumber daya laut oleh negara pantai", "Melarang semua aktivitas perkapalan", "Menetapkan batas wilayah udara"], answer: "Mempromosikan konservasi dan pengelolaan sumber daya laut oleh negara pantai", explanation: "Harapannya, negara pantai akan mengelola sumber daya di ZEE secara berkelanjutan." },
-                    { question: "Menurut FAO (dikutip dalam materi), sekitar berapa persen stok ikan laut dunia yang berada dalam kondisi tereksploitasi penuh, berlebih, atau habis?", options: ["Sekitar 10%", "Sekitar 30%", "Sekitar 70%", "Sekitar 90%"], answer: "Sekitar 70%", explanation: "Angka ini (sekitar 69% dalam materi) menunjukkan kondisi perikanan global yang mengkhawatirkan." },
-                    { question: "Penangkapan spesies non-target yang tidak sengaja tertangkap saat menangkap spesies target disebut...", options: ["Overfishing", "Ghost fishing", "Bycatch", "Maximum Sustainable Yield"], answer: "Bycatch", explanation: "Bycatch seringkali dibuang kembali ke laut dalam kondisi mati atau sekarat dan dapat mencakup ikan muda, spesies terancam, atau mamalia laut." },
-                    { question: "Dampak penangkapan ikan yang menargetkan ikan-ikan besar (predator puncak) dapat menyebabkan...", options: ["Peningkatan ukuran rata-rata ikan dalam populasi", "Peningkatan keanekaragaman hayati", "Perubahan struktur jaring makanan dan penurunan tingkat trofik rata-rata", "Peningkatan biomassa ikan secara keseluruhan"], answer: "Perubahan struktur jaring makanan dan penurunan tingkat trofik rata-rata", explanation: "Hilangnya predator puncak dapat menyebabkan peningkatan populasi mangsanya dan mengubah seluruh dinamika ekosistem ('fishing down the food web')." },
-                    { question: "Budidaya organisme perairan dalam lingkungan terkontrol disebut...", options: ["Perikanan tangkap", "Akuakultur (Aquaculture)", "Ranching", "Konservasi"], answer: "Akuakultur (Aquaculture)", explanation: "Akuakultur meliputi budidaya ikan, kerang, udang, dan rumput laut." },
-                    { question: "Salah satu masalah lingkungan yang dapat ditimbulkan oleh akuakultur intensif adalah...", options: ["Mengurangi tekanan pada stok ikan liar", "Pencemaran air akibat sisa pakan dan kotoran ikan", "Meningkatkan keanekaragaman genetik", "Mengurangi bycatch"], answer: "Pencemaran air akibat sisa pakan dan kotoran ikan", explanation: "Limbah dari keramba jaring apung atau tambak dapat menyebabkan eutrofikasi dan degradasi kualitas air di sekitarnya." },
-                    { question: "Tingkat penangkapan maksimum yang dapat diambil dari suatu stok ikan secara terus-menerus tanpa mengurangi populasinya di masa depan disebut...", options: ["Total Allowable Catch (TAC)", "Maximum Sustainable Yield (MSY)", "Fishing Mortality Rate (F)", "Carrying Capacity (K)"], answer: "Maximum Sustainable Yield (MSY)", explanation: "MSY adalah konsep kunci dalam pengelolaan perikanan, meskipun sulit untuk ditentukan secara pasti dan seringkali dianggap kurang konservatif." },
-                    { question: "Salah satu strategi pengelolaan perikanan untuk melindungi sebagian sumber daya ikan adalah dengan menetapkan...", options: ["Kuota tangkapan individu (ITQ)", "Batas ukuran minimum ikan yang boleh ditangkap", "Kawasan Konservasi Perairan (Marine Protected Area/MPA) atau zona larang tangkap", "Subsidi bahan bakar untuk nelayan"], answer: "Kawasan Konservasi Perairan (Marine Protected Area/MPA) atau zona larang tangkap", explanation: "MPA bertujuan melindungi habitat dan memungkinkan stok ikan pulih serta berpotensi menyebar ke area penangkapan ('spillover effect')." },
-                    { question: "Overhunting merujuk pada perburuan hewan...", options: ["Hanya untuk olahraga", "Dalam jumlah yang melebihi kemampuan populasi untuk pulih", "Menggunakan metode yang tidak etis", "Di luar musim berburu yang ditetapkan"], answer: "Dalam jumlah yang melebihi kemampuan populasi untuk pulih", explanation: "Sama seperti overfishing, overhunting mengancam keberlanjutan populasi hewan buruan." },
-                    { question: "Hewan laut yang sering diburu untuk diambil siripnya sebagai bahan sup adalah...", options: ["Paus", "Lumba-lumba", "Hiu", "Penyu"], answer: "Hiu", explanation: "Praktik 'shark finning' (memotong sirip hiu dan membuang badannya) adalah ancaman serius bagi populasi hiu global." },
-                    { question: "Perburuan paus secara komersial saat ini sebagian besar dilarang oleh moratorium internasional yang diatur oleh...", options: ["CITES", "IUCN", "International Whaling Commission (IWC)", "UNCLOS"], answer: "International Whaling Commission (IWC)", explanation: "IWC menetapkan moratorium penangkapan paus komersial pada tahun 1986, meskipun beberapa negara masih melakukan penangkapan untuk tujuan 'ilmiah' atau memiliki keberatan." },
-                    { question: "Di Indonesia, perburuan paus tradisional masih dilakukan oleh masyarakat di...", options: ["Kepulauan Raja Ampat", "Pulau Bali", "Desa Lamalera, Pulau Lembata, NTT", "Kepulauan Mentawai"], answer: "Desa Lamalera, Pulau Lembata, NTT", explanation: "Perburuan paus di Lamalera adalah praktik budaya turun-temurun yang diizinkan dalam skala terbatas." }
+                    { question: "Apa definisi Fitoplankton?", answer: "Plankton nabati yang memiliki klorofil, mengapung bebas, dan mampu melakukan fotosintesis." },
+                    { question: "Sebutkan 5 divisi utama fitoplankton!", answer: "Cyanophyta, Chrysophyta, Pyrrophyta, Chlorophyta, dan Euglenophyta." },
+                    { question: "Apa yang dimaksud dengan Harmful Algal Blooms (HABs)?", answer: "Fenomena ledakan populasi alga (blooming) yang memproduksi racun atau dampak negatif lain bagi ekosistem dan manusia." },
+                    { question: "Alat apa yang digunakan untuk mencacah/menghitung kelimpahan fitoplankton di laboratorium?", answer: "Sedgewick Rafter Counting Cell." },
+                    { question: "Berapa volume air yang dapat ditampung dalam satu sel Sedgewick Rafter?", answer: "1 ml (1000 mm³)." },
+                    { question: "Apa penyebab utama terjadinya eutrofikasi yang memicu blooming fitoplankton?", answer: "Penambahan zat hara (nutrien) berlebih, terutama nitrogen dan fosfat, ke dalam perairan." },
+                    { question: "Sebutkan rumus umum menghitung kelimpahan plankton (N)!", answer: "N = (T/L) x (P/p) x (V/v) x (1/w)." },
+                    { question: "Kelompok fitoplankton mana yang dinding selnya mengandung silika?", answer: "Chrysophyta (khususnya kelas Bacillariophyceae/Diatom)." },
+                    { question: "Apa peran fitoplankton dalam siklus karbon global?", answer: "Menyerap CO2 dari atmosfer melalui fotosintesis dan menyimpannya sebagai biomassa (Biological Carbon Pump)." },
+                    { question: "Disebut apakah metode pengambilan sampel plankton dengan cara menyaring air laut menggunakan plankton net?", answer: "Metode filtrasi (penyaringan)." },
+                    { question: "Mengapa Euglenophyta unik dibandingkan divisi fitoplankton lain?", answer: "Karena memiliki ciri tumbuhan (klorofil) dan ciri hewan (flagela, bintik mata, tidak berdinding sel kaku)." },
+                    { question: "Apa fungsi pengawetan sampel fitoplankton menggunakan formalin?", answer: "Untuk menjaga keutuhan morfologi sel agar bisa diidentifikasi di laboratorium." },
+                    { question: "Sebutkan dampak negatif HABs bagi ikan!", answer: "Kematian massal akibat kekurangan oksigen, penyumbatan insang, atau keracunan." },
+                    { question: "Dalam metode Sedgewick Rafter, berapa jumlah kotak/lapang pandang yang minimal disarankan untuk diamati?", answer: "Biasanya 5-10 lapang pandang secara sistematis (diagonal atau acak)." },
+                    { question: "Apa yang dimaksud dengan 'Red Tide'?", answer: "Perubahan warna air laut menjadi merah/kecoklatan akibat blooming fitoplankton tertentu (seringkali Dinoflagellata)." }
                 ],
+                mcq: []
+            },
+            "Modul 5: Zooplankton": {
                 essay: [
-                     // Essays (2 soal)
-                    { question: "Jelaskan konsep 'Maximum Sustainable Yield' (MSY) dalam pengelolaan perikanan dan sebutkan setidaknya dua kritik atau keterbatasan dari konsep ini.", answer: "Maximum Sustainable Yield (MSY) adalah jumlah tangkapan terbesar (dalam biomassa atau jumlah individu) yang secara teoritis dapat diambil dari suatu stok ikan setiap tahun secara terus-menerus tanpa membahayakan kapasitas stok tersebut untuk memperbarui dirinya sendiri. Konsep ini didasarkan pada gagasan bahwa populasi ikan tumbuh paling cepat pada tingkat kepadatan tertentu (biasanya sekitar setengah dari daya dukung lingkungan). Kritik/Keterbatasannya: 1. Sulit Ditentukan Secara Akurat: Memperkirakan MSY memerlukan data populasi yang sangat baik (jumlah ikan, laju pertumbuhan, kematian alami), yang seringkali tidak tersedia atau tidak pasti. 2. Mengabaikan Faktor Lingkungan: Konsep MSY klasik sering mengabaikan fluktuasi lingkungan alami (perubahan suhu, arus, ketersediaan makanan) yang dapat mempengaruhi produktivitas stok ikan. 3. Mengabaikan Interaksi Ekosistem: MSY fokus pada satu spesies target dan tidak memperhitungkan dampak penangkapan pada spesies lain (bycatch, predator, mangsa) atau pada habitat." },
-                    { question: "Mengapa bycatch menjadi masalah serius dalam perikanan tangkap? Berikan contoh alat tangkap yang cenderung menghasilkan bycatch tinggi.", answer: "Bycatch menjadi masalah serius karena: 1. Pemborosan Sumber Daya: Sejumlah besar ikan dan biota laut lain yang tidak diinginkan atau tidak memiliki nilai komersial tertangkap dan seringkali mati sia-sia. 2. Ancaman bagi Spesies Terancam: Bycatch dapat mencakup spesies yang dilindungi atau terancam punah seperti penyu, lumba-lumba, hiu, atau burung laut. 3. Mengganggu Ekosistem: Pengambilan spesies non-target dalam jumlah besar dapat mengubah struktur jaring makanan dan keseimbangan ekosistem. Contoh alat tangkap dengan bycatch tinggi adalah pukat udang (shrimp trawl), yang sering menangkap berbagai jenis ikan kecil, penyu, dan invertebrata dasar lainnya selain udang target." }
-                 ]
+                    { question: "Apa definisi Zooplankton?", answer: "Plankton hewani yang bersifat heterotrof dan pergerakannya terbatas (mengikuti arus)." },
+                    { question: "Apa yang dimaksud dengan Diel Vertical Migration (DVM)?", answer: "Pergerakan vertikal harian zooplankton: naik ke permukaan saat malam untuk makan, turun ke kedalaman saat siang untuk menghindari predator." },
+                    { question: "Berdasarkan siklus hidupnya, larva ikan yang hidup sebagai plankton sementara disebut?", answer: "Meroplankton." },
+                    { question: "Zooplankton yang seluruh hidupnya dihabiskan sebagai plankton disebut?", answer: "Holoplankton (contoh: Copepoda)." },
+                    { question: "Apa peran utama zooplankton dalam rantai makanan?", answer: "Konsumen primer (memakan fitoplankton) dan penghubung transfer energi ke tingkat trofik lebih tinggi (ikan, dll)." },
+                    { question: "Sebutkan faktor lingkungan utama yang memicu migrasi vertikal harian zooplankton!", answer: "Cahaya matahari." },
+                    { question: "Alat apa yang digunakan untuk menghitung kelimpahan zooplankton dalam praktikum?", answer: "Sedgewick Rafter." },
+                    { question: "Apa yang dimaksud dengan Tikoplankton?", answer: "Organisme bentos yang terlepas dari dasar perairan dan terbawa arus sehingga sementara menjadi plankton." },
+                    { question: "Sebutkan contoh Holoplankton yang paling umum ditemukan di laut!", answer: "Kopepoda (Copepod)." },
+                    { question: "Mengapa zooplankton melakukan migrasi ke lapisan dalam pada siang hari?", answer: "Untuk menghindari predator visual (ikan) yang berburu menggunakan cahaya." },
+                    { question: "Apa fungsi formalin 4% dalam penanganan sampel zooplankton?", answer: "Sebagai larutan pengawet (fiksatif)." },
+                    { question: "Bagaimana cara menghitung Indeks Keanekaragaman (Shannon-Wiener)?", answer: "H' = - Σ (Pi x ln Pi), dimana Pi = ni/N." },
+                    { question: "Jika nilai Indeks Dominasi mendekati 1, apa artinya?", answer: "Ada satu spesies yang mendominasi komunitas tersebut (keanekaragaman rendah)." },
+                    { question: "Apa pengaruh suhu terhadap siklus hidup zooplankton?", answer: "Peningkatan suhu (dalam batas optimal) dapat mempercepat metabolisme dan reproduksi." },
+                    { question: "Sebutkan contoh Meroplankton dari kelompok Krustasea!", answer: "Larva udang (Nauplius, Zoea) atau larva kepiting (Megalopa)." }
+                ],
+                mcq: []
+            },
+            "Modul 6: Produktivitas Primer": {
+                essay: [
+                    { question: "Apa definisi Produktivitas Primer Kotor (GPP)?", answer: "Laju total fotosintesis/produksi bahan organik tanpa memperhitungkan energi yang digunakan untuk respirasi." },
+                    { question: "Apa definisi Produktivitas Primer Bersih (NPP)?", answer: "Laju penyimpanan energi organik di jaringan tumbuhan setelah dikurangi respirasi (NPP = GPP - R)." },
+                    { question: "Metode apa yang digunakan untuk mengukur oksigen terlarut dalam praktikum ini?", answer: "Metode Titrasi Winkler." },
+                    { question: "Apa fungsi 'Botol Gelap' dalam inkubasi metode oksigen?", answer: "Untuk mengukur laju respirasi komunitas (karena tidak terjadi fotosintesis tanpa cahaya)." },
+                    { question: "Bagaimana cara menghitung nilai Respirasi (R) dari data botol?", answer: "Respirasi = DO Awal (Botol Inisial) - DO Akhir (Botol Gelap)." },
+                    { question: "Bagaimana cara menghitung NPP dari data botol?", answer: "NPP = DO Akhir (Botol Terang) - DO Awal (Botol Inisial)." },
+                    { question: "Bagaimana cara menghitung GPP dari data botol?", answer: "GPP = DO Akhir (Botol Terang) - DO Akhir (Botol Gelap) ATAU GPP = NPP + R." },
+                    { question: "Apa fungsi penambahan MnSO4 dan Alkali Iodida (KI-KOH) pada metode Winkler?", answer: "Untuk memfiksasi oksigen terlarut dengan membentuk endapan mangan hidroksida/oksida." },
+                    { question: "Perubahan warna apa yang terjadi saat titik akhir titrasi dengan indikator amilum?", answer: "Dari biru tua menjadi bening (tidak berwarna)." },
+                    { question: "Larutan apa yang digunakan sebagai titran dalam metode Winkler?", answer: "Natrium Tiosulfat (Na2S2O3)." },
+                    { question: "Apa yang dimaksud dengan 'titik kompensasi' kedalaman?", answer: "Kedalaman di mana laju fotosintesis sama dengan laju respirasi (NPP = 0)." },
+                    { question: "Faktor apa yang paling membatasi produktivitas primer di laut dalam?", answer: "Cahaya matahari." },
+                    { question: "Sebutkan klasifikasi perairan berdasarkan produktivitasnya (15-50 gC/m²/tahun)!", answer: "Oligotrofik." },
+                    { question: "Apa fungsi penambahan H2SO4 pekat pada sampel Winkler yang sudah ada endapannya?", answer: "Untuk melarutkan endapan dan membebaskan iodium (I2) yang setara dengan jumlah oksigen." },
+                    { question: "Mengapa botol BOD tidak boleh ada gelembung udara saat ditutup?", answer: "Karena gelembung udara mengandung oksigen yang akan menambah nilai DO terukur (bias)." },
+                    { question: "Apa yang dimaksud dengan metode 'inkubasi in-situ'?", answer: "Inkubasi botol sampel dilakukan langsung di perairan pada kedalaman tempat sampel diambil." },
+                    { question: "Berdasarkan strukturnya, produktivitas primer di estuari umumnya tinggi atau rendah? Mengapa?", answer: "Tinggi, karena suplai nutrien yang melimpah dari sungai." },
+                    { question: "Apa hubungan antara intensitas cahaya dan fotosintesis pada kurva P-I?", answer: "Fotosintesis meningkat seiring intensitas cahaya hingga titik jenuh, lalu dapat menurun jika cahaya terlalu kuat (fotoinhibisi)." },
+                    { question: "Berapa faktor konversi umum untuk mengubah mg O2 menjadi mg C (karbon)?", answer: "0.375 (koefisien fotosintesis)." },
+                    { question: "Apa peran termoklin dalam membatasi produktivitas primer di laut lepas tropis?", answer: "Menghambat pencampuran vertikal, sehingga nutrien dari lapisan dalam tidak bisa naik ke zona fotik." }
+                ],
+                mcq: []
+            },
+            "Campuran & Umum": {
+                essay: [
+                    { question: "Apa itu Photosynthetically Active Radiation (PAR)?", answer: "Spektrum cahaya (400-700 nm) yang dapat digunakan fitoplankton untuk fotosintesis." },
+                    { question: "Organisme apa yang menjadi penghubung utama antara produsen primer dan konsumen tingkat tinggi di laut?", answer: "Zooplankton (terutama Copepoda)." },
+                    { question: "Disebut apakah zona laut di mana cahaya matahari masih tembus?", answer: "Zona Fotik / Eufotik." },
+                    { question: "Apa yang dimaksud dengan 'Biological Carbon Pump'?", answer: "Mekanisme penyerapan karbon oleh fitoplankton di permukaan dan transportasinya ke laut dalam melalui pengendapan." },
+                    { question: "Larutan apa yang digunakan sebagai indikator amilum pada titrasi Winkler?", answer: "Kanji / Amilum." }
+                ],
+                mcq: []
             }
         };
 
-
-        // --- Logika Kuis (Sama seperti di index.html, dengan penyesuaian untuk jumlah soal) ---
+        // --- Logika Aplikasi ---
         const startScreen = document.getElementById('start-screen');
         const quizScreen = document.getElementById('quiz-screen');
         const resultScreen = document.getElementById('result-screen');
         const topicSelection = document.getElementById('topic-selection');
         const quizTopicTitle = document.getElementById('quiz-topic-title');
         const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const essayContainer = document.getElementById('essay-container');
         const essayAnswer = document.getElementById('essay-answer');
         const questionCounter = document.getElementById('question-counter');
-        // scoreElement tidak digunakan secara langsung, diganti topicScoresBreakdown
-        const topicScoresBreakdown = document.getElementById('topic-scores-breakdown');
         const answersReview = document.getElementById('answers-review');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
-        const modal = document.getElementById('explanationModal');
         const navPanel = document.getElementById('nav-panel');
         const navGrid = document.getElementById('nav-grid');
         const progressBar = document.getElementById('progress-bar');
@@ -346,98 +277,65 @@
         let currentQuestionIndex = 0;
         let userAnswers = [];
         let activeQuestions = [];
-        let selectedOptionElement = null;
         let currentTopic = '';
-        const checkmarkSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="checkmark-svg"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>`;
-
 
         function initializeTopicSelection() {
             topicSelection.innerHTML = '';
-            const topics = Object.keys(quizDataCategorized);
-            // Tambahkan tombol untuk setiap topik
-            topics.forEach(topic => {
-                 // **FIX:** Add checks for undefined mcq or essay arrays
-                 const mcqArray = quizDataCategorized[topic].mcq || [];
-                 const essayArray = quizDataCategorized[topic].essay || [];
-                 const countMCQ = mcqArray.length;
-                 const countEssay = essayArray.length;
-                 const totalCount = countMCQ + countEssay;
-                 const button = document.createElement('button');
-                 button.innerHTML = `${topic}<br><span class="text-sm font-normal">(${countMCQ} PG, ${countEssay} Esai)</span>`;
-                 button.classList.add('topic-button', 'w-full', 'p-4', 'bg-white', 'border-2', 'border-blue-300', 'rounded-lg', 'text-blue-700', 'font-semibold', 'hover:bg-blue-50', 'text-center');
-                 button.onclick = () => startQuiz(topic);
-                 topicSelection.appendChild(button);
-            });
-            // Tambahkan tombol untuk "Semua Topik"
+            // Tombol "Semua Topik" sebagai default utama
             const allButton = document.createElement('button');
-             let totalMCQ = 0;
-             let totalEssay = 0;
-             topics.forEach(topic => {
-                 // **FIX:** Add checks for undefined mcq or essay arrays
-                 totalMCQ += (quizDataCategorized[topic].mcq || []).length;
-                 totalEssay += (quizDataCategorized[topic].essay || []).length;
-             });
-             const grandTotal = totalMCQ + totalEssay;
-             allButton.innerHTML = `Semua Topik<br><span class="text-sm font-normal">(${totalMCQ} PG, ${totalEssay} Esai)</span>`;
-            allButton.classList.add('topic-button', 'w-full', 'p-4', 'bg-blue-600', 'text-white', 'font-bold', 'rounded-lg', 'md:col-span-2', 'lg:col-span-3', 'text-center');
-            allButton.onclick = () => startQuiz('Semua Topik');
+            allButton.innerHTML = '<span class="text-xl">📚</span><br>Semua Materi (100 Soal)';
+            allButton.classList.add('topic-button', 'w-full', 'p-6', 'bg-blue-600', 'text-white', 'font-bold', 'rounded-xl', 'shadow-md', 'hover:bg-blue-700', 'md:col-span-2', 'lg:col-span-3');
+            allButton.onclick = () => startQuiz('Semua Materi');
             topicSelection.appendChild(allButton);
+
+            const topics = Object.keys(quizDataCategorized);
+            topics.forEach(topic => {
+                if(topic !== "Campuran & Umum") {
+                    const button = document.createElement('button');
+                    button.textContent = topic;
+                    button.classList.add('topic-button', 'w-full', 'p-4', 'bg-white', 'border-2', 'border-blue-200', 'rounded-lg', 'text-blue-700', 'font-semibold', 'hover:bg-blue-50', 'hover:border-blue-400');
+                    button.onclick = () => startQuiz(topic);
+                    topicSelection.appendChild(button);
+                }
+            });
         }
 
+        function startQuiz(topic) {
+            currentTopic = topic;
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            resultScreen.classList.add('hidden');
+            
+            activeQuestions = [];
+            if (topic === 'Semua Materi') {
+                Object.keys(quizDataCategorized).forEach(catName => {
+                    const category = quizDataCategorized[catName];
+                    activeQuestions.push(...category.essay.map(q => ({...q, topic: catName})));
+                });
+            } else {
+                const category = quizDataCategorized[topic];
+                activeQuestions = category.essay.map(q => ({...q, topic}));
+            }
+            
+            // Acak soal
+            // activeQuestions = shuffleArray(activeQuestions); 
 
-         function startQuiz(topic) {
-             currentTopic = topic;
-             startScreen.classList.add('hidden');
-             quizScreen.classList.remove('hidden');
-             resultScreen.classList.add('hidden');
-
-             if (topic === 'Semua Topik') {
-                 activeQuestions = [];
-                 // Urutkan topik agar konsisten
-                 const sortedTopics = Object.keys(quizDataCategorized).sort();
-                 sortedTopics.forEach(catName => {
-                     const category = quizDataCategorized[catName];
-                      // **FIX:** Add checks for undefined mcq or essay arrays
-                     const mcqArray = category.mcq || [];
-                     const essayArray = category.essay || [];
-                     // Tambahkan MCQ dulu
-                     activeQuestions.push(...mcqArray.map(q => ({...q, topic: catName, type: 'mcq'})));
-                     // Kemudian tambahkan Esai
-                     activeQuestions.push(...essayArray.map(q => ({...q, topic: catName, type: 'essay'})));
-                 });
-             } else {
-                 const category = quizDataCategorized[topic];
-                  // **FIX:** Add checks for undefined mcq or essay arrays
-                 const mcqArray = category.mcq || [];
-                 const essayArray = category.essay || [];
-                 // Gabungkan MCQ dan Esai, tandai tipenya
-                 activeQuestions = [
-                     ...mcqArray.map(q => ({...q, topic, type: 'mcq'})),
-                     ...essayArray.map(q => ({...q, topic, type: 'essay'}))
-                 ];
-                 activeQuestions = shuffleArray(activeQuestions); // Acak jika hanya satu topik
-             }
-
-             quizTopicTitle.textContent = topic;
-             currentQuestionIndex = 0;
-             // Inisialisasi userAnswers sesuai jumlah soal aktif
-             userAnswers = activeQuestions.map((q, i) => ({
-                 question: q.question,
-                 userAnswer: null,
-                 correctAnswer: q.answer, // Untuk MCQ, ini jawabannya; untuk Esai, ini kunci jawabannya
-                 isCorrect: null, // Hanya relevan untuk MCQ
-                 explanation: q.explanation, // Hanya relevan untuk MCQ
-                 type: q.type, // 'mcq' atau 'essay'
-                 topic: q.topic
-             }));
-
-             populateNavPanel();
-             loadQuiz();
-         }
-
-
+            quizTopicTitle.textContent = topic;
+            currentQuestionIndex = 0;
+            
+            // Reset user answers
+            userAnswers = Array(activeQuestions.length).fill(null).map((_, i) => ({
+                question: activeQuestions[i].question,
+                userAnswer: '',
+                correctAnswer: activeQuestions[i].answer,
+                topic: activeQuestions[i].topic
+            }));
+            
+            populateNavPanel();
+            loadQuiz();
+        }
+        
         function shuffleArray(array) {
-            // Fisher-Yates shuffle algorithm
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
@@ -449,412 +347,123 @@
             navGrid.innerHTML = '';
             activeQuestions.forEach((_, index) => {
                 const btn = document.createElement('button');
-                btn.innerHTML = `<span>${index + 1}</span>`; // Initial content
-                btn.classList.add('nav-btn', 'p-1', 'rounded-md', 'transition-colors', 'duration-200');
-                btn.onclick = (event) => {
-                     event.stopPropagation(); // Prevent modal closing
-                     jumpToQuestion(index);
-                };
+                btn.innerHTML = `<span>${index + 1}</span>`;
+                btn.classList.add('nav-btn', 'p-2', 'rounded-md', 'transition-colors', 'duration-200', 'flex', 'items-center', 'justify-center', 'text-sm');
+                btn.onclick = () => jumpToQuestion(index);
                 navGrid.appendChild(btn);
             });
         }
 
-
         function updateNavPanel() {
             const navButtons = navGrid.children;
-
-            if (navButtons.length !== userAnswers.length) {
-                console.error("Mismatch between nav buttons and user answers length!");
-                return; // Prevent errors if lengths don't match
-            }
+            const checkmarkSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-check-lg inline-block ml-1" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/></svg>`;
 
             for (let i = 0; i < navButtons.length; i++) {
-                // Reset classes and content first
                 navButtons[i].classList.remove('current', 'answered');
-                navButtons[i].innerHTML = `<span>${i + 1}</span>`; // Reset content
+                navButtons[i].innerHTML = `<span>${i + 1}</span>`; 
 
-                // Check if the answer exists and is not null/empty
-                if (userAnswers[i] && userAnswers[i].userAnswer !== null) {
-                    // Check specifically for non-empty strings, allow numbers like 0
-                    let answerValue = userAnswers[i].userAnswer;
-                    if (typeof answerValue === 'string' && answerValue.trim() === '') {
-                         // Treat empty strings as unanswered
-                    } else {
-                         navButtons[i].classList.add('answered');
-                         navButtons[i].innerHTML = `<span>${i + 1}</span>${checkmarkSVG}`; // Add checkmark
-                    }
+                if (userAnswers[i].userAnswer && userAnswers[i].userAnswer.trim() !== '') {
+                    navButtons[i].classList.add('answered');
+                    navButtons[i].innerHTML = `<span>${i + 1}</span>${checkmarkSVG}`;
                 }
-
-                // Highlight the current question
                 if (i === currentQuestionIndex) {
                     navButtons[i].classList.add('current');
                 }
             }
         }
 
-
         function toggleNavPanel() {
-            // Check if navPanel exists
-             if (!navPanel) return;
-
-             // Determine if opening or closing
-             const isOpening = navPanel.classList.contains('hidden');
-
-             if (isOpening) {
-                 navPanel.classList.remove('hidden');
-                 // Update immediately upon opening
-                 updateNavPanel();
-                 // Optionally disable body scroll
-                 document.body.style.overflow = 'hidden';
-             } else {
-                 navPanel.classList.add('hidden');
-                 // Re-enable body scroll
-                 document.body.style.overflow = '';
-             }
+            navPanel.classList.toggle('hidden');
+            if (!navPanel.classList.contains('hidden')) {
+                updateNavPanel();
+            }
         }
 
         function jumpToQuestion(index) {
-            saveCurrentAnswer(); // Save answer before jumping
-            if (index >= 0 && index < activeQuestions.length) {
-                currentQuestionIndex = index;
-                loadQuiz();
-                // Close nav panel after jumping (optional, good UX)
-                if (!navPanel.classList.contains('hidden')) {
-                     toggleNavPanel();
-                }
-            }
+            saveCurrentAnswer();
+            currentQuestionIndex = index;
+            loadQuiz();
+            toggleNavPanel();
         }
-
 
         function saveCurrentAnswer() {
-            // Ensure userAnswers and activeQuestions are valid for the current index
-             if (!userAnswers[currentQuestionIndex] || !activeQuestions[currentQuestionIndex]) {
-                 console.error("Cannot save answer: Invalid index or data structure.");
-                 return;
-             }
-
-             const currentQData = userAnswers[currentQuestionIndex];
-             let userAnswerToSave = null;
-
-             if (currentQData.type === 'mcq') {
-                 const selected = optionsContainer.querySelector('.quiz-option.selected');
-                 if (selected) {
-                     userAnswerToSave = selected.textContent;
-                 }
-             } else if (currentQData.type === 'essay') {
-                 // Save essay answer only if it's not just whitespace
-                 if (essayAnswer && essayAnswer.value.trim() !== '') {
-                     userAnswerToSave = essayAnswer.value.trim();
-                 }
-             }
-
-             // Update userAnswers
-             userAnswers[currentQuestionIndex].userAnswer = userAnswerToSave;
-
-             // Update correctness only for MCQ
-             if (currentQData.type === 'mcq') {
-                 userAnswers[currentQuestionIndex].isCorrect = (userAnswerToSave === currentQData.correctAnswer);
-             } else {
-                 userAnswers[currentQuestionIndex].isCorrect = null; // No correctness check for essays here
-             }
-
-             // Optional: Update nav panel immediately after saving
-             // if (!navPanel.classList.contains('hidden')) {
-             //     updateNavPanel();
-             // }
+            userAnswers[currentQuestionIndex].userAnswer = essayAnswer.value;
         }
-
 
         function loadQuiz() {
-            // Ensure activeQuestions has data and index is valid
-            if (!activeQuestions || activeQuestions.length === 0 || currentQuestionIndex < 0 || currentQuestionIndex >= activeQuestions.length) {
-                console.error("Cannot load quiz: No active questions or invalid index.");
-                // Optionally redirect to start or show an error message
-                // restartQuiz();
-                return;
-            }
-
-            deselectOptions(); // Clear previous MCQ selection visually
-
-            const currentQuestion = activeQuestions[currentQuestionIndex];
-            const currentAnswerData = userAnswers[currentQuestionIndex];
-
-            // Display question text and counter
-            questionText.textContent = currentQuestion.question;
+            const currentQuestionData = userAnswers[currentQuestionIndex];
+            questionText.textContent = currentQuestionData.question;
             questionCounter.textContent = `Soal ${currentQuestionIndex + 1} / ${activeQuestions.length}`;
-
-            // Update progress bar
             progressBar.style.width = `${((currentQuestionIndex + 1) / activeQuestions.length) * 100}%`;
 
-            // Handle MCQ vs Essay display
-            if (currentQuestion.type === 'mcq') {
-                optionsContainer.classList.remove('hidden');
-                essayContainer.classList.add('hidden');
-                optionsContainer.innerHTML = ''; // Clear previous options
-
-                // Shuffle options if needed (optional but good practice)
-                const options = currentQuestion.options ? shuffleArray([...currentQuestion.options]) : [];
-
-                options.forEach(option => {
-                    const button = document.createElement('button');
-                    button.textContent = option;
-                    button.classList.add('quiz-option', 'w-full', 'p-4', 'border-2', 'border-gray-300', 'rounded-lg', 'text-left', 'hover:bg-blue-100', 'transition', 'duration-200');
-                    button.onclick = () => selectAnswer(button);
-
-                    // Re-select the saved answer if it exists
-                    if (option === currentAnswerData.userAnswer) {
-                        button.classList.add('selected');
-                        selectedOptionElement = button; // Keep track of the selected element
-                    }
-                    optionsContainer.appendChild(button);
-                });
-            } else if (currentQuestion.type === 'essay') {
-                optionsContainer.classList.add('hidden');
-                essayContainer.classList.remove('hidden');
-                // Load saved essay answer or clear if none
-                essayAnswer.value = currentAnswerData.userAnswer || '';
-            } else {
-                 // Handle unknown question type if necessary
-                 console.error("Unknown question type:", currentQuestion.type);
-                 optionsContainer.classList.add('hidden');
-                 essayContainer.classList.add('hidden');
-            }
-
-            // Update button visibility and text
+            essayAnswer.value = currentQuestionData.userAnswer || '';
+            essayAnswer.focus();
+            
             prevBtn.style.visibility = currentQuestionIndex === 0 ? 'hidden' : 'visible';
             nextBtn.textContent = currentQuestionIndex === activeQuestions.length - 1 ? 'Selesai' : 'Selanjutnya';
-            // Update nav panel highlighting
-            updateNavPanel();
-        }
-
-        function selectAnswer(buttonElement) {
-            deselectOptions(); // Clear any previous selection
-            selectedOptionElement = buttonElement;
-            buttonElement.classList.add('selected'); // Highlight the new selection
-            // Optional: Immediately save answer upon selection
-            // saveCurrentAnswer();
-        }
-
-        function deselectOptions() {
-            if (selectedOptionElement) {
-                selectedOptionElement.classList.remove('selected');
-                selectedOptionElement = null;
-            }
-            // Fallback: Ensure all options are deselected
-            const options = document.querySelectorAll('.quiz-option');
-            options.forEach(option => option.classList.remove('selected'));
         }
 
         function prevQuestion() {
             if (currentQuestionIndex > 0) {
-                saveCurrentAnswer(); // Save current answer first
+                saveCurrentAnswer();
                 currentQuestionIndex--;
                 loadQuiz();
             }
         }
 
         function nextQuestion() {
-            saveCurrentAnswer(); // Save current answer first
+            saveCurrentAnswer();
             if (currentQuestionIndex < activeQuestions.length - 1) {
                 currentQuestionIndex++;
                 loadQuiz();
             } else {
-                showResults(); // Go to results if it's the last question
+                showResults();
             }
         }
 
-
         function showResults() {
-             saveCurrentAnswer(); // Save the very last answer
-             quizScreen.classList.add('hidden');
-             resultScreen.classList.remove('hidden');
+            saveCurrentAnswer();
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
 
-             const topicScores = {};
-             let essayAnswers = []; // Store essay answers separately
-
-             userAnswers.forEach(answer => {
-                 // Initialize topic score if it doesn't exist
-                 if (!topicScores[answer.topic]) {
-                     topicScores[answer.topic] = { mcqCorrect: 0, mcqTotal: 0, essayTotal: 0 };
-                 }
-
-                 if (answer.type === 'mcq') {
-                     topicScores[answer.topic].mcqTotal++;
-                     if (answer.isCorrect) {
-                         topicScores[answer.topic].mcqCorrect++;
-                     }
-                 } else if (answer.type === 'essay') {
-                      topicScores[answer.topic].essayTotal++;
-                      essayAnswers.push(answer); // Collect essay answers for review section
-                 }
-             });
-
-             // --- Display Score Breakdown ---
-             topicScoresBreakdown.innerHTML = '<h3 class="text-xl font-bold mb-4">Rincian Hasil per Topik</h3>';
-             let totalMcqCorrect = 0;
-             let totalMcqQuestions = 0;
-             let totalEssayQuestions = 0;
-
-             // Ensure consistent order of topics
-             const sortedTopics = Object.keys(quizDataCategorized).sort();
-
-             sortedTopics.forEach(topic => {
-                 if (topicScores[topic] && (topicScores[topic].mcqTotal > 0 || topicScores[topic].essayTotal > 0)) {
-                     const score = topicScores[topic];
-                     totalMcqCorrect += score.mcqCorrect;
-                     totalMcqQuestions += score.mcqTotal;
-                     totalEssayQuestions += score.essayTotal;
-
-                     const percentage = score.mcqTotal > 0 ? ((score.mcqCorrect / score.mcqTotal) * 100).toFixed(0) : 0;
-
-                     topicScoresBreakdown.innerHTML += `
-                         <div class="mb-3 pb-3 border-b last:border-b-0">
-                             <p class="font-semibold text-lg">${topic}</p>
-                             ${score.mcqTotal > 0 ? `<div class="flex justify-between items-center text-sm ml-2"><span>Pilihan Ganda:</span><span class="font-bold">${score.mcqCorrect}/${score.mcqTotal} (${percentage}%)</span></div>` : ''}
-                             ${score.essayTotal > 0 ? `<div class="flex justify-between items-center text-sm ml-2"><span>Esai:</span><span class="font-bold">${score.essayTotal} soal</span></div>` : ''}
-                         </div>
-                     `;
-                 }
-             });
-
-             // Display Total Score (only for MCQ)
-             if (totalMcqQuestions > 0) {
-                 const totalPercentage = ((totalMcqCorrect / totalMcqQuestions) * 100).toFixed(0);
-                 topicScoresBreakdown.innerHTML += `
-                     <div class="flex justify-between items-center mt-4 pt-3 border-t">
-                         <span class="font-bold text-lg text-blue-600">Skor Total Pilihan Ganda</span>
-                         <span class="font-bold text-lg text-blue-600">${totalMcqCorrect}/${totalMcqQuestions} (${totalPercentage}%)</span>
-                     </div>`;
-             } else {
-                 topicScoresBreakdown.innerHTML += `<p class="mt-4 pt-3 border-t">Tidak ada soal pilihan ganda yang dikerjakan.</p>`;
-             }
-             if (totalEssayQuestions > 0) {
-                  topicScoresBreakdown.innerHTML += `
-                     <div class="flex justify-between items-center mt-2 text-gray-700">
-                         <span class="font-bold text-lg">Total Soal Esai</span>
-                         <span class="font-bold text-lg">${totalEssayQuestions} soal</span>
-                     </div>`;
-             }
-
-
-             // --- Display Answer Review ---
-             answersReview.innerHTML = '';
-             userAnswers.forEach((answer, index) => {
-                 const reviewItem = document.createElement('div');
-                 reviewItem.classList.add('p-4', 'mb-4', 'border', 'rounded-lg');
-
-                 let answerStatusHtml = '';
-                 if (answer.type === 'mcq') {
-                     if (answer.userAnswer === null) { // Unanswered MCQ
-                          reviewItem.classList.add('bg-yellow-50', 'border-yellow-200');
-                          answerStatusHtml = `
-                              <p class="mt-2"><strong>Jawaban Anda:</strong> <span class="text-yellow-700 font-semibold">(Tidak dijawab)</span></p>
-                              <p class="mt-1"><strong>Jawaban Benar:</strong> <span class="text-green-700 font-semibold">${answer.correctAnswer}</span></p>
-                          `;
-                     } else if (answer.isCorrect) { // Correct MCQ
-                         reviewItem.classList.add('bg-green-50', 'border-green-200');
-                         answerStatusHtml = `<p class="mt-2"><strong>Jawaban Anda:</strong> <span class="text-green-700 font-semibold">${answer.userAnswer} (Benar)</span></p>`;
-                     } else { // Incorrect MCQ
-                         reviewItem.classList.add('bg-red-50', 'border-red-200');
-                         answerStatusHtml = `
-                             <p class="mt-2"><strong>Jawaban Anda:</strong> <span class="text-red-700 font-semibold">${answer.userAnswer} (Salah)</span></p>
-                             <p class="mt-1"><strong>Jawaban Benar:</strong> <span class="text-green-700 font-semibold">${answer.correctAnswer}</span></p>
-                         `;
-                     }
-                 } else { // Essay
-                     reviewItem.classList.add('bg-blue-50', 'border-blue-200');
-                     answerStatusHtml = `
-                         <p class="mt-2"><strong>Jawaban Anda (Esai):</strong></p>
-                         <p class="italic text-gray-700 p-2 bg-white rounded">${answer.userAnswer || '<span class="text-yellow-700">(Tidak dijawab)</span>'}</p>
-                         <p class="mt-2"><strong>Kunci Jawaban:</strong></p>
-                         <p class="text-gray-800 p-2 bg-gray-100 rounded">${answer.correctAnswer || '(Kunci jawaban tidak tersedia)'}</p>
-                     `;
-                 }
-
-                 // Add explanation button only for MCQs with explanations
-                 const explanationButton = (answer.type === 'mcq' && answer.explanation)
-                     ? `<button onclick="showExplanation(${index})" class="mt-2 text-sm text-blue-600 hover:underline">Lihat Penjelasan</button>`
-                     : '';
-
-                 reviewItem.innerHTML = `
-                     <p class="font-semibold">${index + 1}. ${answer.question}</p>
-                     <p class="text-xs text-gray-500 mb-1">Topik: ${answer.topic}</p>
-                     ${answerStatusHtml}
-                     ${explanationButton}
-                 `;
-                 answersReview.appendChild(reviewItem);
-             });
+            answersReview.innerHTML = '';
+            userAnswers.forEach((answer, index) => {
+                const reviewItem = document.createElement('div');
+                reviewItem.classList.add('p-5', 'border-l-4', 'border-blue-500', 'bg-white', 'shadow-sm', 'rounded-r-lg');
+                
+                // Cek apakah jawaban kosong
+                const userAnswerText = answer.userAnswer.trim() ? answer.userAnswer : '<span class="text-red-500 italic">(Tidak dijawab)</span>';
+                
+                reviewItem.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="font-bold text-gray-700 text-lg">Soal ${index + 1}</span>
+                        <span class="text-xs font-semibold bg-gray-200 text-gray-700 px-2 py-1 rounded">${answer.topic}</span>
+                    </div>
+                    <p class="mb-3 text-gray-800 font-medium">${answer.question}</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                        <div class="bg-blue-50 p-3 rounded border border-blue-100">
+                            <p class="text-xs text-blue-600 font-bold uppercase mb-1">Jawaban Anda</p>
+                            <p class="text-gray-800">${userAnswerText}</p>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded border border-green-100">
+                            <p class="text-xs text-green-600 font-bold uppercase mb-1">Kunci Jawaban</p>
+                            <p class="text-gray-800 font-semibold">${answer.correctAnswer}</p>
+                        </div>
+                    </div>
+                `;
+                answersReview.appendChild(reviewItem);
+            });
         }
-
-
+        
         function restartQuiz() {
             resultScreen.classList.add('hidden');
             startScreen.classList.remove('hidden');
-            // Reset state variables
-            currentQuestionIndex = 0;
-            userAnswers = [];
-            activeQuestions = [];
-            currentTopic = '';
-            // Re-initialize topic buttons in case they were modified
-             initializeTopicSelection();
         }
 
-        function showExplanation(index) {
-            // Ensure index is valid and userAnswers has data
-             if (index < 0 || index >= userAnswers.length || !userAnswers[index]) {
-                 console.error("Cannot show explanation: Invalid index.");
-                 return;
-             }
-
-             const answer = userAnswers[index];
-
-             // Check if it's an MCQ and has necessary data
-             if (answer.type !== 'mcq' || !answer.correctAnswer || !answer.explanation) {
-                  console.warn("Explanation not available for this question type or data missing.");
-                  // Optionally show a message to the user
-                  // alert("Penjelasan tidak tersedia untuk soal ini.");
-                  return;
-             }
-
-
-            // Populate modal content
-            document.getElementById('modal-question').textContent = answer.question;
-            document.getElementById('modal-correct-answer').textContent = answer.correctAnswer;
-            document.getElementById('modal-explanation').textContent = answer.explanation;
-
-            // Show modal with transition
-            modal.classList.remove('hidden');
-            // Force reflow before adding the class for transition
-            void modal.offsetWidth;
-            const modalContent = modal.querySelector('div[onclick="event.stopPropagation()"]');
-            if (modalContent) {
-                modalContent.classList.remove('scale-95');
-                 modalContent.classList.add('scale-100'); // Assuming scale-100 is the final state
-            }
-             // Disable body scroll when modal is open
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            const modalContent = modal.querySelector('div[onclick="event.stopPropagation()"]');
-            if (modalContent) {
-                 modalContent.classList.add('scale-95');
-                 modalContent.classList.remove('scale-100'); // Ensure final state class is removed
-            }
-
-            // Hide modal after transition
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                 // Re-enable body scroll
-                document.body.style.overflow = '';
-            }, 300); // Match transition duration
-        }
-
-
-        // Initialize topic selection when the page loads
+        // Initialize
         window.onload = initializeTopicSelection;
 
     </script>
 </body>
 </html>
-
