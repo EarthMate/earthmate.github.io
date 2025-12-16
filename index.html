@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif Pasang Surut (Ocean Tide) - Per Minggu</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -45,8 +46,8 @@
     <div id="quiz-container" class="w-full max-w-5xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
         <!-- Layar Awal (Pemilihan Topik) -->
         <div id="start-screen">
-            <h1 class="text-3xl sm:text-4xl font-bold text-center text-blue-600 mb-2">UAP Oseanografi Biologi</h1>
-            <p class="text-center text-gray-600 mb-8">100 Soal Isian Singkat</p>
+            <h1 class="text-3xl sm:text-4xl font-bold text-center text-blue-600 mb-2">SIMULASI UAS PASUT</h1>
+            <p class="text-center text-gray-600 mb-8">Simulasi UAS pasut viral terbaru 2025 no sensor by Akademik Keilmuan Komisariat HMO TRITON ITB</p>
             <div id="topic-selection" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Tombol topik akan di-generate oleh JavaScript -->
             </div>
@@ -55,10 +56,10 @@
         <!-- Layar Kuis -->
         <div id="quiz-screen" class="hidden">
             <div class="flex justify-between items-start mb-2">
-                 <div>
-                    <h2 id="quiz-topic-title" class="text-2xl font-bold text-blue-600"></h2>
-                    <button id="nav-toggle-btn" onclick="toggleNavPanel()" class="text-sm text-blue-600 hover:underline mt-1">
-                        Navigasi Soal
+                 <div class="w-3/4">
+                    <h2 id="quiz-topic-title" class="text-xl sm:text-2xl font-bold text-blue-600 leading-tight"></h2>
+                    <button id="nav-toggle-btn" onclick="toggleNavPanel()" class="text-sm text-blue-600 hover:underline mt-1 font-medium">
+                        Buka Navigasi Soal
                     </button>
                 </div>
                 <span id="question-counter" class="text-lg font-semibold text-gray-500 text-right"></span>
@@ -68,33 +69,30 @@
                 <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"></div>
             </div>
             
-            <div id="question-card" class="bg-blue-50 border-2 border-blue-200 p-6 rounded-xl min-h-[150px] flex items-center justify-center mb-6">
+            <div id="question-card" class="bg-blue-50 border-2 border-blue-200 p-6 rounded-xl min-h-[120px] flex items-center justify-center mb-6">
                 <p id="question-text" class="text-center text-lg sm:text-xl font-medium"></p>
             </div>
 
-            <!-- Container Jawaban Isian Singkat -->
-            <div id="essay-container" class="mb-6">
-                 <label class="block text-gray-700 text-sm font-bold mb-2" for="essay-answer">Jawaban Anda:</label>
-                 <textarea id="essay-answer" class="w-full p-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-lg" rows="3" placeholder="Ketik jawaban singkat di sini..."></textarea>
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
+            <div id="essay-container" class="hidden mb-6">
+                 <textarea id="essay-answer" class="w-full p-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" rows="6" placeholder="Ketik jawaban esai Anda di sini..."></textarea>
             </div>
-
-            <!-- Container Opsi (Disembunyikan karena fokus isian singkat, tapi disiapkan jika needed) -->
-            <div id="options-container" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
 
             <div class="flex justify-between items-center mt-8">
                  <button id="prev-btn" onclick="prevQuestion()" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition duration-300">Sebelumnya</button>
-                 <button onclick="showResults()" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition duration-300">Selesai & Lihat Kunci</button>
+                 <button onclick="showResults()" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition duration-300">Lihat Hasil</button>
                  <button id="next-btn" onclick="nextQuestion()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300">Selanjutnya</button>
             </div>
         </div>
 
         <!-- Layar Hasil -->
         <div id="result-screen" class="hidden text-center">
-            <h2 class="text-3xl font-bold text-blue-600 mb-4">Kunci Jawaban & Review</h2>
-            <p class="text-lg mb-6 text-gray-600">Bandingkan jawaban Anda dengan kunci jawaban komprehensif di bawah ini.</p>
-            
-            <div id="answers-review" class="text-left max-h-[60vh] overflow-y-auto p-4 bg-gray-50 rounded-lg border space-y-4"></div>
-            
+            <h2 class="text-3xl font-bold text-blue-600 mb-4">Hasil Kuis</h2>
+            <div id="topic-scores-breakdown" class="mb-8 text-left border rounded-lg p-4 bg-gray-50">
+                <!-- Rincian skor per topik akan ditampilkan di sini -->
+            </div>
+            <p class="text-lg mb-6 font-semibold">Tinjau Jawaban:</p>
+            <div id="answers-review" class="text-left max-h-[50vh] overflow-y-auto p-4 bg-white rounded-lg border shadow-inner"></div>
             <div class="mt-8 flex justify-center space-x-4">
                 <button onclick="restartQuiz()" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300">
                     Kembali ke Menu Utama
@@ -105,170 +103,246 @@
 
     <!-- Modal Navigasi -->
     <div id="nav-panel" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-40" onclick="toggleNavPanel()">
-        <div class="bg-white rounded-2xl p-6 max-w-3xl w-full shadow-2xl" onclick="event.stopPropagation()">
+        <div class="bg-white rounded-2xl p-6 max-w-4xl w-full shadow-2xl" onclick="event.stopPropagation()">
             <h3 class="text-xl font-bold mb-4">Navigasi Soal</h3>
-            <div id="nav-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2 max-h-[60vh] overflow-y-auto p-2"></div>
+            <div id="nav-grid" class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-[60vh] overflow-y-auto p-2"></div>
             <div class="mt-6 text-right">
                 <button onclick="toggleNavPanel()" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600">Tutup</button>
             </div>
         </div>
     </div>
 
+    <!-- Modal Penjelasan -->
+    <div id="explanationModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50" onclick="closeModal()">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl transform transition-transform duration-300 scale-95" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-bold text-blue-600 mb-4" id="modal-question"></h3>
+            <p class="text-md mb-2 font-semibold">Jawaban yang Benar:</p>
+            <p class="text-green-700 bg-green-100 p-3 rounded-lg mb-4 font-medium" id="modal-correct-answer"></p>
+            <p class="text-md mb-2 font-semibold">Penjelasan:</p>
+            <p id="modal-explanation" class="text-gray-700 leading-relaxed"></p>
+            <div class="mt-6 text-right">
+                <button onclick="closeModal()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition">Tutup</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // --- Data Kuis 100 Soal Isian Singkat ---
-        // Mencakup Modul 1 (Nekton), 2 (Klorofil-a), 3 (Sel), 4 (Fitoplankton), 5 (Zooplankton), 6 (NPP)
-        // Fokus: Teori Dasar (Bab 2), Metodologi (Bab 3), Hasil/Analisis (Bab 4)
-        
+        // --- Data Kuis Per Minggu (Minimal 20 Soal Pilihan Ganda + 2 Esai per Topik) ---
         const quizDataCategorized = {
-            "Modul 1: Nekton": {
-                essay: [
-                    { question: "Apa definisi Nekton?", answer: "Organisme hewani laut penghuni zona pelagis yang mampu berenang dan bergerak aktif tanpa terpengaruh oleh hambatan arus atau pergerakan massa air." },
-                    { question: "Sebutkan 3 filum utama yang termasuk dalam kelompok Nekton!", answer: "Chordata (ikan, mamalia laut), Mollusca (cephalopoda), dan Arthropoda (dekapoda)." },
-                    { question: "Apa nama zona kedalaman laut 0-200 meter yang memiliki intensitas cahaya matahari tertinggi?", answer: "Zona Epipelagis." },
-                    { question: "Sebutkan adaptasi khusus yang dimiliki nekton di zona mesopelagis ('zona senja')!", answer: "Bioluminesensi (untuk menarik mangsa/komunikasi) dan migrasi vertikal harian." },
-                    { question: "Apa istilah untuk sirip ekor ikan yang bentuknya simetris antara bagian atas dan bawah?", answer: "Homocercal." },
-                    { question: "Fungsi utama dari linea lateralis (gurat sisi) pada ikan adalah?", answer: "Mendeteksi gerakan dan getaran di dalam air (navigasi dan deteksi mangsa/predator)." },
-                    { question: "Pada anatomi ikan, organ apa yang berfungsi mengatur daya apung agar ikan bisa melayang di berbagai kedalaman?", answer: "Gelembung renang (Swim Bladder)." },
-                    { question: "Apa fungsi operkulum pada ikan bertulang sejati (Osteichthyes)?", answer: "Melindungi insang dan membantu memompa air melewati insang untuk pernapasan." },
-                    { question: "Sebutkan perbedaan utama antara Chondrichthyes dan Osteichthyes dari segi penyusun rangkanya!", answer: "Chondrichthyes memiliki rangka tulang rawan, sedangkan Osteichthyes memiliki rangka tulang keras." },
-                    { question: "Apa fungsi dari insisi (sayatan) berbentuk jendela pada dinding perut saat melakukan diseksi ikan?", answer: "Untuk memperlihatkan dan mengamati organ-organ internal ikan tanpa merusak strukturnya." },
-                    { question: "Mengapa ikan yang hidup di zona batipelagis cenderung memiliki metabolisme yang rendah?", answer: "Karena sumber makanan sangat terbatas dan kondisi lingkungan yang ekstrem (dingin, tekanan tinggi)." },
-                    { question: "Apa fungsi sirip pektoral (dada) pada pergerakan ikan?", answer: "Mengarahkan, mengontrol gerakan, melakukan belokan tajam, dan pengereman." },
-                    { question: "Sebutkan tipe bentuk tubuh ikan yang ideal untuk perenang cepat di perairan terbuka!", answer: "Fusiform atau bentuk torpedo (streamline)." },
-                    { question: "Apa yang dimaksud dengan 'suspensi rahang autodiastylic' pada Placodermi?", answer: "Rahang bawah terhubung langsung dengan tengkorak, memberikan keleluasaan lebih dalam membuka mulut." },
-                    { question: "Organ apa yang biasanya diamati pertama kali saat membuka operkulum ikan?", answer: "Insang (Gill filaments, gill rakers, gill arches)." }
+            "Mg 9: Model Darwin": {
+                mcq: [
+                    { question: "Satu hari sideris didefinisikan sebagai periode dari saat vernal equinox dilewati meridian pengamat sampai...", options: ["Matahari kembali ke zenith", "Vernal equinox kembali melewati meridian", "Bulan kembali ke posisi semula", "Tepat 24 jam"], answer: "Vernal equinox kembali melewati meridian", explanation: "Hari sideris mengacu pada rotasi bumi terhadap bintang tetap (vernal equinox)." },
+                    { question: "Berapa panjang satu hari sideris dalam satuan jam surya rata-rata?", options: ["24 jam 0 menit", "23 jam 56 menit 4 detik", "24 jam 50 menit", "12 jam 25 menit"], answer: "23 jam 56 menit 4 detik", explanation: "Hari sideris lebih pendek sekitar 4 menit dari hari surya karena revolusi bumi mengelilingi matahari." },
+                    { question: "Waktu surya rata-rata (mean solar time) didasarkan pada pergerakan...", options: ["Matahari sejati", "Matahari semu (mean sun)", "Bulan semu", "Bintang tetap"], answer: "Matahari semu (mean sun)", explanation: "Karena gerak matahari sejati tidak konstan, digunakan matahari semu yang bergerak konstan di ekuator." },
+                    { question: "Simbol 'h' dalam parameter astronomis Darwin menyatakan...", options: ["Longitude bulan semu", "Longitude matahari semu", "Sudut jam sideris", "Sudut jam bulan"], answer: "Longitude matahari semu", explanation: "h adalah longitude matahari semu (mean sun)." },
+                    { question: "Hubungan antara sudut jam sideris (θ), sudut jam matahari (t), dan h adalah...", options: ["15°θ = 15°t - 180° + h", "15°θ = 15°t + h", "15°θ = 15°t - h", "15°θ = 15°t + 180° - h"], answer: "15°θ = 15°t - 180° + h", explanation: "Ini adalah persamaan dasar yang menghubungkan waktu sideris dan waktu surya." },
+                    { question: "Simbol 's' dalam parameter astronomis menyatakan...", options: ["Longitude bulan semu", "Longitude matahari", "Perigee", "Ascending node"], answer: "Longitude bulan semu", explanation: "s adalah longitude dari bulan semu (mean moon)." },
+                    { question: "Metode pengembangan harmonik yang dikembangkan Darwin disebut...", options: ["Metode Harmonik Sejati", "Metode Respons", "Metode Kuasi Harmonik", "Metode Spektral"], answer: "Metode Kuasi Harmonik", explanation: "Disebut kuasi harmonik karena menganggap amplitudo dan fase konstan untuk periode tertentu, padahal bervariasi lambat." },
+                    { question: "Komponen pasut M2 memiliki periode sekitar...", options: ["12 jam", "12,42 jam", "23,93 jam", "24 jam"], answer: "12,42 jam", explanation: "M2 adalah komponen utama bulan (12 jam 25 menit)." },
+                    { question: "Parameter 'k' dalam pengembangan Darwin didefinisikan sebagai...", options: ["s' - s", "h - s", "s - p", "N"], answer: "s' - s", explanation: "k adalah selisih antara longitude bulan sebenarnya (s') dan bulan semu (s)." },
+                    { question: "Komponen K1 dalam model Darwin memiliki periode...", options: ["Semidiurnal", "Diurnal", "Periode panjang", "Tahunan"], answer: "Diurnal", explanation: "K1 adalah komponen diurnal (satu kali pasang surut sehari) akibat deklinasi luni-solar." },
+                    { question: "Faktor 'f' dalam notasi Darwin digunakan untuk mengoreksi...", options: ["Fase", "Amplitudo", "Waktu", "Frekuensi"], answer: "Amplitudo", explanation: "f adalah faktor koreksi nodal untuk amplitudo." },
+                    { question: "Faktor 'u' dalam notasi Darwin digunakan untuk mengoreksi...", options: ["Amplitudo", "Fase", "Kecepatan sudut", "Tinggi muka air"], answer: "Fase", explanation: "u adalah faktor koreksi nodal untuk fase." },
+                    { question: "Argumen kecepatan sudut untuk komponen S2 adalah...", options: ["30°t", "28,98°t", "15°t", "13,94°t"], answer: "30°t", explanation: "S2 bergerak tepat dengan kecepatan matahari rata-rata (30 derajat per jam)." },
+                    { question: "Nilai maksimum faktor k (ketidakteraturan bulan) adalah sekitar...", options: ["0,137 radian", "0,5 radian", "1 radian", "2,2 radian"], answer: "0,137 radian", explanation: "Nilai k kecil, maksimum sekitar 0,137 radian." },
+                    { question: "Parameter 'p' dalam astronomi pasut biasanya melambangkan...", options: ["Longitude of lunar perigee", "Longitude of solar perigee", "Tekanan atmosfer", "Periode"], answer: "Longitude of lunar perigee", explanation: "p adalah longitude perigee bulan." },
+                    { question: "Satu jam sideris setara dengan berapa derajat pergerakan?", options: ["10 derajat", "15 derajat", "30 derajat", "360 derajat"], answer: "15 derajat", explanation: "360 derajat dibagi 24 jam = 15 derajat per jam." },
+                    { question: "Komponen Mf (Lunar Fortnightly) memiliki periode...", options: ["Harian", "Bulanan", "Dua mingguan (13,66 hari)", "Tahunan"], answer: "Dua mingguan (13,66 hari)", explanation: "Mf adalah komponen periode panjang dua mingguan." },
+                    { question: "Parameter N melambangkan...", options: ["Longitude of Ascending Node", "Jumlah data", "Kecepatan sudut", "Faktor meteorologis"], answer: "Longitude of Ascending Node", explanation: "N adalah bujur simpul naik (ascending node) orbit bulan." },
+                    { question: "Komponen O1 adalah komponen...", options: ["Principal Lunar Diurnal", "Principal Solar Diurnal", "Luni-solar Diurnal", "Elliptic Lunar"], answer: "Principal Lunar Diurnal", explanation: "O1 adalah komponen diurnal utama yang disebabkan oleh bulan." },
+                    { question: "Faktor 1 - 3 sin²(phi) muncul dalam potensial pasut untuk komponen tipe...", options: ["Semidiurnal", "Diurnal", "Periode Panjang", "Shallow Water"], answer: "Periode Panjang", explanation: "Suku ini terkait dengan komponen zonal atau long-period tides." }
                 ],
-                mcq: [] 
+                essay: [
+                    { question: "Jelaskan mengapa metode pengembangan Darwin disebut sebagai 'metode kuasi harmonik'. Apa keterbatasannya?", answer: "Metode Darwin disebut kuasi harmonik karena ia memperlakukan parameter amplitudo dan fase tertentu (faktor f dan u) sebagai konstanta selama periode waktu pendek (misalnya satu tahun), padahal sebenarnya parameter tersebut berubah secara periodik dalam siklus 18,6 tahun (siklus nodal). Keterbatasannya adalah metode ini tidak sepenuhnya 'harmonik' murni karena adanya modulasi lambat pada koefisiennya, sehingga memerlukan koreksi tahunan." },
+                    { question: "Jelaskan perbedaan antara Hari Sideris dan Hari Surya Rata-rata serta penyebab perbedaannya.", answer: "Hari sideris adalah waktu yang dibutuhkan bumi untuk berotasi 360 derajat penuh relatif terhadap bintang tetap (vernal equinox), panjangnya 23 jam 56 menit 4 detik. Hari surya rata-rata adalah waktu yang dibutuhkan matahari semu untuk kembali ke meridian yang sama, panjangnya tepat 24 jam. Perbedaannya disebabkan oleh revolusi bumi mengelilingi matahari; karena bumi bergerak mengelilingi matahari, bumi harus berotasi sedikit lebih dari 360 derajat (sekitar 361 derajat) agar matahari tampak kembali di posisi yang sama di langit." }
+                ]
             },
-            "Modul 2: Klorofil-a": {
-                essay: [
-                    { question: "Apa rumus kimia dari Klorofil-a?", answer: "C55H72MgN4O5." },
-                    { question: "Logam apa yang menjadi pusat aktif pada struktur cincin porfirin klorofil-a?", answer: "Magnesium (Mg)." },
-                    { question: "Mengapa klorofil-a digunakan sebagai indikator utama produktivitas primer perairan?", answer: "Karena klorofil-a merupakan pigmen utama fotosintesis yang ada pada semua fitoplankton, sehingga konsentrasinya mencerminkan biomassa fitoplankton." },
-                    { question: "Pada analisis spektrofotometri, hukum apa yang menyatakan bahwa absorbansi sebanding dengan konsentrasi zat?", answer: "Hukum Lambert-Beer." },
-                    { question: "Apa fungsi penambahan larutan aseton 90% pada kertas filter GF/F saat preparasi sampel?", answer: "Untuk mengekstraksi (melarutkan) pigmen klorofil-a dari sel-sel fitoplankton yang tertahan di kertas filter." },
-                    { question: "Mengapa sampel klorofil-a harus dibungkus aluminium foil dan disimpan dalam suhu dingin?", answer: "Untuk mencegah degradasi klorofil akibat paparan cahaya (fotodegradasi) dan panas." },
-                    { question: "Berapa lama waktu inkubasi sampel klorofil-a dalam aseton di lemari es sebelum diukur?", answer: "24 jam." },
-                    { question: "Apa tujuan pengukuran absorbansi pada panjang gelombang 750 nm?", answer: "Sebagai koreksi terhadap turbiditas (kekeruhan) sampel, karena klorofil tidak menyerap cahaya pada 750 nm." },
-                    { question: "Sebutkan 3 panjang gelombang utama selain 750 nm yang diukur dalam metode trichromatic untuk klorofil-a!", answer: "664 nm, 647 nm, dan 630 nm." },
-                    { question: "Jika nilai klorofil-a di suatu perairan > 50 µg/L, perairan tersebut dikategorikan sebagai?", answer: "Hiper-eutrofik." },
-                    { question: "Bagaimana pengaruh tingginya nutrien (nitrat dan fosfat) dari daratan terhadap konsentrasi klorofil-a di pesisir?", answer: "Meningkatkan konsentrasi klorofil-a karena nutrien memicu pertumbuhan fitoplankton." },
-                    { question: "Apa fungsi syringe filter PTFE 0.2 mikrometer pada tahap akhir preparasi?", answer: "Untuk menyaring ekstrak sampel dari partikel-partikel kecil sebelum dimasukkan ke dalam kuvet agar tidak mengganggu pembacaan spektrofotometer." },
-                    { question: "Apa yang dimaksud dengan 'blanko' dalam pengukuran spektrofotometri klorofil-a?", answer: "Larutan pelarut murni (aseton 90%) tanpa sampel, digunakan untuk mengkalibrasi alat (menol-kan absorbansi)." },
-                    { question: "Alat apa yang digunakan untuk memisahkan cahaya polikromatik menjadi monokromatik pada spektrofotometer?", answer: "Monokromator (prisma atau kisi difraksi)." },
-                    { question: "Mengapa konsentrasi klorofil-a biasanya lebih tinggi di perairan pantai dibanding laut lepas?", answer: "Karena adanya suplai nutrien yang tinggi dari limpasan sungai (run-off) di wilayah pantai." }
+            "Mg 10: Model Doodson (Bulan)": {
+                mcq: [
+                    { question: "Pengembangan Doodson didasarkan pada penguraian...", options: ["Persamaan gelombang Airy", "Persamaan potensial pasut menggunakan segitiga bola", "Data statistik pasut", "Gaya Coriolis"], answer: "Persamaan potensial pasut menggunakan segitiga bola", explanation: "Doodson menggunakan ekspansi trigonometri dari persamaan segitiga bola untuk potensial pasut." },
+                    { question: "Komponen M2 (Principal Lunar) memiliki koefisien relatif sekitar...", options: ["0,08", "0,4", "0,919", "1,2"], answer: "0,919", explanation: "M2 adalah komponen terbesar dengan koefisien ~0,919." },
+                    { question: "Komponen N2 disebut sebagai...", options: ["Major Lunar Elliptic", "Minor Lunar Elliptic", "Principal Solar", "Luni-Solar"], answer: "Major Lunar Elliptic", explanation: "N2 muncul akibat efek eliptisitas orbit bulan (jarak) dan merupakan yang terbesar (major)." },
+                    { question: "Pasangan 'conjugate pair' dari M2 yang berkaitan dengan variasi jarak bulan adalah...", options: ["K1 dan O1", "S2 dan K2", "N2 dan L2", "P1 dan K1"], answer: "N2 dan L2", explanation: "N2 (major) dan L2 (minor) adalah pasangan conjugate akibat variasi jarak bulan." },
+                    { question: "Beda fase antara M2 dan N2 bergantung pada parameter...", options: ["s - p", "s - 2h", "N", "h"], answer: "s - p", explanation: "Argumen N2 melibatkan (s-p), yang merepresentasikan anomali rata-rata bulan." },
+                    { question: "Saat (s-p) = 0, bulan berada di posisi...", options: ["Apogee", "Perigee", "Syzygy", "Quadrature"], answer: "Perigee", explanation: "Saat s=p, bulan berada pada jarak terdekat dengan bumi (Perigee)." },
+                    { question: "Komponen K2 (Luni-Solar) memiliki periode...", options: ["12 jam", "11 jam 58 menit", "24 jam", "14 hari"], answer: "11 jam 58 menit", explanation: "K2 adalah komponen semidiurnal dengan periode sidereal (setengah hari sideris)." },
+                    { question: "Komponen 'Evection' (gangguan matahari thd orbit bulan) menghasilkan pasangan...", options: ["M2 dan S2", "nu2 dan lambda2", "mu2 dan S2", "N2 dan L2"], answer: "nu2 dan lambda2", explanation: "Nu2 dan Lambda2 adalah komponen akibat efek eveksi." },
+                    { question: "Komponen 'Variation' (gangguan matahari thd eksentrisitas orbit bulan) menghasilkan...", options: ["mu2 dan S2", "N2 dan L2", "K1 dan O1", "M2 dan K2"], answer: "mu2 dan S2", explanation: "Mu2 dan S2 (lunar) muncul dari efek variasi." },
+                    { question: "Komponen S2 dalam tabel Doodson bulan (Lunar S2) memiliki argumen yang sama dengan...", options: ["S2 Matahari", "M2", "K2", "N2"], answer: "S2 Matahari", explanation: "Bulan juga menghasilkan komponen S2 akibat efek variasi, yang frekuensinya sama persis dengan S2 matahari." },
+                    { question: "Koefisien relatif komponen K2 adalah sekitar...", options: ["0,919", "0,08", "0,19", "0,01"], answer: "0,08", explanation: "K2 jauh lebih kecil dari M2, dengan koefisien sekitar 0,08." },
+                    { question: "Komponen L2 disebut sebagai...", options: ["Major lunar elliptic", "Minor lunar elliptic", "Principal lunar", "Solar elliptic"], answer: "Minor lunar elliptic", explanation: "L2 adalah pasangan kecil dari N2." },
+                    { question: "Argumen kecepatan sudut M2 adalah...", options: ["2t + 2h - 2s", "2t + 2h", "2t", "t + h"], answer: "2t + 2h - 2s", explanation: "Ini adalah argumen standar untuk M2 (2 kali jam bulan)." },
+                    { question: "Apa arti istilah 'Conjugate Pair'?", options: ["Pasangan pasang surut", "Komponen dengan argumen simetris terhadap komponen utama", "Pasangan bulan matahari", "Komponen dengan amplitudo sama"], answer: "Komponen dengan argumen simetris terhadap komponen utama", explanation: "Mereka memiliki argumen (Argumen Utama ± α)." },
+                    { question: "Komponen 2N2 memiliki hubungan fase dengan M2 sebesar...", options: ["s - p", "2(s - p)", "s - 2h", "N"], answer: "2(s - p)", explanation: "2N2 adalah komponen eliptik orde kedua." },
+                    { question: "Argumen kecepatan sudut K2 adalah...", options: ["2t + 2h", "2t", "2t - 2s", "2t + s"], answer: "2t + 2h", explanation: "K2 memiliki argumen 2t + 2h (dua kali jam sideris)." },
+                    { question: "Efek 'Evection' berkaitan dengan gangguan...", options: ["Matahari terhadap orbit bulan", "Bulan terhadap orbit bumi", "Venus terhadap bumi", "Pasang surut atmosfer"], answer: "Matahari terhadap orbit bulan", explanation: "Gangguan gravitasi matahari menyebabkan orbit bulan tidak elips sempurna (eveksi)." },
+                    { question: "Kecepatan sudut M2 adalah...", options: ["28,984 derajat/jam", "30,000 derajat/jam", "15,041 derajat/jam", "13,943 derajat/jam"], answer: "28,984 derajat/jam", explanation: "M2 sedikit lebih lambat dari 30 derajat/jam." },
+                    { question: "Komponen M1 (dalam analisis) sering dianggap gabungan dari...", options: ["Theta1 dan Chi1", "Epsilon O1 dan Epsilon K1", "M2 dan S2", "P1 dan K1"], answer: "Epsilon O1 dan Epsilon K1", explanation: "M1 adalah resultan dari dua komponen kecil di sekitar frekuensi tersebut." },
+                    { question: "Pasangan conjugate K2 dan komponen tak bernama (No. 3) dipengaruhi oleh...", options: ["Deklinasi bulan", "Jarak bulan", "Jarak matahari", "Suhu"], answer: "Deklinasi bulan", explanation: "Mereka adalah komponen deklinasional (lunar declinational)." }
                 ],
-                mcq: []
+                essay: [
+                    { question: "Jelaskan konsep 'Conjugate Pair' dalam model Doodson menggunakan contoh komponen N2 dan L2.", answer: "Conjugate Pair adalah pasangan komponen pasut yang muncul akibat modulasi periodik (seperti variasi jarak atau deklinasi) pada komponen utama. Argumen frekuensi mereka simetris terhadap komponen utama. Contohnya, N2 dan L2 adalah conjugate pair terhadap M2 akibat variasi jarak bulan (efek eliptik). Jika argumen M2 adalah V, maka N2 memiliki argumen V - (s-p) dan L2 memiliki argumen V + (s-p). N2 (Major Elliptic) lebih besar amplitudonya daripada L2 (Minor Elliptic)." },
+                    { question: "Apa yang dimaksud dengan efek 'Evection' dan komponen pasut apa yang dihasilkannya?", answer: "Evection adalah ketidakteraturan atau gangguan pada orbit bulan yang disebabkan oleh gaya tarik matahari yang bervariasi tergantung posisi bulan relatif terhadap matahari. Efek ini menghasilkan pasangan komponen pasut 'nu2' (v2) dan 'lambda2' (λ2), yang merupakan conjugate pair terhadap M2." }
+                ]
             },
-            "Modul 3: Pengamatan Sel": {
-                essay: [
-                    { question: "Sebutkan perbedaan utama struktur sel tumbuhan laut dibanding sel hewan laut!", answer: "Sel tumbuhan memiliki dinding sel, kloroplas, dan vakuola besar, sedangkan sel hewan tidak." },
-                    { question: "Apa fungsi larutan fiksatif (seperti formalin atau etanol) pada pembuatan preparat awetan?", answer: "Menghentikan aktivitas biologis, mencegah pembusukan, dan mempertahankan struktur sel agar mirip kondisi aslinya." },
-                    { question: "Mengapa eritrosit (sel darah merah) ikan berbeda dengan eritrosit mamalia/manusia?", answer: "Eritrosit ikan memiliki inti sel (nukleus) dan berbentuk oval, sedangkan eritrosit mamalia tidak berinti dan berbentuk cakram bikonkaf." },
-                    { question: "Apa fungsi pirenoid pada sel alga hijau (Chlorophyta)?", answer: "Menyimpan cadangan makanan hasil fotosintesis (seperti pati/amilum)." },
-                    { question: "Apa nama dinding sel khas pada Diatom yang terbuat dari silika?", answer: "Frustule." },
-                    { question: "Zat pewarna apa yang umum digunakan untuk memperjelas inti sel dan sitoplasma pada preparat sel darah?", answer: "Giemsa atau Wright." },
-                    { question: "Apa fungsi vakuola kontraktil pada organisme uniseluler laut?", answer: "Osmoregulasi (mengatur tekanan osmotik dengan memompa air keluar sel)." },
-                    { question: "Sebutkan organel sel yang berfungsi sebagai tempat respirasi seluler (penghasil energi)!", answer: "Mitokondria." },
-                    { question: "Pada Dinoflagellata, struktur apa yang digunakan untuk pergerakan?", answer: "Flagela (biasanya memiliki dua flagela)." },
-                    { question: "Mengapa pengamatan sel darah ikan penting dalam oseanografi biologi?", answer: "Sebagai indikator kesehatan ikan dan adaptasi fisiologis terhadap kondisi lingkungan (misal: kadar oksigen rendah)." },
-                    { question: "Apa fungsi 'Knob fokus halus' pada mikroskop?", answer: "Untuk memperjelas/mempertajam bayangan spesimen setelah fokus awal didapatkan." },
-                    { question: "Apa ciri khas morfologi sel Spirogyra (Chlorophyta) di bawah mikroskop?", answer: "Kloroplas berbentuk pita spiral." },
-                    { question: "Apa peran sentriol pada sel hewan?", answer: "Berperan dalam proses pembelahan sel." },
-                    { question: "Dalam preparat awetan, media perekat apa yang biasa digunakan untuk menutup kaca penutup (cover glass)?", answer: "Gliserin atau resin kanada (Canada Balsam)." },
-                    { question: "Struktur sel apa yang mengatur keluar-masuknya zat dari dan ke dalam sel?", answer: "Membran plasma (membran sel)." }
+            "Mg 11: Model Doodson (Matahari)": {
+                mcq: [
+                    { question: "Komponen utama semidiurnal matahari adalah...", options: ["M2", "S2", "K2", "T2"], answer: "S2", explanation: "S2 (Principal Solar) adalah komponen utama dari matahari." },
+                    { question: "Kecepatan sudut S2 adalah...", options: ["28,98 derajat/jam", "30,00 derajat/jam", "15,04 derajat/jam", "29,53 derajat/jam"], answer: "30,00 derajat/jam", explanation: "S2 mengikuti gerak rata-rata matahari, tepat 30 derajat per jam." },
+                    { question: "Komponen T2 (Major Solar Elliptic) muncul akibat...", options: ["Deklinasi matahari", "Variasi jarak matahari (eliptisitas orbit bumi)", "Rotasi bumi", "Gravitasi bulan"], answer: "Variasi jarak matahari (eliptisitas orbit bumi)", explanation: "T2 adalah analog matahari dari N2 bulan, akibat orbit bumi yang elips." },
+                    { question: "Komponen K2 (Luni-Solar) terdiri dari...", options: ["Hanya komponen bulan", "Hanya komponen matahari", "Gabungan komponen bulan dan matahari", "Komponen atmosfer"], answer: "Gabungan komponen bulan dan matahari", explanation: "Matahari dan bulan sama-sama menghasilkan gaya pada frekuensi K2." },
+                    { question: "Argumen kecepatan sudut untuk S2 adalah...", options: ["2t", "2t + 2h", "2t - 2s", "t + h"], answer: "2t", explanation: "S2 murni bergantung pada waktu surya (t)." },
+                    { question: "Komponen P1 adalah pasangan conjugate dari...", options: ["O1", "K1 (Solar)", "Q1", "M1"], answer: "K1 (Solar)", explanation: "P1 dan K1 (solar) adalah pasangan komponen diurnal deklinasional matahari." },
+                    { question: "Komponen P1 disebut sebagai...", options: ["Solar Declinational Diurnal", "Lunar Elliptic", "Principal Lunar", "Shallow Water"], answer: "Solar Declinational Diurnal", explanation: "P1 murni dihasilkan oleh deklinasi matahari." },
+                    { question: "Komponen periode panjang 'Sa' memiliki periode...", options: ["Bulanan", "Setengah tahun", "Satu tahun", "18,6 tahun"], answer: "Satu tahun", explanation: "Sa = Solar Annual." },
+                    { question: "Komponen periode panjang 'Ssa' memiliki periode...", options: ["Bulanan", "Setengah tahun", "Satu tahun", "18,6 tahun"], answer: "Setengah tahun", explanation: "Ssa = Solar Semi-annual." },
+                    { question: "Argumen untuk komponen Sa adalah...", options: ["h - ps", "2h", "s - p", "N"], answer: "h - ps", explanation: "Sa bergantung pada anomali rata-rata matahari (h - ps)." },
+                    { question: "Argumen untuk komponen Ssa adalah...", options: ["h - ps", "2h", "s - p", "N"], answer: "2h", explanation: "Ssa berkaitan dengan deklinasi matahari (2h)." },
+                    { question: "Simbol 'ps' dalam argumen matahari menyatakan...", options: ["Longitude perigee matahari (perihelion)", "Tekanan permukaan", "Sudut fase", "Parallax"], answer: "Longitude perigee matahari (perihelion)", explanation: "ps adalah longitude perihelion matahari." },
+                    { question: "Komponen K1 solar disebut sebagai...", options: ["Luni-solar declinational", "Solar elliptic", "Lunar principal", "Evection"], answer: "Luni-solar declinational", explanation: "K1 solar bergabung dengan K1 lunar membentuk K1 luni-solar." },
+                    { question: "Komponen S1 (Solar Diurnal) secara teoritis...", options: ["Sangat besar", "Tidak ada dalam equilibrium tide", "Sama dengan K1", "Komponen utama"], answer: "Tidak ada dalam equilibrium tide", explanation: "S1 tidak muncul signifikan dalam teori potensial gravitasi murni, seringkali efek meteorologis." },
+                    { question: "Parameter 'epsilon' (ε) dalam model matahari adalah...", options: ["Eksentrisitas", "Obliquity (kemiringan sumbu bumi)", "Fase", "Amplitudo"], answer: "Obliquity (kemiringan sumbu bumi)", explanation: "Epsilon adalah sudut kemiringan ekliptika (~23,5 derajat)." },
+                    { question: "Gaya pembangkit pasut matahari dibandingkan bulan adalah sekitar...", options: ["46%", "100%", "200%", "10%"], answer: "46%", explanation: "Matahari memberikan pengaruh sekitar 46% dari pengaruh bulan." },
+                    { question: "Suku ke-2 dari potensial semidiurnal matahari (V22s) menghasilkan komponen...", options: ["K2", "S2", "T2", "P1"], answer: "S2", explanation: "Suku dengan cos(2t) adalah S2." },
+                    { question: "Suku ke-1 dari potensial semidiurnal matahari (V22s) menghasilkan komponen...", options: ["K2 (Solar)", "S2", "T2", "P1"], answer: "K2 (Solar)", explanation: "Suku dengan cos(2t+2h) adalah K2 solar." },
+                    { question: "Komponen 'Pi1' (π1) berkaitan dengan...", options: ["Efek eliptik matahari diurnal", "Efek bulan", "Efek shallow water", "Efek eveksi"], answer: "Efek eliptik matahari diurnal", explanation: "Pi1 adalah komponen kecil akibat eliptisitas orbit bumi pada diurnal." },
+                    { question: "Siklus perigee matahari (ps) sangat lambat, periodenya sekitar...", options: ["1 tahun", "8,85 tahun", "21.000 tahun", "18,6 tahun"], answer: "21.000 tahun", explanation: "Presesi perihelion bumi sangat lambat." }
                 ],
-                mcq: []
+                essay: [
+                    { question: "Jelaskan asal usul komponen T2 dan apa hubungannya dengan komponen S2.", answer: "Komponen T2 (Major Solar Elliptic) muncul akibat variasi jarak bumi-matahari karena orbit bumi yang berbentuk elips. T2 adalah pasangan conjugate dari S2 (Principal Solar). Jika S2 mewakili pasut matahari pada jarak rata-rata, T2 memodulasi S2 untuk memperhitungkan efek perihelion (jarak terdekat) dan aphelion (jarak terjauh). Hubungannya analog dengan komponen N2 dan M2 pada bulan." },
+                    { question: "Mengapa komponen K1 dan K2 disebut sebagai komponen Luni-Solar?", answer: "Disebut Luni-Solar karena komponen-komponen ini dihasilkan oleh kontribusi gaya tarik dari Bulan DAN Matahari. Baik bulan maupun matahari menghasilkan gaya pembangkit pasut pada frekuensi yang persis sama untuk K1 (diurnal) dan K2 (semidiurnal). Dalam analisis pasut, kita tidak dapat memisahkan sumbernya, sehingga resultannya dianggap sebagai satu komponen gabungan." }
+                ]
             },
-            "Modul 4: Fitoplankton": {
-                essay: [
-                    { question: "Apa definisi Fitoplankton?", answer: "Plankton nabati yang memiliki klorofil, mengapung bebas, dan mampu melakukan fotosintesis." },
-                    { question: "Sebutkan 5 divisi utama fitoplankton!", answer: "Cyanophyta, Chrysophyta, Pyrrophyta, Chlorophyta, dan Euglenophyta." },
-                    { question: "Apa yang dimaksud dengan Harmful Algal Blooms (HABs)?", answer: "Fenomena ledakan populasi alga (blooming) yang memproduksi racun atau dampak negatif lain bagi ekosistem dan manusia." },
-                    { question: "Alat apa yang digunakan untuk mencacah/menghitung kelimpahan fitoplankton di laboratorium?", answer: "Sedgewick Rafter Counting Cell." },
-                    { question: "Berapa volume air yang dapat ditampung dalam satu sel Sedgewick Rafter?", answer: "1 ml (1000 mm³)." },
-                    { question: "Apa penyebab utama terjadinya eutrofikasi yang memicu blooming fitoplankton?", answer: "Penambahan zat hara (nutrien) berlebih, terutama nitrogen dan fosfat, ke dalam perairan." },
-                    { question: "Sebutkan rumus umum menghitung kelimpahan plankton (N)!", answer: "N = (T/L) x (P/p) x (V/v) x (1/w)." },
-                    { question: "Kelompok fitoplankton mana yang dinding selnya mengandung silika?", answer: "Chrysophyta (khususnya kelas Bacillariophyceae/Diatom)." },
-                    { question: "Apa peran fitoplankton dalam siklus karbon global?", answer: "Menyerap CO2 dari atmosfer melalui fotosintesis dan menyimpannya sebagai biomassa (Biological Carbon Pump)." },
-                    { question: "Disebut apakah metode pengambilan sampel plankton dengan cara menyaring air laut menggunakan plankton net?", answer: "Metode filtrasi (penyaringan)." },
-                    { question: "Mengapa Euglenophyta unik dibandingkan divisi fitoplankton lain?", answer: "Karena memiliki ciri tumbuhan (klorofil) dan ciri hewan (flagela, bintik mata, tidak berdinding sel kaku)." },
-                    { question: "Apa fungsi pengawetan sampel fitoplankton menggunakan formalin?", answer: "Untuk menjaga keutuhan morfologi sel agar bisa diidentifikasi di laboratorium." },
-                    { question: "Sebutkan dampak negatif HABs bagi ikan!", answer: "Kematian massal akibat kekurangan oksigen, penyumbatan insang, atau keracunan." },
-                    { question: "Dalam metode Sedgewick Rafter, berapa jumlah kotak/lapang pandang yang minimal disarankan untuk diamati?", answer: "Biasanya 5-10 lapang pandang secara sistematis (diagonal atau acak)." },
-                    { question: "Apa yang dimaksud dengan 'Red Tide'?", answer: "Perubahan warna air laut menjadi merah/kecoklatan akibat blooming fitoplankton tertentu (seringkali Dinoflagellata)." }
+            "Mg 12: Variasi Nodal": {
+                mcq: [
+                    { question: "Variasi Nodal disebabkan oleh...", options: ["Revolusi bumi", "Rotasi bumi", "Regresi titik simpul (node) orbit bulan", "Pergerakan matahari"], answer: "Regresi titik simpul (node) orbit bulan", explanation: "Pergerakan ascending node orbit bulan menyebabkan variasi deklinasi maksimum bulan." },
+                    { question: "Periode siklus nodal adalah...", options: ["1 tahun", "8,85 tahun", "18,6 tahun", "100 tahun"], answer: "18,6 tahun", explanation: "Siklus pergerakan node N adalah 18,61 tahun." },
+                    { question: "Faktor 'f' disebut sebagai...", options: ["Faktor koreksi amplitudo nodal", "Faktor koreksi fase nodal", "Faktor parallax", "Faktor waktu"], answer: "Faktor koreksi amplitudo nodal", explanation: "f digunakan untuk memodulasi amplitudo rata-rata." },
+                    { question: "Faktor 'u' disebut sebagai...", options: ["Faktor koreksi amplitudo nodal", "Faktor koreksi fase nodal", "Faktor parallax", "Faktor waktu"], answer: "Faktor koreksi fase nodal", explanation: "u digunakan untuk memodulasi fase." },
+                    { question: "Untuk komponen M2, nilai pendekatan f adalah...", options: ["1,0", "1,001 - 0,039 cos N", "10,8 sin N", "0,5 cos N"], answer: "1,001 - 0,039 cos N", explanation: "M2 bervariasi sekitar 3,7-4% tergantung N." },
+                    { question: "Nilai u untuk M2 adalah sekitar...", options: ["-2,14° sin N", "13° sin N", "0°", "90°"], answer: "-2,14° sin N", explanation: "Fase M2 bergeser kecil sekitar ±2 derajat akibat nodal." },
+                    { question: "Komponen S2 memiliki nilai f dan u sebesar...", options: ["f=1, u=0", "f=1.04, u=-2.1", "f=0, u=0", "Tergantung N"], answer: "f=1, u=0", explanation: "S2 adalah komponen matahari murni, tidak dipengaruhi node bulan." },
+                    { question: "Komponen O1 memiliki variasi nodal yang...", options: ["Lebih besar dari M2", "Lebih kecil dari M2", "Sama dengan S2", "Tidak ada"], answer: "Lebih besar dari M2", explanation: "O1 adalah komponen deklinasional, sangat dipengaruhi kemiringan orbit bulan (f bisa mencapai ~1.2)." },
+                    { question: "Rumus u untuk komponen K1 mirip dengan...", options: ["M2", "O1", "S2", "Berlawanan dengan O1"], answer: "Berlawanan dengan O1", explanation: "K1 dan O1 memiliki ketergantungan nodal yang kuat tapi fasenya berbeda." },
+                    { question: "Simbol N melambangkan...", options: ["Longitude of Ascending Node", "Jumlah gelombang", "Kecepatan arus", "Newton"], answer: "Longitude of Ascending Node", explanation: "N adalah bujur simpul naik bulan." },
+                    { question: "Tujuan penggunaan f dan u dalam prediksi pasut adalah...", options: ["Menghitung MSL", "Mengkoreksi amplitudo dan fase rata-rata ke tahun tertentu", "Menghilangkan pasut meteorologis", "Menentukan chart datum"], answer: "Mengkoreksi amplitudo dan fase rata-rata ke tahun tertentu", explanation: "Agar prediksi akurat, amplitudo rata-rata (H) harus dikalikan f, dan fase dikoreksi u." },
+                    { question: "Komponen K2 (Luni-Solar) memiliki variasi nodal...", options: ["Ya, dari bagian bulannya", "Tidak sama sekali", "Sangat kecil", "Konstan"], answer: "Ya, dari bagian bulannya", explanation: "K2 didominasi bulan, jadi f dan u-nya bervariasi." },
+                    { question: "Komponen P1 (Solar) memiliki nilai f dan u...", options: ["f=1, u=0", "f bervariasi", "u bervariasi", "Sama dengan K1"], answer: "f=1, u=0", explanation: "P1 adalah matahari murni, f=1, u=0." },
+                    { question: "Nilai f maksimum untuk komponen K1 terjadi saat N = ...", options: ["0 derajat", "90 derajat", "180 derajat", "270 derajat"], answer: "0 derajat", explanation: "Saat N=0, deklinasi bulan maksimum, komponen diurnal (K1, O1) membesar." },
+                    { question: "Faktor nodal untuk komponen M1 dihitung...", options: ["Sama dengan M2", "Sebagai gabungan dari komponen O1 dan K1", "Tidak ada", "Konstan"], answer: "Sebagai gabungan dari komponen O1 dan K1", explanation: "M1 adalah resultan dua komponen kecil yang dipengaruhi nodal secara kompleks." },
+                    { question: "Faktor f umumnya bernilai di sekitar...", options: ["0", "1", "10", "100"], answer: "1", explanation: "f adalah faktor modulasi di sekitar nilai 1 (unity)." },
+                    { question: "Koreksi nodal u biasanya dinyatakan dalam satuan...", options: ["Meter", "Jam", "Derajat", "Radian per detik"], answer: "Derajat", explanation: "u adalah koreksi sudut fase." },
+                    { question: "Tabel 9.2 pada materi menunjukkan bahwa u untuk K1 adalah...", options: ["-8,86° sin N", "0°", "-2,14° sin N", "10,8° sin N"], answer: "-8,86° sin N", explanation: "Nilai pendekatan u untuk K1." },
+                    { question: "Komponen L2 memiliki perhitungan f dan u yang...", options: ["Sederhana", "Kompleks karena melibatkan p dan N", "Sama dengan M2", "Nol"], answer: "Kompleks karena melibatkan p dan N", explanation: "L2 memiliki argumen yang melibatkan perigee (p) dan node (N)." },
+                    { question: "Dalam analisis pasut jangka pendek (< 1 tahun), f dan u dianggap...", options: ["Nol", "Konstan", "Berubah tiap jam", "Tidak dipakai"], answer: "Konstan", explanation: "Dianggap konstan pada pertengahan periode data." }
                 ],
-                mcq: []
+                essay: [
+                    { question: "Jelaskan mengapa komponen S2 dan P1 memiliki nilai f=1 dan u=0.", answer: "Komponen S2 dan P1 adalah komponen pasang surut yang murni dihasilkan oleh gaya tarik Matahari. Variasi nodal disebabkan oleh presesi orbit Bulan (pergerakan ascending node N). Karena S2 dan P1 tidak bergantung pada parameter orbit bulan, mereka tidak terpengaruh oleh siklus nodal 18,6 tahun tersebut, sehingga faktor koreksinya adalah 1 (amplitudo tetap) dan 0 (fase tetap)." },
+                    { question: "Apa dampak jika faktor nodal f dan u diabaikan dalam prediksi pasang surut jangka panjang?", answer: "Jika faktor f dan u diabaikan, prediksi pasut akan memiliki kesalahan sistematis. Amplitudo pasut bisa meleset hingga ±4% untuk M2 dan lebih besar lagi (~20%) untuk komponen diurnal seperti K1 dan O1 tergantung tahunnya. Kesalahan fase juga akan terjadi, menyebabkan waktu air tinggi/rendah bergeser dari yang seharusnya. Dalam rentang 18,6 tahun, prediksi tidak akan akurat mengikuti variasi kekuatan pasut astronomis yang sebenarnya." }
+                ]
             },
-            "Modul 5: Zooplankton": {
-                essay: [
-                    { question: "Apa definisi Zooplankton?", answer: "Plankton hewani yang bersifat heterotrof dan pergerakannya terbatas (mengikuti arus)." },
-                    { question: "Apa yang dimaksud dengan Diel Vertical Migration (DVM)?", answer: "Pergerakan vertikal harian zooplankton: naik ke permukaan saat malam untuk makan, turun ke kedalaman saat siang untuk menghindari predator." },
-                    { question: "Berdasarkan siklus hidupnya, larva ikan yang hidup sebagai plankton sementara disebut?", answer: "Meroplankton." },
-                    { question: "Zooplankton yang seluruh hidupnya dihabiskan sebagai plankton disebut?", answer: "Holoplankton (contoh: Copepoda)." },
-                    { question: "Apa peran utama zooplankton dalam rantai makanan?", answer: "Konsumen primer (memakan fitoplankton) dan penghubung transfer energi ke tingkat trofik lebih tinggi (ikan, dll)." },
-                    { question: "Sebutkan faktor lingkungan utama yang memicu migrasi vertikal harian zooplankton!", answer: "Cahaya matahari." },
-                    { question: "Alat apa yang digunakan untuk menghitung kelimpahan zooplankton dalam praktikum?", answer: "Sedgewick Rafter." },
-                    { question: "Apa yang dimaksud dengan Tikoplankton?", answer: "Organisme bentos yang terlepas dari dasar perairan dan terbawa arus sehingga sementara menjadi plankton." },
-                    { question: "Sebutkan contoh Holoplankton yang paling umum ditemukan di laut!", answer: "Kopepoda (Copepod)." },
-                    { question: "Mengapa zooplankton melakukan migrasi ke lapisan dalam pada siang hari?", answer: "Untuk menghindari predator visual (ikan) yang berburu menggunakan cahaya." },
-                    { question: "Apa fungsi formalin 4% dalam penanganan sampel zooplankton?", answer: "Sebagai larutan pengawet (fiksatif)." },
-                    { question: "Bagaimana cara menghitung Indeks Keanekaragaman (Shannon-Wiener)?", answer: "H' = - Σ (Pi x ln Pi), dimana Pi = ni/N." },
-                    { question: "Jika nilai Indeks Dominasi mendekati 1, apa artinya?", answer: "Ada satu spesies yang mendominasi komunitas tersebut (keanekaragaman rendah)." },
-                    { question: "Apa pengaruh suhu terhadap siklus hidup zooplankton?", answer: "Peningkatan suhu (dalam batas optimal) dapat mempercepat metabolisme dan reproduksi." },
-                    { question: "Sebutkan contoh Meroplankton dari kelompok Krustasea!", answer: "Larva udang (Nauplius, Zoea) atau larva kepiting (Megalopa)." }
+            "Mg 13: Analisis Harmonik": {
+                mcq: [
+                    { question: "Tujuan utama analisis harmonik pasut adalah menentukan...", options: ["Suhu permukaan laut", "Konstanta Harmonik (Amplitudo dan Fase)", "Kecepatan angin", "Salinitas"], answer: "Konstanta Harmonik (Amplitudo dan Fase)", explanation: "Output analisis adalah H (amplitudo) dan g (phase lag)." },
+                    { question: "Simbol 'g' dalam konstanta harmonik menyatakan...", options: ["Phase lag Greenwich", "Phase lag Lokal", "Gravitasi", "Amplitudo"], answer: "Phase lag Lokal", explanation: "g (kecil) adalah keterlambatan fase relatif terhadap waktu lokal." },
+                    { question: "Simbol 'Kappa' (κ) atau 'G' menyatakan...", options: ["Phase lag Greenwich", "Phase lag Lokal", "Konstanta pegas", "Kecepatan sudut"], answer: "Phase lag Greenwich", explanation: "G mengacu pada meridian Greenwich (GMT)." },
+                    { question: "Hubungan antara g dan G adalah...", options: ["g = G", "g = G - wS", "g = G + wS", "g = G / L"], answer: "g = G - wS", explanation: "g = G - wS + mL (koreksi waktu dan bujur)." },
+                    { question: "Dalam rumus g = G - wS, 'S' adalah...", options: ["Salinitas", "Beda waktu lokal dengan GMT (jam)", "Amplitudo S2", "Jarak"], answer: "Beda waktu lokal dengan GMT (jam)", explanation: "S adalah time meridian offset (misal WIB = +7)." },
+                    { question: "Argumen V dalam persamaan pasut dihitung berdasarkan...", options: ["Data lapangan", "Teori astronomis (t=0 di Greenwich)", "Kondisi cuaca", "Topografi"], answer: "Teori astronomis (t=0 di Greenwich)", explanation: "V adalah fase pasut setimbang di Greenwich pada t=0." },
+                    { question: "Fase pasut sebenarnya di tempat pengamatan adalah...", options: ["V + u", "V + u - g", "V + u + g", "g saja"], answer: "V + u - g", explanation: "Argumen astronomis dikurangi keterlambatan fase (phase lag)." },
+                    { question: "Analisis harmonik memodelkan pasut sebagai superposisi dari...", options: ["Fungsi polinomial", "Fungsi Cosinus", "Fungsi Logaritma", "Fungsi Eksponen"], answer: "Fungsi Cosinus", explanation: "Pasut dianggap penjumlahan gelombang cosinus: A cos(wt - phase)." },
+                    { question: "Konstanta Harmonik bersifat...", options: ["Berubah setiap hari", "Tetap untuk suatu lokasi tertentu", "Sama di seluruh dunia", "Tergantung cuaca"], answer: "Tetap untuk suatu lokasi tertentu", explanation: "H dan g dianggap karakteristik tetap suatu lokasi." },
+                    { question: "Parameter 'm' dalam rumus g = Kappa + mL - wS adalah...", options: ["Massa bulan", "Species number (0, 1, 2)", "Menit", "Meter"], answer: "Species number (0, 1, 2)", explanation: "m=1 untuk diurnal, m=2 untuk semidiurnal." },
+                    { question: "Parameter 'L' dalam rumus fase adalah...", options: ["Bujur tempat pengamatan (Longitude)", "Lintang", "Panjang data", "Level air"], answer: "Bujur tempat pengamatan (Longitude)", explanation: "L adalah bujur, positif ke barat (biasanya)." },
+                    { question: "Metode Admiralty adalah salah satu metode...", options: ["Analisis Harmonik", "Analisis Spektral", "Prediksi numerik", "Analisis Non-Harmonik"], answer: "Analisis Harmonik", explanation: "Metode klasik untuk menghitung konstanta harmonik." },
+                    { question: "Co-tidal chart menggambarkan garis-garis...", options: ["Amplitudo sama", "Fase sama (waktu pasang sama)", "Kedalaman sama", "Suhu sama"], answer: "Fase sama (waktu pasang sama)", explanation: "Co-tidal lines menghubungkan titik-titik dengan fase pasut yang sama." },
+                    { question: "Co-range chart menggambarkan garis-garis...", options: ["Amplitudo (tunggang) sama", "Fase sama", "Arus sama", "Salinitas sama"], answer: "Amplitudo (tunggang) sama", explanation: "Co-range lines menghubungkan titik-titik dengan amplitudo sama." },
+                    { question: "Titik di mana amplitudo pasut nol disebut...", options: ["Titik Nodal", "Titik Amphidromic", "Titik Zenith", "Titik Nadir"], answer: "Titik Amphidromic", explanation: "Pusat rotasi sistem pasut di laut, amplitudo nol." },
+                    { question: "Kecepatan sudut (omega) untuk komponen M2 adalah...", options: ["15 derajat/jam", "28,98 derajat/jam", "30 derajat/jam", "0,5 derajat/jam"], answer: "28,98 derajat/jam", explanation: "Frekuensi M2." },
+                    { question: "Dalam analisis, elevasi muka air dinyatakan sebagai fungsi...", options: ["Jarak", "Waktu", "Suhu", "Tekanan"], answer: "Waktu", explanation: "eta(t) = S0 + Sigma(fi Hi cos(...))." },
+                    { question: "Apa input yang dibutuhkan untuk analisis harmonik?", options: ["Data pasut (elevasi) time series", "Hanya data amplitudo", "Peta laut", "Suhu air"], answer: "Data pasut (elevasi) time series", explanation: "Data observasi level air per jam." },
+                    { question: "Konstanta S0 hasil analisis menyatakan...", options: ["Amplitudo S2", "Mean Sea Level (MSL)", "Fase awal", "Error"], answer: "Mean Sea Level (MSL)", explanation: "S0 adalah duduk tengah atau rata-rata muka air." },
+                    { question: "Mengapa konstanta harmonik M2 di Jakarta berbeda dengan di Surabaya?", options: ["Beda waktu (WIB/WITA)", "Respon laut lokal (topografi/geometri) berbeda", "Beda gravitasi bulan", "Salah alat"], answer: "Respon laut lokal (topografi/geometri) berbeda", explanation: "Konstanta harmonik adalah karakteristik lokal yang dipengaruhi bentuk cekungan laut." }
                 ],
-                mcq: []
+                essay: [
+                    { question: "Apa perbedaan antara 'g' dan 'G' (Kappa) dalam konstanta harmonik? Tuliskan hubungan matematisnya.", answer: "'G' (atau Kappa) adalah keterlambatan fase (phase lag) relatif terhadap pasut setimbang di meridian Greenwich (waktu GMT). 'g' adalah keterlambatan fase relatif terhadap pasut setimbang di meridian lokal (menggunakan waktu lokal). Hubungannya adalah: g = G - wS (untuk komponen long period), atau g = Kappa + mL - wS (secara umum), dimana w adalah kecepatan sudut, S adalah beda waktu lokal dengan GMT, m adalah species number, dan L adalah bujur." },
+                    { question: "Apa itu Konstanta Harmonik dan mengapa penting dalam prediksi pasang surut?", answer: "Konstanta Harmonik adalah pasangan nilai Amplitudo (H) dan Keterlambatan Fase (g) untuk setiap komponen frekuensi pasut (M2, S2, K1, O1, dll) di suatu lokasi tertentu. Nilai ini dianggap tetap (konstan) untuk lokasi tersebut. Konstanta harmonik penting karena jika kita mengetahuinya, kita dapat memprediksi tinggi pasang surut di masa depan kapan saja dengan menjumlahkan kontribusi semua komponen tersebut." }
+                ]
             },
-            "Modul 6: Produktivitas Primer": {
-                essay: [
-                    { question: "Apa definisi Produktivitas Primer Kotor (GPP)?", answer: "Laju total fotosintesis/produksi bahan organik tanpa memperhitungkan energi yang digunakan untuk respirasi." },
-                    { question: "Apa definisi Produktivitas Primer Bersih (NPP)?", answer: "Laju penyimpanan energi organik di jaringan tumbuhan setelah dikurangi respirasi (NPP = GPP - R)." },
-                    { question: "Metode apa yang digunakan untuk mengukur oksigen terlarut dalam praktikum ini?", answer: "Metode Titrasi Winkler." },
-                    { question: "Apa fungsi 'Botol Gelap' dalam inkubasi metode oksigen?", answer: "Untuk mengukur laju respirasi komunitas (karena tidak terjadi fotosintesis tanpa cahaya)." },
-                    { question: "Bagaimana cara menghitung nilai Respirasi (R) dari data botol?", answer: "Respirasi = DO Awal (Botol Inisial) - DO Akhir (Botol Gelap)." },
-                    { question: "Bagaimana cara menghitung NPP dari data botol?", answer: "NPP = DO Akhir (Botol Terang) - DO Awal (Botol Inisial)." },
-                    { question: "Bagaimana cara menghitung GPP dari data botol?", answer: "GPP = DO Akhir (Botol Terang) - DO Akhir (Botol Gelap) ATAU GPP = NPP + R." },
-                    { question: "Apa fungsi penambahan MnSO4 dan Alkali Iodida (KI-KOH) pada metode Winkler?", answer: "Untuk memfiksasi oksigen terlarut dengan membentuk endapan mangan hidroksida/oksida." },
-                    { question: "Perubahan warna apa yang terjadi saat titik akhir titrasi dengan indikator amilum?", answer: "Dari biru tua menjadi bening (tidak berwarna)." },
-                    { question: "Larutan apa yang digunakan sebagai titran dalam metode Winkler?", answer: "Natrium Tiosulfat (Na2S2O3)." },
-                    { question: "Apa yang dimaksud dengan 'titik kompensasi' kedalaman?", answer: "Kedalaman di mana laju fotosintesis sama dengan laju respirasi (NPP = 0)." },
-                    { question: "Faktor apa yang paling membatasi produktivitas primer di laut dalam?", answer: "Cahaya matahari." },
-                    { question: "Sebutkan klasifikasi perairan berdasarkan produktivitasnya (15-50 gC/m²/tahun)!", answer: "Oligotrofik." },
-                    { question: "Apa fungsi penambahan H2SO4 pekat pada sampel Winkler yang sudah ada endapannya?", answer: "Untuk melarutkan endapan dan membebaskan iodium (I2) yang setara dengan jumlah oksigen." },
-                    { question: "Mengapa botol BOD tidak boleh ada gelembung udara saat ditutup?", answer: "Karena gelembung udara mengandung oksigen yang akan menambah nilai DO terukur (bias)." },
-                    { question: "Apa yang dimaksud dengan metode 'inkubasi in-situ'?", answer: "Inkubasi botol sampel dilakukan langsung di perairan pada kedalaman tempat sampel diambil." },
-                    { question: "Berdasarkan strukturnya, produktivitas primer di estuari umumnya tinggi atau rendah? Mengapa?", answer: "Tinggi, karena suplai nutrien yang melimpah dari sungai." },
-                    { question: "Apa hubungan antara intensitas cahaya dan fotosintesis pada kurva P-I?", answer: "Fotosintesis meningkat seiring intensitas cahaya hingga titik jenuh, lalu dapat menurun jika cahaya terlalu kuat (fotoinhibisi)." },
-                    { question: "Berapa faktor konversi umum untuk mengubah mg O2 menjadi mg C (karbon)?", answer: "0.375 (koefisien fotosintesis)." },
-                    { question: "Apa peran termoklin dalam membatasi produktivitas primer di laut lepas tropis?", answer: "Menghambat pencampuran vertikal, sehingga nutrien dari lapisan dalam tidak bisa naik ke zona fotik." }
+            "Mg 14: Metode Least Square": {
+                mcq: [
+                    { question: "Prinsip metode Least Square adalah...", options: ["Memaksimalkan korelasi", "Meminimalkan jumlah kuadrat error (selisih data dan model)", "Meminimalkan jumlah data", "Memaksimalkan amplitudo"], answer: "Meminimalkan jumlah kuadrat error (selisih data dan model)", explanation: "Mencari parameter yang membuat sum of squared errors minimum." },
+                    { question: "Persamaan pasut diubah menjadi bentuk linear A cos(wt) + B sin(wt). Hubungan Amplitudo (C) dengan A dan B adalah...", options: ["C = A + B", "C = sqrt(A^2 + B^2)", "C = A^2 + B^2", "C = A - B"], answer: "C = sqrt(A^2 + B^2)", explanation: "Amplitudo adalah akar kuadrat dari jumlah kuadrat koefisien A dan B." },
+                    { question: "Hubungan Fase (P) dengan A dan B adalah...", options: ["P = tan(B/A)", "P = atan(B/A)", "P = A/B", "P = A*B"], answer: "P = atan(B/A)", explanation: "Fase adalah arc tangen dari B dibagi A." },
+                    { question: "Untuk menyelesaikan sistem persamaan Least Square, kita menggunakan matriks...", options: ["Matriks Normal", "Matriks Singular", "Matriks Nol", "Matriks Rotasi"], answer: "Matriks Normal", explanation: "Solusi diperoleh dari (A^T A)x = A^T y." },
+                    { question: "Periode Sinodik (PS) adalah...", options: ["Waktu rotasi bumi", "Waktu agar dua komponen berbeda fase 360 derajat", "Waktu satu siklus pasut", "Waktu revolusi bulan"], answer: "Waktu agar dua komponen berbeda fase 360 derajat", explanation: "Syarat separasi dua frekuensi (Rayleigh criterion)." },
+                    { question: "Rumus Periode Sinodik adalah...", options: ["360 / (w1 - w2)", "360 * (w1 - w2)", "w1 / w2", "360 / w1"], answer: "360 / (w1 - w2)", explanation: "360 derajat dibagi selisih kecepatan sudut." },
+                    { question: "Berapa lama data yang dibutuhkan untuk memisahkan M2 dan S2?", options: ["1 hari", "14,77 hari", "6 bulan", "1 tahun"], answer: "14,77 hari", explanation: "Periode sinodik M2 dan S2 adalah sekitar 14,77 hari." },
+                    { question: "Berapa lama data yang dibutuhkan untuk memisahkan S2 dan K2?", options: ["15 hari", "29 hari", "6 bulan (183 hari)", "19 tahun"], answer: "6 bulan (183 hari)", explanation: "Frekuensi S2 dan K2 sangat dekat, butuh data panjang (6 bulan)." },
+                    { question: "Berapa lama data untuk memisahkan M2 dan K1?", options: ["1 hari", "15 hari", "30 hari", "1 tahun"], answer: "1 hari", explanation: "Beda frekuensi besar (semidiurnal vs diurnal), 1 hari cukup." },
+                    { question: "Jika data kurang dari periode sinodik, maka...", options: ["Hasil analisis lebih akurat", "Terjadi aliasing/interferensi antar komponen", "Amplitudo menjadi nol", "Fase menjadi 180"], answer: "Terjadi aliasing/interferensi antar komponen", explanation: "Komponen tidak dapat dipisahkan (coupling)." },
+                    { question: "Shallow water tides (pasut perairan dangkal) timbul akibat...", options: ["Gaya tarik planet", "Interaksi non-linear / gesekan dasar", "Angin", "Suhu"], answer: "Interaksi non-linear / gesekan dasar", explanation: "Contoh: M4, MS4." },
+                    { question: "Komponen M4 memiliki frekuensi...", options: ["Sama dengan M2", "2 kali M2 (Quartodiurnal)", "Setengah M2", "Diurnal"], answer: "2 kali M2 (Quartodiurnal)", explanation: "M4 adalah harmonik ke-2 dari M2." },
+                    { question: "Parameter yang dicari dalam Least Square adalah...", options: ["w (frekuensi)", "t (waktu)", "A, B, dan S0", "V (argumen)"], answer: "A, B, dan S0", explanation: "Koefisien cosinus (A), sinus (B), dan MSL (S0)." },
+                    { question: "Jumlah persamaan normal untuk k komponen pasut adalah...", options: ["k", "2k", "2k + 1", "k^2"], answer: "2k + 1", explanation: "Untuk k komponen ada 2k koefisien plus 1 S0." },
+                    { question: "Dalam analisis pasut, kita mengabaikan faktor...", options: ["Astronomis", "Meteorologis sesaat", "Geometris", "Posisi bulan"], answer: "Meteorologis sesaat", explanation: "Analisis harmonik fokus pada sinyal deterministik astronomis." },
+                    { question: "Matriks yang berisi nilai cos(wt) dan sin(wt) disebut...", options: ["Matriks Desain / Koefisien", "Matriks Data", "Matriks Hasil", "Matriks Error"], answer: "Matriks Desain / Koefisien", explanation: "Matriks A dalam persamaan Ax=B." },
+                    { question: "Jika periode sinodik M2-N2 adalah 27,6 hari, maka data 15 hari...", options: ["Cukup memisahkan M2 dan N2", "Tidak cukup memisahkan M2 dan N2", "Bisa memisahkan S2 dan K2", "Sangat bagus"], answer: "Tidak cukup memisahkan M2 dan N2", explanation: "Butuh minimal 27,6 hari (biasanya 29 hari)." },
+                    { question: "Residu (sisa) antara data observasi dan prediksi biasanya disebabkan oleh...", options: ["Kesalahan hitung", "Faktor meteorologis (surge) dan noise", "Pasut astronomis", "Gerak bulan"], answer: "Faktor meteorologis (surge) dan noise", explanation: "Sinyal non-astronomis masuk ke residu." },
+                    { question: "Untuk analisis komponen K1 dan O1, periode sinodiknya adalah...", options: ["1 hari", "13,6 hari", "183 hari", "1 tahun"], answer: "13,6 hari", explanation: "Sekitar 13-14 hari." },
+                    { question: "Keuntungan metode Least Square dibandingkan metode Admiralty adalah...", options: ["Bisa menangani data yang tidak menerus/bolong", "Lebih cepat hitungannya manual", "Hanya bisa data 29 hari", "Tidak butuh komputer"], answer: "Bisa menangani data yang tidak menerus/bolong", explanation: "Least Square fleksibel terhadap gap data." }
                 ],
-                mcq: []
+                essay: [
+                    { question: "Apa itu 'Periode Sinodik' dan mengapa konsep ini penting dalam menentukan durasi pengukuran pasang surut?", answer: "Periode Sinodik adalah selang waktu yang dibutuhkan agar dua komponen gelombang pasut dengan frekuensi berbeda memiliki beda fase 360 derajat (kembali sefase). Ini penting karena menjadi syarat batas (Rayleigh criterion) untuk dapat memisahkan kedua komponen tersebut dalam analisis harmonik. Jika durasi data lebih pendek dari periode sinodik dua komponen, maka kedua komponen tersebut tidak dapat dipisahkan secara akurat (terjadi aliasing)." },
+                    { question: "Jelaskan secara singkat langkah-langkah analisis pasut menggunakan metode Least Square.", answer: "1. Definisikan komponen pasut yang akan dianalisis (berdasarkan panjang data). 2. Buat persamaan model pasut sebagai jumlahan fungsi cosinus dan sinus: n(t) = S0 + Σ(An cos wt + Bn sin wt). 3. Bentuk matriks desain (berisi nilai cos dan sin untuk setiap waktu t) dan matriks data (elevasi terukur). 4. Hitung parameter S0, An, dan Bn dengan meminimalkan jumlah kuadrat error (menggunakan invers matriks normal). 5. Hitung Amplitudo (C) dan Fase (P) dari An dan Bn. 6. Terapkan koreksi nodal (f dan u) dan hitung fase Greenwich (G)." }
+                ]
             },
-            "Campuran & Umum": {
-                essay: [
-                    { question: "Apa itu Photosynthetically Active Radiation (PAR)?", answer: "Spektrum cahaya (400-700 nm) yang dapat digunakan fitoplankton untuk fotosintesis." },
-                    { question: "Organisme apa yang menjadi penghubung utama antara produsen primer dan konsumen tingkat tinggi di laut?", answer: "Zooplankton (terutama Copepoda)." },
-                    { question: "Disebut apakah zona laut di mana cahaya matahari masih tembus?", answer: "Zona Fotik / Eufotik." },
-                    { question: "Apa yang dimaksud dengan 'Biological Carbon Pump'?", answer: "Mekanisme penyerapan karbon oleh fitoplankton di permukaan dan transportasinya ke laut dalam melalui pengendapan." },
-                    { question: "Larutan apa yang digunakan sebagai indikator amilum pada titrasi Winkler?", answer: "Kanji / Amilum." }
+            "Mg 15: Hidrografi & Chart Datum": {
+                mcq: [
+                    { question: "Chart Datum (CD) adalah...", options: ["Muka air rata-rata", "Bidang referensi vertikal untuk kedalaman di peta laut", "Tinggi gelombang", "Dasar laut"], answer: "Bidang referensi vertikal untuk kedalaman di peta laut", explanation: "Referensi nol untuk kedalaman (sounding)." },
+                    { question: "Chart Datum biasanya ditetapkan pada level...", options: ["Mean Sea Level", "High Water", "Low Water (Air Rendah)", "Land Level"], answer: "Low Water (Air Rendah)", explanation: "Agar aman, CD dipilih serendah mungkin (air jarang surut di bawah CD)." },
+                    { question: "IHO merekomendasikan penggunaan CD jenis...", options: ["MLWS", "MLLW", "LAT (Lowest Astronomical Tide)", "MSL"], answer: "LAT (Lowest Astronomical Tide)", explanation: "LAT adalah air terendah yang dapat diprediksi secara astronomis." },
+                    { question: "MSL (Mean Sea Level) biasanya digunakan sebagai referensi untuk...", options: ["Peta Laut", "Peta Topografi Darat (Land Survey Datum)", "Kedalaman pelabuhan", "Ketinggian jembatan di laut"], answer: "Peta Topografi Darat (Land Survey Datum)", explanation: "MSL adalah nol ketinggian di darat." },
+                    { question: "MLWS (Mean Low Water Springs) adalah...", options: ["Rata-rata air rendah saat purnama/perbani", "Rata-rata seluruh air rendah", "Air terendah astronomis", "Rata-rata air tinggi"], answer: "Rata-rata air rendah saat purnama/perbani", explanation: "Digunakan di peta Admiralty Inggris." },
+                    { question: "MLLW (Mean Lower Low Water) digunakan pada peta laut negara...", options: ["Inggris", "Amerika Serikat (USA)", "Indonesia", "Perancis"], answer: "Amerika Serikat (USA)", explanation: "Standar NOAA Amerika." },
+                    { question: "Rumus pendekatan LPLW (Lowest Possible Low Water) adalah...", options: ["S0 - M2", "S0 - (M2+S2)", "S0 - 1.2(M2+S2+K2)", "S0 - (K1+O1)"], answer: "S0 - 1.2(M2+S2+K2)", explanation: "Rumus empiris untuk LPLW (Perancis)." },
+                    { question: "ISLW (Indian Spring Low Water) dirumuskan sebagai...", options: ["S0 - (M2+S2)", "S0 - 1.2(M2+S2+K1+O1)", "S0 - M2", "S0 - (K1+O1)"], answer: "S0 - 1.2(M2+S2+K1+O1)", explanation: "Memperhitungkan komponen diurnal signifikan." },
+                    { question: "Kedalaman yang tertera di peta (Charted Depth) sama dengan...", options: ["Kedalaman terukur", "Kedalaman terukur - Tinggi Pasut (relatif CD)", "Kedalaman terukur + Tinggi Pasut", "MSL"], answer: "Kedalaman terukur - Tinggi Pasut (relatif CD)", explanation: "Koreksi pasut: Sounding = Observed Depth - Tide Height." },
+                    { question: "Drying Height adalah...", options: ["Tinggi daratan di atas MSL", "Area yang kering saat surut dan basah saat pasang", "Dasar laut dalam", "Tinggi jembatan"], answer: "Area yang kering saat surut dan basah saat pasang", explanation: "Ketinggian di atas CD tapi di bawah air tinggi." },
+                    { question: "Safe Vertical Clearance (misal jembatan) diukur terhadap...", options: ["LAT", "MSL", "HAT (Highest Astronomical Tide)", "MLWS"], answer: "HAT (Highest Astronomical Tide)", explanation: "Agar kapal aman lewat saat air tertinggi." },
+                    { question: "Garis Pangkal (Baseline) untuk batas wilayah menurut UNCLOS biasanya adalah...", options: ["Garis Air Tinggi", "Garis Air Rendah (Low Water Line)", "MSL", "Garis vegetasi"], answer: "Garis Air Rendah (Low Water Line)", explanation: "Referensi batas teritorial." },
+                    { question: "Pengamatan pasut untuk menentukan CD minimal dilakukan selama...", options: ["24 jam", "15 hari (siklus spring-neap)", "6 bulan", "1 jam"], answer: "15 hari (siklus spring-neap)", explanation: "Agar mencakup variasi purnama." },
+                    { question: "Nilai Z0 dalam hidrografi biasanya sama dengan...", options: ["Amplitudo M2", "S0 (MSL) relatif terhadap nol palem", "Chart Datum", "Kedalaman"], answer: "S0 (MSL) relatif terhadap nol palem", explanation: "Z0 adalah tinggi MSL di atas nol palem/CD." },
+                    { question: "Jika Chart Datum = MSL - (M2+S2), ini adalah pendekatan untuk...", options: ["LAT", "MLWS", "MLLW", "HAT"], answer: "MLWS", explanation: "Pendekatan sederhana untuk Mean Low Water Springs." },
+                    { question: "Warna magenta di peta laut untuk clearance jembatan mengacu pada...", options: ["HAT", "LAT", "MSL", "CD"], answer: "HAT", explanation: "Standar warna peta untuk info vertikal clearance." },
+                    { question: "Zona intertidal berada di antara...", options: ["MSL dan CD", "HAT dan LAT", "High Water dan Low Water", "Darat dan Laut"], answer: "High Water dan Low Water", explanation: "Daerah pasang surut." },
+                    { question: "LAT (Lowest Astronomical Tide) dihitung dari...", options: ["Data meteorologi", "Prediksi pasut terendah selama 19 tahun", "Rata-rata harian", "Pengukuran sesaat"], answer: "Prediksi pasut terendah selama 19 tahun", explanation: "Memperhitungkan siklus nodal 18,6 tahun." },
+                    { question: "Jika kedalaman terukur 10 m, dan pasut saat itu 2 m di atas CD, maka kedalaman peta adalah...", options: ["12 m", "8 m", "10 m", "2 m"], answer: "8 m", explanation: "10 - 2 = 8 m." },
+                    { question: "Datum vertikal geodesi (seperti EGM96) mengacu pada...", options: ["Ellipsoid/Geoid", "Permukaan laut sesaat", "Dasar laut", "Atmosfer"], answer: "Ellipsoid/Geoid", explanation: "Bidang referensi gayaberat bumi." }
                 ],
-                mcq: []
+                essay: [
+                    { question: "Jelaskan perbedaan mendasar antara Chart Datum (CD) dan Mean Sea Level (MSL) dari segi definisi dan penggunaannya.", answer: "MSL (Mean Sea Level) adalah tinggi muka air rata-rata yang dihitung dari data pengamatan jangka panjang, digunakan sebagai referensi ketinggian (elevasi) di daratan (peta topografi). Chart Datum (CD) adalah bidang referensi permukaan air yang dipilih serendah mungkin (biasanya air rendah terendah), digunakan sebagai referensi kedalaman (sounding) di peta laut (peta batimetri) untuk menjamin keamanan navigasi kapal agar tidak kandas." },
+                    { question: "Mengapa IHO (International Hydrographic Organization) merekomendasikan LAT (Lowest Astronomical Tide) sebagai Chart Datum internasional?", answer: "IHO merekomendasikan LAT karena LAT merupakan level air terendah yang dapat diprediksi akibat faktor astronomis (gravitasi bulan matahari) dalam satu siklus nodal penuh (18,6 tahun). Dengan menggunakan LAT, kedalaman air di lapangan hampir tidak akan pernah lebih dangkal daripada kedalaman yang tertera di peta (kecuali ada faktor meteorologis ekstrem), sehingga memberikan margin keselamatan (safety margin) maksimal bagi navigator kapal." }
+                ]
             }
         };
 
-        // --- Logika Aplikasi ---
+        // --- Logika Kuis ---
         const startScreen = document.getElementById('start-screen');
         const quizScreen = document.getElementById('quiz-screen');
         const resultScreen = document.getElementById('result-screen');
         const topicSelection = document.getElementById('topic-selection');
         const quizTopicTitle = document.getElementById('quiz-topic-title');
         const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const essayContainer = document.getElementById('essay-container');
         const essayAnswer = document.getElementById('essay-answer');
         const questionCounter = document.getElementById('question-counter');
+        const topicScoresBreakdown = document.getElementById('topic-scores-breakdown');
         const answersReview = document.getElementById('answers-review');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
+        const modal = document.getElementById('explanationModal');
         const navPanel = document.getElementById('nav-panel');
         const navGrid = document.getElementById('nav-grid');
         const progressBar = document.getElementById('progress-bar');
@@ -276,27 +350,24 @@
         let currentQuestionIndex = 0;
         let userAnswers = [];
         let activeQuestions = [];
+        let selectedOptionElement = null;
         let currentTopic = '';
 
         function initializeTopicSelection() {
             topicSelection.innerHTML = '';
-            // Tombol "Semua Topik" sebagai default utama
-            const allButton = document.createElement('button');
-            allButton.innerHTML = '<span class="text-xl">📚</span><br>Semua Materi (100 Soal)';
-            allButton.classList.add('topic-button', 'w-full', 'p-6', 'bg-blue-600', 'text-white', 'font-bold', 'rounded-xl', 'shadow-md', 'hover:bg-blue-700', 'md:col-span-2', 'lg:col-span-3');
-            allButton.onclick = () => startQuiz('Semua Materi');
-            topicSelection.appendChild(allButton);
-
             const topics = Object.keys(quizDataCategorized);
             topics.forEach(topic => {
-                if(topic !== "Campuran & Umum") {
-                    const button = document.createElement('button');
-                    button.textContent = topic;
-                    button.classList.add('topic-button', 'w-full', 'p-4', 'bg-white', 'border-2', 'border-blue-200', 'rounded-lg', 'text-blue-700', 'font-semibold', 'hover:bg-blue-50', 'hover:border-blue-400');
-                    button.onclick = () => startQuiz(topic);
-                    topicSelection.appendChild(button);
-                }
+                const button = document.createElement('button');
+                button.textContent = topic;
+                button.classList.add('topic-button', 'w-full', 'p-4', 'bg-white', 'border-2', 'border-blue-300', 'rounded-lg', 'text-blue-700', 'font-semibold', 'hover:bg-blue-50', 'text-left');
+                button.onclick = () => startQuiz(topic);
+                topicSelection.appendChild(button);
             });
+            const allButton = document.createElement('button');
+            allButton.textContent = 'Simulasi Ujian Akhir (Semua Topik)';
+            allButton.classList.add('topic-button', 'w-full', 'p-4', 'bg-blue-600', 'text-white', 'font-bold', 'rounded-lg', 'md:col-span-full', 'text-center', 'hover:bg-blue-700');
+            allButton.onclick = () => startQuiz('Semua Topik');
+            topicSelection.appendChild(allButton);
         }
 
         function startQuiz(topic) {
@@ -305,28 +376,33 @@
             quizScreen.classList.remove('hidden');
             resultScreen.classList.add('hidden');
             
-            activeQuestions = [];
-            if (topic === 'Semua Materi') {
+            if (topic === 'Semua Topik') {
+                activeQuestions = [];
                 Object.keys(quizDataCategorized).forEach(catName => {
                     const category = quizDataCategorized[catName];
-                    activeQuestions.push(...category.essay.map(q => ({...q, topic: catName})));
+                    activeQuestions.push(...category.mcq.map(q => ({...q, topic: catName, type: 'mcq'})));
+                    activeQuestions.push(...category.essay.map(q => ({...q, topic: catName, type: 'essay'})));
                 });
             } else {
                 const category = quizDataCategorized[topic];
-                activeQuestions = category.essay.map(q => ({...q, topic}));
+                activeQuestions = [
+                    ...category.mcq.map(q => ({...q, topic, type: 'mcq'})),
+                    ...category.essay.map(q => ({...q, topic, type: 'essay'}))
+                ];
             }
             
-            // Acak soal
-            // activeQuestions = shuffleArray(activeQuestions); 
+            // Shuffle questions for randomness
+            activeQuestions = shuffleArray(activeQuestions);
 
             quizTopicTitle.textContent = topic;
             currentQuestionIndex = 0;
-            
-            // Reset user answers
             userAnswers = Array(activeQuestions.length).fill(null).map((_, i) => ({
                 question: activeQuestions[i].question,
-                userAnswer: '',
+                userAnswer: null,
                 correctAnswer: activeQuestions[i].answer,
+                isCorrect: null,
+                explanation: activeQuestions[i].explanation,
+                type: activeQuestions[i].type,
                 topic: activeQuestions[i].topic
             }));
             
@@ -335,6 +411,7 @@
         }
         
         function shuffleArray(array) {
+            // Fisher-Yates shuffle
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
@@ -361,7 +438,7 @@
                 navButtons[i].classList.remove('current', 'answered');
                 navButtons[i].innerHTML = `<span>${i + 1}</span>`; 
 
-                if (userAnswers[i].userAnswer && userAnswers[i].userAnswer.trim() !== '') {
+                if (userAnswers[i] && userAnswers[i].userAnswer !== null && userAnswers[i].userAnswer.trim() !== '') {
                     navButtons[i].classList.add('answered');
                     navButtons[i].innerHTML = `<span>${i + 1}</span>${checkmarkSVG}`;
                 }
@@ -386,22 +463,67 @@
         }
 
         function saveCurrentAnswer() {
-            userAnswers[currentQuestionIndex].userAnswer = essayAnswer.value;
+            const currentQuestion = activeQuestions[currentQuestionIndex];
+            let userAnswer = null;
+
+            if (currentQuestion.type === 'mcq') {
+                const selected = optionsContainer.querySelector('.selected');
+                if (selected) userAnswer = selected.textContent;
+            } else {
+                if (essayAnswer.value.trim() !== '') userAnswer = essayAnswer.value.trim();
+            }
+
+            userAnswers[currentQuestionIndex].userAnswer = userAnswer;
+            if (currentQuestion.type === 'mcq') {
+                userAnswers[currentQuestionIndex].isCorrect = (userAnswer === currentQuestion.answer);
+            }
         }
 
         function loadQuiz() {
+            deselectOptions();
             const currentQuestionData = userAnswers[currentQuestionIndex];
             questionText.textContent = currentQuestionData.question;
             questionCounter.textContent = `Soal ${currentQuestionIndex + 1} / ${activeQuestions.length}`;
             progressBar.style.width = `${((currentQuestionIndex + 1) / activeQuestions.length) * 100}%`;
 
-            essayAnswer.value = currentQuestionData.userAnswer || '';
-            essayAnswer.focus();
+            if (currentQuestionData.type === 'mcq') {
+                optionsContainer.classList.remove('hidden');
+                essayContainer.classList.add('hidden');
+                optionsContainer.innerHTML = '';
+                const options = shuffleArray([...activeQuestions[currentQuestionIndex].options]);
+                options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.classList.add('quiz-option', 'w-full', 'p-4', 'border-2', 'rounded-lg', 'text-left', 'hover:bg-blue-100', 'transition', 'duration-200');
+                    button.onclick = () => selectAnswer(button);
+                    if (option === currentQuestionData.userAnswer) {
+                        button.classList.add('selected');
+                        selectedOptionElement = button;
+                    }
+                    optionsContainer.appendChild(button);
+                });
+            } else {
+                optionsContainer.classList.add('hidden');
+                essayContainer.classList.remove('hidden');
+                essayAnswer.value = currentQuestionData.userAnswer || '';
+            }
             
             prevBtn.style.visibility = currentQuestionIndex === 0 ? 'hidden' : 'visible';
             nextBtn.textContent = currentQuestionIndex === activeQuestions.length - 1 ? 'Selesai' : 'Selanjutnya';
         }
 
+        function selectAnswer(buttonElement) {
+            deselectOptions();
+            selectedOptionElement = buttonElement;
+            buttonElement.classList.add('selected');
+        }
+
+        function deselectOptions() {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(option => option.classList.remove('selected'));
+            selectedOptionElement = null;
+        }
+        
         function prevQuestion() {
             if (currentQuestionIndex > 0) {
                 saveCurrentAnswer();
@@ -425,31 +547,84 @@
             quizScreen.classList.add('hidden');
             resultScreen.classList.remove('hidden');
 
+            const topicScores = {};
+            userAnswers.forEach(answer => {
+                if (answer.type !== 'mcq') return;
+                if (!topicScores[answer.topic]) {
+                    topicScores[answer.topic] = { correct: 0, total: 0 };
+                }
+                topicScores[answer.topic].total++;
+                if (answer.isCorrect) {
+                    topicScores[answer.topic].correct++;
+                }
+            });
+
+            topicScoresBreakdown.innerHTML = '<h3 class="text-xl font-bold mb-4">Rincian Skor Pilihan Ganda</h3>';
+            let totalCorrect = 0;
+            let totalQuestions = 0;
+
+            const sortedTopics = Object.keys(quizDataCategorized).sort();
+
+            sortedTopics.forEach(topic => {
+                if (topicScores[topic] && topicScores[topic].total > 0) {
+                    const score = topicScores[topic];
+                    totalCorrect += score.correct;
+                    totalQuestions += score.total;
+                    const percentage = score.total > 0 ? ((score.correct / score.total) * 100).toFixed(0) : 0;
+                    topicScoresBreakdown.innerHTML += `
+                        <div class="flex justify-between items-center mb-2 border-b pb-2">
+                            <span class="font-medium text-gray-700">${topic}</span>
+                            <span class="font-bold text-blue-600">${score.correct}/${score.total} (${percentage}%)</span>
+                        </div>
+                    `;
+                }
+            });
+
+            if (totalQuestions > 0) {
+                const totalPercentage = ((totalCorrect / totalQuestions) * 100).toFixed(0);
+                topicScoresBreakdown.innerHTML += `<div class="flex justify-between items-center mt-4 pt-2 border-t-2 border-gray-300">
+                    <span class="font-bold text-lg text-gray-800">Total Skor</span>
+                    <span class="font-bold text-lg text-green-600">${totalCorrect}/${totalQuestions} (${totalPercentage}%)</span>
+                </div>`;
+            } else {
+                 topicScoresBreakdown.innerHTML += `<p class="text-gray-500 italic">Tidak ada soal pilihan ganda yang dikerjakan.</p>`;
+            }
+
+
             answersReview.innerHTML = '';
             userAnswers.forEach((answer, index) => {
                 const reviewItem = document.createElement('div');
-                reviewItem.classList.add('p-5', 'border-l-4', 'border-blue-500', 'bg-white', 'shadow-sm', 'rounded-r-lg');
+                reviewItem.classList.add('p-4', 'mb-4', 'border', 'rounded-lg');
                 
-                // Cek apakah jawaban kosong
-                const userAnswerText = answer.userAnswer.trim() ? answer.userAnswer : '<span class="text-red-500 italic">(Tidak dijawab)</span>';
-                
+                let answerStatusHtml = '';
+                if (answer.type === 'mcq') {
+                    if (answer.isCorrect) {
+                        reviewItem.classList.add('bg-green-50', 'border-green-200');
+                        answerStatusHtml = `<p class="mt-2 text-sm"><strong>Jawaban Anda:</strong> <span class="text-green-700 font-bold">${answer.userAnswer || '(Tidak dijawab)'} (Benar)</span></p>`;
+                    } else {
+                        reviewItem.classList.add('bg-red-50', 'border-red-200');
+                        answerStatusHtml = `
+                            <p class="mt-2 text-sm"><strong>Jawaban Anda:</strong> <span class="text-red-700 font-bold">${answer.userAnswer || '(Tidak dijawab)'} (Salah)</span></p>
+                            <p class="mt-1 text-sm"><strong>Jawaban Benar:</strong> <span class="text-green-700 font-bold">${answer.correctAnswer}</span></p>
+                        `;
+                    }
+                } else { // Essay
+                     reviewItem.classList.add('bg-blue-50', 'border-blue-200');
+                     answerStatusHtml = `
+                        <p class="mt-2 text-sm font-semibold">Jawaban Anda (Esai):</p>
+                        <p class="italic text-gray-700 p-2 bg-white rounded border mt-1 text-sm">${answer.userAnswer || '(Tidak dijawab)'}</p>
+                        <p class="mt-2 text-sm font-semibold">Kunci Jawaban / Referensi:</p>
+                        <p class="text-gray-800 p-2 bg-gray-100 rounded border mt-1 text-sm">${answer.correctAnswer}</p>
+                     `;
+                }
+
                 reviewItem.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="font-bold text-gray-700 text-lg">Soal ${index + 1}</span>
-                        <span class="text-xs font-semibold bg-gray-200 text-gray-700 px-2 py-1 rounded">${answer.topic}</span>
+                    <div class="flex justify-between items-start">
+                        <p class="font-semibold text-gray-800 pr-4">${index + 1}. ${answer.question}</p>
+                        <span class="text-xs font-medium px-2 py-1 bg-gray-200 rounded text-gray-600 whitespace-nowrap">${answer.topic.split(':')[0]}</span>
                     </div>
-                    <p class="mb-3 text-gray-800 font-medium">${answer.question}</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                        <div class="bg-blue-50 p-3 rounded border border-blue-100">
-                            <p class="text-xs text-blue-600 font-bold uppercase mb-1">Jawaban Anda</p>
-                            <p class="text-gray-800">${userAnswerText}</p>
-                        </div>
-                        <div class="bg-green-50 p-3 rounded border border-green-100">
-                            <p class="text-xs text-green-600 font-bold uppercase mb-1">Kunci Jawaban</p>
-                            <p class="text-gray-800 font-semibold">${answer.correctAnswer}</p>
-                        </div>
-                    </div>
+                    ${answerStatusHtml}
+                    ${answer.type === 'mcq' ? `<button onclick="showExplanation(${index})" class="mt-3 text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium focus:outline-none">Lihat Penjelasan</button>` : ''}
                 `;
                 answersReview.appendChild(reviewItem);
             });
@@ -460,10 +635,23 @@
             startScreen.classList.remove('hidden');
         }
 
+        function showExplanation(index) {
+            const answer = userAnswers[index];
+            document.getElementById('modal-question').textContent = answer.question;
+            document.getElementById('modal-correct-answer').textContent = answer.correctAnswer;
+            document.getElementById('modal-explanation').textContent = answer.explanation || "Penjelasan tidak tersedia.";
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.querySelector('div').classList.remove('scale-95'), 10);
+        }
+
+        function closeModal() {
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
         // Initialize
         window.onload = initializeTopicSelection;
 
     </script>
 </body>
 </html>
-
