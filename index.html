@@ -3,444 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIMULASI UTS SISTEM BUMI</title>
+    <title>Kompre Mode Kompe</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
-        
-        /* Navigasi Panel - Identik dengan UI Referensi */
-        .nav-btn { 
-            width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; 
-            border-radius: 6px; font-size: 10px; font-weight: 700; border: 1px solid #e2e8f0; 
-            background-color: #f8fafc; transition: all 0.2s; cursor: pointer;
-        }
-        .nav-btn.answered { background-color: #3b82f6; border-color: #2563eb; color: white; }
-        .nav-btn.current { border: 2px solid #1e293b; transform: scale(1.05); }
-        .nav-btn.essay { background-color: #fffbeb; border-color: #fcd34d; color: #92400e; }
-        .nav-btn.essay.answered { background-color: #f59e0b; border-color: #d97706; color: white; }
-
-        /* Card Option Style */
-        .quiz-option { transition: all 0.2s ease; border: 1px solid #e2e8f0; background: white; cursor: pointer; }
-        .quiz-option:hover { border-color: #3b82f6; background-color: #eff6ff; }
+        body { font-family: 'Inter', sans-serif; }
         .quiz-option.selected { background-color: #3b82f6; color: white; border-color: #2563eb; }
-        .quiz-option.selected .letter-box { background-color: rgba(255, 255, 255, 0.2); border-color: white; color: white; }
-
-        /* Topic Card identical to reference image */
-        .topic-card { transition: all 0.3s ease; cursor: pointer; border: 1px solid #e2e8f0; border-radius: 24px; padding: 24px; background: white; }
-        .topic-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); border-color: #3b82f6; }
-
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        #nav-panel { transition: opacity 0.3s ease; }
+        .nav-btn.answered { background-color: #dbeafe; border-color: #93c5fd; color: #1e40af; }
+        .nav-btn.current { border: 2px solid #2563eb; font-weight: bold; }
+        .topic-button { transition: all 0.2s ease-in-out; }
+        .topic-button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
+    <div id="quiz-container" class="w-full max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+        
+        <!-- Layar Awal -->
+        <div id="start-screen">
+            <h1 class="text-3xl sm:text-4xl font-bold text-center text-blue-600 mb-4">Kompre Mode Kompe</h1>
+            <p class="text-center text-gray-600 mb-8">Made with love by EarthMate & Kak Gem (Gemini).</p>
+            <div id="topic-selection" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
 
-    <!-- Header -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-50 px-6 py-4 shadow-sm">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="bg-blue-600 p-2.5 rounded-xl text-white shadow-lg shadow-blue-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
+        <!-- Layar Kuis -->
+        <div id="quiz-screen" class="hidden">
+            <div class="flex justify-between items-start mb-2">
+                 <div>
+                    <h2 id="quiz-topic-title" class="text-2xl font-bold text-blue-600"></h2>
+                    <button onclick="toggleNavPanel()" class="text-sm text-blue-600 hover:underline mt-1">Buka Navigasi Soal</button>
                 </div>
-                <div>
-                    <h1 class="font-bold text-slate-900 leading-none mb-1 text-lg">Simulasi UTS SisBum</h1>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">by EarthMate</p>
-                </div>
+                <span id="question-counter" class="text-lg font-semibold text-gray-500 text-right"></span>
             </div>
-            
-            <div class="flex items-center gap-4">
-                <div id="timer-box" class="hidden flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-full border border-slate-200">
-                    <span class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Waktu Berjalan</span>
-                    <span id="timer" class="font-mono font-bold text-blue-600">00:00:00</span>
-                </div>
-                <button id="finish-btn-header" onclick="openFinishModal()" class="hidden bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-5 py-2 rounded-xl text-xs font-bold transition">Selesaikan</button>
+             <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"></div>
+            </div>
+            <div id="question-card" class="bg-blue-50 border-2 border-blue-200 p-6 rounded-xl min-h-[120px] flex items-center justify-center mb-6">
+                <p id="question-text" class="text-center text-lg sm:text-xl font-medium"></p>
+            </div>
+            <div id="options-container" class="grid grid-cols-1 gap-3 mb-6"></div>
+            <div class="flex justify-between items-center mt-8">
+                 <button id="prev-btn" onclick="prevQuestion()" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Sebelumnya</button>
+                 <button id="next-btn" onclick="nextQuestion()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition">Selanjutnya</button>
             </div>
         </div>
-    </header>
 
-    <div class="flex-grow flex flex-col md:flex-row max-w-7xl mx-auto w-full p-6 gap-8">
-        
-        <!-- Welcome & Topic Selection -->
-        <main id="start-screen" class="w-full">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-black text-slate-900 mb-4">Pilih Topik Materi</h2>
-                <p class="text-slate-500 max-w-2xl mx-auto">Klik salah satu modul di bawah ini untuk memulai latihan soal spesifik atau pilih "Semua Materi" untuk semua topik.</p>
+        <!-- Layar Hasil -->
+        <div id="result-screen" class="hidden text-center">
+            <h2 class="text-3xl font-bold text-blue-600 mb-4">Hasil Evaluasi</h2>
+            <div id="topic-scores-breakdown" class="mb-8 text-left border rounded-lg p-4 bg-gray-50"></div>
+            <div id="answers-review" class="text-left max-h-[40vh] overflow-y-auto p-4 bg-white rounded-lg border"></div>
+            <div class="mt-8">
+                <button onclick="restartQuiz()" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition">Kembali ke Menu Utama</button>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="topic-grid">
-                <!-- Topics generated by JS -->
-            </div>
-        </main>
-
-        <!-- Sidebar Navigation (Identical to UI Ref) -->
-        <aside id="sidebar" class="hidden w-full md:w-80 flex flex-col gap-4">
-            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 p-6 sticky top-28">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="font-bold text-slate-800 text-[11px] uppercase tracking-widest">Panel Navigasi</h2>
-                    <span id="progress-info" class="text-blue-600 font-bold text-xs">0/110</span>
-                </div>
-                
-                <div class="max-h-[calc(100vh-380px)] overflow-y-auto pr-2 custom-scrollbar">
-                    <div class="mb-8">
-                        <p class="text-[9px] text-slate-400 font-bold uppercase mb-4 tracking-tighter">Pilihan Ganda (1-100)</p>
-                        <div class="grid grid-cols-5 gap-2" id="nav-mcq-container"></div>
-                    </div>
-                    <div>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase mb-4 tracking-tighter">Esai (101-110)</p>
-                        <div class="grid grid-cols-5 gap-2" id="nav-essay-container"></div>
-                    </div>
-                </div>
-
-                <div class="mt-8 pt-6 border-t border-slate-100">
-                    <button onclick="openFinishModal()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-black transition shadow-lg">Kirim Semua Jawaban</button>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Quiz Area -->
-        <main id="quiz-screen" class="hidden flex-grow">
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
-                <div class="bg-slate-50/50 px-8 py-5 border-b border-slate-100 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <span id="q-topic-badge" class="bg-blue-600 text-white px-3.5 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest">Alam Semesta</span>
-                        <span id="q-number-label" class="text-slate-400 text-xs font-bold">SOAL 1</span>
-                    </div>
-                    <div class="w-24 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                        <div id="q-progress-bar" class="h-full bg-blue-600 transition-all duration-500" style="width: 1%"></div>
-                    </div>
-                </div>
-
-                <div class="p-8 md:p-12">
-                    <h2 id="q-text" class="text-2xl md:text-3xl font-bold text-slate-800 leading-tight mb-10">Memuat pertanyaan...</h2>
-                    
-                    <div id="mcq-options" class="space-y-4">
-                        <!-- Options generated by JS -->
-                    </div>
-
-                    <div id="essay-box" class="hidden">
-                        <textarea id="essay-input" rows="12" class="w-full p-8 bg-slate-50 border-2 border-slate-100 rounded-[2rem] focus:border-blue-500 focus:bg-white outline-none transition text-lg" placeholder="Tuliskan analisis mendalam Anda di sini..."></textarea>
-                    </div>
-                </div>
-
-                <div class="px-10 py-8 bg-slate-50 border-t border-slate-100 flex justify-between">
-                    <button id="btn-prev" onclick="moveQuestion(-1)" class="flex items-center gap-2 px-6 py-3 text-slate-500 font-bold hover:text-blue-600 transition disabled:opacity-20">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
-                        Sebelumnya
-                    </button>
-                    <button id="btn-next" onclick="moveQuestion(1)" class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-700 transition shadow-xl shadow-blue-100 flex items-center gap-2">
-                        <span>Berikutnya</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                    </button>
-                </div>
-            </div>
-        </main>
-
-        <!-- Result Screen -->
-        <main id="result-screen" class="hidden w-full max-w-4xl mx-auto">
-            <div class="bg-white rounded-[3rem] shadow-sm border border-slate-200 p-10 text-center">
-                <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                </div>
-                <h2 class="text-3xl font-black text-slate-900 mb-2">Simulasi UAS Selesai!</h2>
-                <p class="text-slate-400 mb-10">Hasil simulasi SisBum.</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                    <div class="bg-emerald-50 border border-emerald-100 p-8 rounded-[2rem]">
-                        <p id="res-correct" class="text-emerald-600 font-black text-5xl mb-2">0</p>
-                        <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Benar</p>
-                    </div>
-                    <div class="bg-rose-50 border border-rose-100 p-8 rounded-[2rem]">
-                        <p id="res-wrong" class="text-rose-600 font-black text-5xl mb-2">0</p>
-                        <p class="text-[10px] font-bold text-rose-400 uppercase tracking-widest">Salah</p>
-                    </div>
-                    <div class="bg-blue-600 p-8 rounded-[2rem] text-white shadow-2xl shadow-blue-200">
-                        <p id="res-score" class="font-black text-5xl mb-2">0</p>
-                        <p class="text-[10px] font-bold opacity-60 uppercase tracking-widest">Skor PG</p>
-                    </div>
-                </div>
-
-                <div class="text-left space-y-4 mb-10">
-                    <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
-                        Evaluasi Per Butir Soal
-                    </h3>
-                    <div id="review-list" class="space-y-3 max-h-96 overflow-y-auto pr-4 custom-scrollbar"></div>
-                </div>
-
-                <button onclick="location.reload()" class="bg-slate-900 text-white font-bold py-4 px-12 rounded-2xl hover:bg-black transition shadow-lg">Kembali ke Beranda</button>
-            </div>
-        </main>
+        </div>
     </div>
 
     <!-- Modals -->
-    <div id="modal-finish" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm">
-        <div class="bg-white rounded-[2.5rem] max-w-md w-full p-10 shadow-2xl text-center transform scale-95 transition-all">
-            <h2 class="text-2xl font-black text-slate-900 mb-2">Kirim Jawaban?</h2>
-            <p class="text-slate-500 mb-10 leading-relaxed">Anda masih memiliki sisa waktu. Pastikan semua esai sudah dianalisis dengan baik.</p>
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="closeFinishModal()" class="py-3 bg-slate-100 text-slate-600 font-bold rounded-2xl">Batal</button>
-                <button onclick="processResults()" class="py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg">Ya, Kirim</button>
+    <div id="nav-panel" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-40" onclick="toggleNavPanel()">
+        <div class="bg-white rounded-2xl p-6 max-w-3xl w-full shadow-2xl" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Lompat ke Soal</h3>
+                <button onclick="toggleNavPanel()" class="text-gray-500 hover:text-gray-800 font-bold">TUTUP</button>
             </div>
+            <div id="nav-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2 max-h-[60vh] overflow-y-auto p-2"></div>
         </div>
     </div>
 
-    <div id="modal-desc" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm">
-        <div class="bg-white rounded-[2.5rem] max-w-2xl w-full p-10 shadow-2xl overflow-y-auto max-h-[80vh] custom-scrollbar">
-            <h2 class="text-2xl font-black text-slate-900 mb-6">Penjelasan Jawaban</h2>
-            <div id="modal-body" class="space-y-6 text-sm"></div>
-            <button onclick="document.getElementById('modal-desc').classList.add('hidden')" class="mt-10 w-full bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-xl">Tutup Penjelasan</button>
+    <div id="explanationModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50" onclick="closeModal()">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-bold text-blue-600 mb-4" id="modal-question"></h3>
+            <p class="font-bold text-green-600 mb-2" id="modal-correct-answer"></p>
+            <p id="modal-explanation" class="text-gray-700 leading-relaxed"></p>
+            <div class="mt-6 text-right"><button onclick="closeModal()" class="bg-blue-600 text-white py-2 px-6 rounded-lg">Tutup</button></div>
         </div>
     </div>
 
     <script>
-        // KONTEN SOAL BERDASARKAN MATERI PDF/PPT
-        const mcqData = [
-            // ALAM SEMESTA (01)
-            { topic: "Alam Semesta", type: "mcq", q: "Apa nama radiasi yang ditemukan oleh Penzias dan Wilson (1964) sebagai 'echo' sisa ledakan Big Bang?", o: ["Radiasi Sinar-X", "Radiasi Latar Belakang Kosmik (CMB)", "Sinar Gamma", "Emisi Radio Galaksi"], a: 1, ex: "Cosmic Microwave Background (CMB) adalah bukti terkuat Big Bang yang merupakan radiasi dari tahap awal alam semesta." },
-            { topic: "Alam Semesta", type: "mcq", q: "Bukti bahwa alam semesta sedang berekspansi (Expanding Universe) didasarkan pada pengamatan Hubble tentang...", o: ["Redshift (Pergeseran Merah)", "Blueshift (Pergeseran Biru)", "Rotasi Galaksi", "Jumlah Bintang"], a: 0, ex: "Cahaya dari galaksi jauh bergeser ke arah warna merah, menunjukkan mereka sedang menjauh." },
-            { topic: "Alam Semesta", type: "mcq", q: "Unsur paling melimpah di alam semesta sesaat setelah pembentukan atom pertama adalah...", o: ["Helium", "Nitrogen", "Hidrogen", "Oksigen"], a: 2, ex: "Hidrogen menyusun sekitar 75% massa atom di alam semesta awal." },
-            
-            // EVOLUSI BUMI (02)
-            { topic: "Evolusi Bumi", type: "mcq", q: "Hukum geologi yang menyatakan bahwa lapisan terbawah adalah yang paling tua dalam urutan batuan normal disebut...", o: ["Hukum Inklusi", "Hukum Superposisi", "Hukum Potong Lintang", "Hukum Keselarasan"], a: 1, ex: "Hukum Superposisi (Steno) menyatakan sedimen diendapkan bertumpuk, bawah lebih tua." },
-            { topic: "Evolusi Bumi", type: "mcq", q: "Zaman di mana reptilia (dinosaurus) mendominasi bumi terjadi pada era...", o: ["Paleozoikum", "Mesozoikum", "Kenozoikum", "Prekambrium"], a: 1, ex: "Mesozoikum mencakup Periode Trias, Jura, dan Kapur." },
-            { topic: "Evolusi Bumi", type: "mcq", q: "Waktu yang dibutuhkan atom induk radioaktif meluruh menjadi setengahnya disebut...", o: ["Umur Relatif", "Waktu Paruh (Half-life)", "Masa Kedaluarsa", "Periode Fosil"], a: 1, ex: "Half-life konstan dan digunakan untuk penentuan umur absolut batuan." },
+        const quizData = {
+            "Osgeo": [
+                { q: "Informasi berikut betul mengenai palung laut, KECUALI:", o: ["Terbentuk akibat proses ambesan pada pematang samudera yang sudah tidak aktif", "Berada pada dasar laut yang dalam dan berdinding curam", "Kedalaman bisa mencapai 11000 meter", "Terbentuk akibat benturan antara dua lempeng yang berbeda berat jenisnya", "Salah satu contoh palung adalah mariana trench"], a: "Terbentuk akibat proses ambesan pada pematang samudera yang sudah tidak aktif", e: "Palung laut terbentuk di zona subduksi, sedangkan pematang samudera (ridge) adalah zona divergensi (pemekaran)." },
+                { q: "Apa penyebab utama kerak samudra lebih berat sehingga terjadi subduksi?", o: ["Tersusun atas batuan granitis yang tebal", "Tersusun atas batuan basal yang lebih padat", "Karena kerak samudra lebih dingin di permukaan", "Karena pengaruh tekanan air laut di atasnya", "Hanya faktor kebetulan"], a: "Tersusun atas batuan basal yang lebih padat", e: "Kerak samudera bersifat mafik (kaya Mg dan Fe) sehingga massa jenisnya lebih tinggi dari kerak benua yang bersifat felsik." },
+                { q: "Komponen penyusun cerobong 'black smoker' pada hidrotermal adalah:", o: ["Sulfite", "Oxide", "Sulfide", "Dioxide", "Hydroxide"], a: "Sulfide", e: "Black smoker menyemburkan fluida panas yang kaya akan partikel mineral sulfida logam." },
+                { q: "Manakah fenomena berikut yang TIDAK muncul pada batas konvergensi lempeng?", o: ["Terbentuknya palung laut", "Terhalangnya aktivitas vulkanisme", "Daerah hiposentra gempa", "Penghancuran bagian lempeng", "Terjadinya timbunan sedimen"], a: "Terhalangnya aktivitas vulkanisme", e: "Batas konvergensi justru merupakan lokasi utama terbentuknya busur vulkanik akibat subduksi." },
+                { q: "Urutan pembentukan cekungan samudera yang benar adalah:", o: ["Zona pengangkatan - Rekahan - Sesar - Lembah pemekaran - Pemekaran - Cekungan sedimen", "Rekahan - Pemekaran - Sesar - Cekungan sedimen", "Cekungan sedimen - Lembah - Rekahan", "Sesar - Zona pengangkatan - Pemekaran", "Pemekaran - Sesar - Rekahan"], a: "Zona pengangkatan - Rekahan - Sesar - Lembah pemekaran - Pemekaran - Cekungan sedimen", e: "Tahapan ini sesuai dengan model Siklus Wilson pada tahap awal pembentukan samudera." },
+                { q: "Bukti terbaik pendukung konsep Sea Floor Spreading (Pemekaran Lantai Laut) adalah:", o: ["Kecocokan garis pantai", "Fosil reptil Lystrosaurus", "Pengaturan anomali magnetik simetris di dasar laut", "Ketebalan sedimen di benua", "Jenis batuan Appalachian"], a: "Pengaturan anomali magnetik simetris di dasar laut", e: "Pola magnetik yang simetris di kedua sisi ridge membuktikan pembentukan lantai laut baru yang terus menerus." },
+                { q: "Pangaea mulai berpisah pada Era:", o: ["Pre-Cambrian", "Paleozoikum", "Mesozoikum", "Kenozoikum", "Holosen"], a: "Mesozoikum", e: "Superkontinen Pangaea pecah sekitar 200 juta tahun lalu pada periode Trias (Era Mesozoikum)." },
+                { q: "Teknologi sonar memetakan dasar laut dengan menggunakan:", o: ["Sinar Ultraviolet", "X-ray", "Gelombang Suara", "GPS", "Sinar Gamma"], a: "Gelombang Suara", e: "Sonar (Sound Navigation and Ranging) bekerja dengan memantulkan gelombang akustik." },
+                { q: "Contoh sedimen laut yang berasal dari sisa organisme disebut:", o: ["Lithogenous", "Biogenous", "Hydrogenous", "Cosmogenous", "Volcanogenic"], a: "Biogenous", e: "Sedimen biogenous terbentuk dari cangkang atau kerangka mikroorganisme laut (misal silika/karbonat)." },
+                { q: "Apa yang membedakan kerak samudera dan kerak benua dalam hal ketebalan?", o: ["Kerak samudera lebih tebal", "Kerak benua lebih tebal", "Keduanya sama tebal", "Tergantung suhu air", "Berubah setiap musim"], a: "Kerak benua lebih tebal", e: "Kerak benua memiliki ketebalan rata-rata 35-40 km, sedangkan kerak samudera hanya sekitar 7-10 km." }
+            ],
+            "Core Ose": [
+                { q: "Sirkulasi siklon di Belahan Bumi Utara (BBU) bergerak:", o: ["Searah jarum jam", "Berlawanan arah jarum jam", "Ke arah khatulistiwa", "Statis", "Tegak lurus arah angin"], a: "Berlawanan arah jarum jam", e: "Gaya Coriolis di BBU membelokkan partikel ke kanan, menciptakan pusaran berlawanan jarum jam pada tekanan rendah." },
+                { q: "Ekman Spiral menyebabkan arus permukaan bergerak:", o: ["45° ke kiri angin di BBU", "45° ke kanan angin di BBU", "90° ke kanan angin di BBU", "Sejajar angin", "Tegak lurus ke atas"], a: "45° ke kanan angin di BBU", e: "Gesekan angin dan gaya Coriolis menyebabkan pembelokan 45 derajat pada lapisan paling atas." },
+                { q: "Arus Lintas Indonesia (Arlindo) terjadi akibat:", o: ["Angin muson", "Tinggi muka air Pasifik lebih tinggi dari Hindia", "Gaya Coriolis di garis ekuator", "Perbedaan salinitas lokal", "Tsunami"], a: "Tinggi muka air Pasifik lebih tinggi dari Hindia", e: "Gradien tekanan antara Samudera Pasifik dan Hindia mendorong massa air melewati perairan Indonesia." },
+                { q: "Rossby Number adalah rasio antara gaya:", o: ["Inersia terhadap Coriolis", "Inersia terhadap Viskositas", "Apung terhadap Gesek", "Gaya apung terhadap Viskositas", "Momentum terhadap Thermal"], a: "Inersia terhadap Coriolis", e: "Ro = V / (fL). Bilangan ini menunjukkan signifikansi efek Coriolis." },
+                { q: "Reynolds Number adalah rasio antara gaya:", o: ["Inersia terhadap viskositas dinamis", "Inersia terhadap Coriolis", "Apung terhadap gesek", "Gravitasi terhadap tekanan", "Panas terhadap momentum"], a: "Inersia terhadap viskositas dinamis", e: "Re membandingkan gaya inersia dengan gaya hambat internal (viskositas)." },
+                { q: "Tsunami termasuk jenis gelombang:", o: ["Deep water wave", "Shallow water wave", "Capillary wave", "Internal wave", "Sound wave"], a: "Shallow water wave", e: "Karena panjang gelombangnya yang sangat besar, tsunami selalu berinteraksi dengan dasar laut bahkan di samudera dalam." },
+                { q: "Gaya Coriolis bernilai nol di:", o: ["Kutub Utara", "Kutub Selatan", "Ekuator", "Lintang 45°", "Seluruh samudera"], a: "Ekuator", e: "Parameter Coriolis (f) sebanding dengan sin(lintang); sin(0) = 0." },
+                { q: "Penyebab utama arus permukaan samudera adalah:", o: ["Pemanasan matahari langsung", "Angin permukaan", "Pasang surut", "Gempa bumi", "Pergerakan ikan"], a: "Angin permukaan", e: "Angin mentransfer energi ke permukaan laut melalui gesekan." },
+                { q: "Transport Ekman (neto) di BBU mengarah ke:", o: ["45° kanan angin", "90° kanan angin", "45° kiri angin", "90° kiri angin", "Searah angin"], a: "90° kanan angin", e: "Secara keseluruhan (rata-rata lapisan), transport massa Ekman tegak lurus ke kanan arah angin di BBU." },
+                { q: "Seiches (gelombang berdiri) terjadi akibat resonansi di:", o: ["Laut lepas yang sangat luas", "Wadah semi-tertutup seperti teluk/danau", "Daerah ekuator saja", "Dasar palung", "Hanya saat tsunami"], a: "Wadah semi-tertutup seperti teluk/danau", e: "Seiches memerlukan batas pemantulan agar gelombang dapat berinterferensi menjadi gelombang berdiri." }
+            ],
+            "Kimia": [
+                { q: "Waktu tinggal Na (80 juta thn) vs Al (600 thn) menunjukkan:", o: ["Na lebih reaktif", "Na memiliki distribusi konsentrasi merata (konservatif)", "Al lebih melimpah", "Al lebih sulit larut", "Na mudah mengendap"], a: "Na memiliki distribusi konsentrasi merata (konservatif)", e: "Elemen dengan waktu tinggal lama cenderung homogen di seluruh samudera." },
+                { q: "Salinitas tertinggi biasanya ditemukan di:", o: ["Laut Mediterania", "Teluk Benggala", "Selat Melaka", "Laut Hitam", "Laut Jawa"], a: "Laut Mediterania", e: "Evaporasi yang tinggi dan sirkulasi yang terisolasi meningkatkan salinitas secara signifikan." },
+                { q: "Struktur molekul H2O membentuk sudut 105°, hal ini menyebabkan air bersifat:", o: ["Monopolar", "Bipolar", "Tripolar", "Nonpolar", "Heteropolar"], a: "Bipolar", e: "Ketidakseimbangan muatan pada molekul air menciptakan dipol listrik." },
+                { q: "Kapasitas buffer pada air laut adalah kemampuan untuk:", o: ["Menstabilkan pH", "Menstabilkan salinitas", "Meningkatkan suhu", "Menurunkan densitas", "Meningkatkan oksigen"], a: "Menstabilkan pH", e: "Sistem karbonat laut mempertahankan pH tetap stabil (sekitar 8.1)." },
+                { q: "Gas dengan kelarutan rendah dan reaktivitas kimia rendah adalah:", o: ["CO2", "NH3", "N2", "SO2", "H2S"], a: "N2", e: "Gas nitrogen (N2) bersifat inert dan kurang larut dibandingkan gas reaktif seperti CO2." },
+                { q: "Densitas air laut terutama dipengaruhi oleh:", o: ["Salinitas dan Tekanan", "Suhu dan Salinitas", "Suhu dan Cahaya", "Sedimen dan Arus", "Kedalaman saja"], a: "Suhu dan Salinitas", e: "Hubungan T-S (Temperature-Salinity) adalah pengontrol utama massa jenis air laut." },
+                { q: "Kelarutan gas (Oksigen/CO2) di laut akan meningkat jika:", o: ["Suhu naik", "Suhu turun, tekanan naik", "Tekanan turun", "Salinitas naik tajam", "Siang hari"], a: "Suhu turun, tekanan naik", e: "Air dingin dan bertekanan tinggi mampu mengikat lebih banyak molekul gas terlarut." },
+                { q: "Salinitas rata-rata air laut terbuka adalah:", o: ["35 psu (ppt)", "3.5 psu", "38 psu", "30 psu", "10 psu"], a: "35 psu (ppt)", e: "35 gram garam terlarut dalam 1 kg air laut." },
+                { q: "Lapisan di mana densitas air laut berubah drastis terhadap kedalaman disebut:", o: ["Termoklin", "Haloklin", "Piknoklin", "Kemoklin", "Oksiklin"], a: "Piknoklin", e: "Piknoklin adalah lapisan gradien densitas." },
+                { q: "Apa yang terjadi pada pH laut jika konsentrasi CO2 atmosfer meningkat?", o: ["pH akan naik", "pH akan turun (mengasam)", "pH tetap stabil", "Salinitas akan turun", "Oksigen bertambah"], a: "pH akan turun (mengasam)", e: "CO2 bereaksi dengan air membentuk asam karbonat, menurunkan pH (Ocean Acidification)." }
+            ],
+            "Pasang Surut & Gelombang": [
+                { q: "Pasang surut yang terjadi saat Matahari, Bumi, dan Bulan berada dalam garis lurus disebut:", o: ["Neap tide", "Spring tide", "Diurnal tide", "Amphidromic", "Ebb tide"], a: "Spring tide", e: "Gaya gravitasi gabungan menyebabkan tunggang pasang maksimum (Pasang Purnama)." },
+                { q: "Pasang surut saat Matahari, Bumi, dan Bulan membentuk sudut tegak lurus disebut:", o: ["Spring tide", "Neap tide", "Purnama", "Perigean", "Apogean"], a: "Neap tide", e: "Gaya gravitasi saling melemahkan, menghasilkan tunggang pasut minimum (Pasang Perbani)." },
+                { q: "Kondisi pasang surut di Selat Karimata adalah:", o: ["Harian tunggal (diurnal)", "Harian ganda (semi-diurnal)", "Campuran dominan harian ganda", "Campuran dominan harian tunggal", "Statis"], a: "Harian tunggal (diurnal)", e: "Sesuai dengan data pengamatan di Laut Jawa bagian utara dan Selat Karimata." },
+                { q: "Komponen pasang surut M2 merepresentasikan:", o: ["Pengaruh matahari harian", "Pengaruh bulan harian ganda", "Pengaruh bulan harian tunggal", "Pasang perbani", "Arus residu"], a: "Pengaruh bulan harian ganda", e: "M2 (Main Lunar Semidiurnal) adalah komponen utama pasang surut akibat gravitasi bulan." },
+                { q: "Tahapan pembentukan gelombang oleh angin adalah:", o: ["Ripples - Seas - Fully Developed Sea", "Seas - Ripples - Fully Developed Sea", "Fully Developed Sea - Ripples - Seas", "Ripples - Swell - Seas", "Angin - Swell - Ripples"], a: "Ripples - Seas - Fully Developed Sea", e: "Dimulai dari riak kecil (ripples), menjadi ombak (seas), hingga mencapai kondisi energi jenuh." },
+                { q: "Prisma Pasang Surut (Tidal Prism) didefinisikan sebagai:", o: ["Tinggi air pasang", "Volume air yang bertukar di mulut estuari dalam satu siklus", "Kecepatan arus pasut", "Gaya gravitasi bulan", "Kedalaman rata-rata estuari"], a: "Volume air yang bertukar di mulut estuari dalam satu siklus", e: "Volume total air yang masuk atau keluar estuari antara pasang dan surut." },
+                { q: "Apa yang dimaksud dengan 'Fetch' dalam pembentukan gelombang?", o: ["Kecepatan angin", "Durasi angin bertiup", "Jarak bebas hambatan di mana angin bertiup di atas air", "Kedalaman laut", "Suhu permukaan"], a: "Jarak bebas hambatan di mana angin bertiup di atas air", e: "Semakin panjang fetch, semakin besar energi yang ditransfer ke gelombang." },
+                { q: "Gelombang yang telah menjalar jauh keluar dari daerah badai asalnya disebut:", o: ["Seas", "Ripples", "Swell", "Tsunami", "Capillary wave"], a: "Swell", e: "Swell adalah gelombang yang lebih teratur dan berperioda panjang yang tidak lagi dipengaruhi angin lokal." },
+                { q: "Pusat rotasi sistem pasang surut di lautan di mana amplitudo pasut adalah nol disebut:", o: ["Node", "Antinode", "Amphidromic point", "Crest", "Trough"], a: "Amphidromic point", e: "Garis-garis cotidal bertemu pada satu titik pusat ini." },
+                { q: "Apa yang terjadi pada panjang gelombang saat mendekati pantai (shallowing)?", o: ["Panjang gelombang bertambah", "Panjang gelombang berkurang", "Panjang gelombang tetap", "Tinggi gelombang berkurang", "Kecepatan bertambah"], a: "Panjang gelombang berkurang", e: "Karena gesekan dasar, kecepatan berkurang dan gelombang 'merapat' (wavelength shortening)." }
+            ],
+            "Arus & Massa Air": [
+                { q: "Massa air paling padat (densitas tertinggi) di samudera dunia adalah:", o: ["NADW (North Atlantic Deep Water)", "AABW (Antarctic Bottom Water)", "AAIW", "Surface Water", "Pacific Deep Water"], a: "AABW (Antarctic Bottom Water)", e: "Terbentuk di Laut Weddell dengan suhu sangat dingin dan salinitas tinggi akibat pembentukan es." },
+                { q: "Sirkulasi global yang didorong oleh perbedaan densitas (T-S) disebut:", o: ["Sirkulasi Gyre", "Sirkulasi Thermohalin", "Arus Geostropik", "Arus Ekman", "Arus Pasang Surut"], a: "Sirkulasi Thermohalin", e: "Juga dikenal sebagai 'Global Ocean Conveyor Belt'." },
+                { q: "Gulf Stream di Samudera Atlantik merupakan contoh arus:", o: ["Arus batas timur yang dingin", "Arus batas barat yang hangat", "Arus ekuator", "Arus dasar laut", "Arus musiman"], a: "Arus batas barat yang hangat", e: "Membawa panas dari daerah tropis ke arah Lintang Tinggi (Eropa)." },
+                { q: "Eddies yang berputar searah jarum jam di BBU dan memerangkap air hangat disebut:", o: ["Cold core eddy", "Warm core eddy", "Cyclonic eddy", "Tidal eddy", "Inertial eddy"], a: "Warm core eddy", e: "Warm core eddies bersifat antisiklonik di BBU." },
+                { q: "Arus yang bergerak sejajar pantai akibat gelombang pecah disebut:", o: ["Rip current", "Longshore current", "Tidal current", "Drift current", "Upwelling"], a: "Longshore current", e: "Bertanggung jawab atas transport sedimen di sepanjang garis pantai." },
+                { q: "Fenomena El Nino ditandai dengan:", o: ["Suhu permukaan laut mendingin di Pasifik Timur", "Suhu permukaan laut menghangat di Pasifik Timur", "Angin pasat menguat", "Upwelling di Peru meningkat", "Kekeringan di Peru"], a: "Suhu permukaan laut menghangat di Pasifik Timur", e: "El Nino adalah anomali positif suhu permukaan laut di wilayah Ekuator Pasifik Tengah dan Timur." },
+                { q: "Upwelling terjadi ketika angin mendorong air permukaan menjauh dari pantai, yang dipengaruhi oleh:", o: ["Efek Coriolis dan Transport Ekman", "Gaya gravitasi bulan", "Tekanan atmosfer tinggi", "Suhu air laut dalam", "Pancaran radiasi UV"], a: "Efek Coriolis dan Transport Ekman", e: "Coastal upwelling terjadi akibat transport Ekman yang mengarah ke lepas pantai (offshore)." },
+                { q: "Arus geostropik terjadi akibat keseimbangan antara gaya Coriolis dan:", o: ["Gaya gesek angin", "Gaya gradien tekanan", "Gaya gravitasi vertikal", "Gaya sentrifugal", "Gaya viskositas"], a: "Gaya gradien tekanan", e: "Aliran sejajar dengan garis isobar karena keseimbangan Coriolis dan gradien tekanan horizontal." },
+                { q: "Konvergensi massa air di tengah Gyre subtropis menyebabkan:", o: ["Upwelling", "Downwelling", "Tsunami", "Peningkatan klorofil", "Pengasaman laut"], a: "Downwelling", e: "Akumulasi air di pusat gyre memaksa massa air turun ke bawah." },
+                { q: "Apa dampak terganggunya Global Conveyor Belt terhadap iklim?", o: ["Peningkatan suhu kutub secara instan", "Perubahan distribusi panas global dan potensi migrasi iklim", "Tidak ada dampak", "Berhentinya pasang surut", "Lautan menjadi tawar"], a: "Perubahan distribusi panas global dan potensi migrasi iklim", e: "Mempengaruhi sistem cuaca global karena redistribusi panas terganggu." }
+            ]
+        };
 
-            // INTERIOR BUMI (03)
-            { topic: "Interior & Tektonik", type: "mcq", q: "Batas pemisah antara kerak bumi (crust) dan mantel (mantle) bumi disebut diskontinuitas...", o: ["Gutenberg", "Lehmann", "Mohorovicic (Moho)", "Conrad"], a: 2, ex: "Moho ditandai dengan perubahan kecepatan gelombang seismik secara drastis." },
-            { topic: "Interior & Tektonik", type: "mcq", q: "Lapisan bumi yang berwujud cair dan menghasilkan medan magnet bumi adalah...", o: ["Inti Dalam", "Inti Luar", "Mantel", "Litosfer"], a: 1, ex: "Inti luar besi-nikel yang cair bergerak menciptakan efek dinamo (magnetosfer)." },
-            { topic: "Interior & Tektonik", type: "mcq", q: "Lempeng yang bergerak saling menjauh dan membentuk kerak samudera baru terjadi pada batas...", o: ["Konvergen", "Transform", "Divergen", "Subduksi"], a: 2, ex: "Contoh: Mid-Atlantic Ridge." },
-
-            // PROSES BUMI (04)
-            { topic: "Proses Geologi", type: "mcq", q: "Pelapukan batuan akibat pembekuan air di rekahan batuan (frost wedging) adalah contoh pelapukan...", o: ["Kimia", "Biologi", "Fisika/Mekanik", "Vulkanik"], a: 2, ex: "Air memuai saat membeku, memberikan tekanan fisik yang memecah batu." },
-            { topic: "Proses Geologi", type: "mcq", q: "Fitur morfologi karst yang berupa cekungan tertutup berbentuk corong akibat pelarutan gamping disebut...", o: ["Stalaktit", "Uvala", "Dolina", "Polje"], a: 2, ex: "Dolina adalah bentuk lahan negatif dasar di kawasan karst." },
-
-            // KELAUTAN (07)
-            { topic: "Oseanografi", type: "mcq", q: "Salinitas rata-rata air laut global adalah...", o: ["3.5 gr/kg", "35 gr/kg (35‰)", "10 gr/kg", "50 gr/kg"], a: 1, ex: "35 gram garam terlarut dalam 1000 gram air laut." },
-            { topic: "Oseanografi", type: "mcq", q: "Pasang surut yang terjadi dua kali pasang dan dua kali surut dalam sehari dengan tinggi yang hampir sama disebut...", o: ["Diurnal", "Semidiurnal", "Mixed Diurnal", "Mixed Semidiurnal"], a: 1, ex: "Semidiurnal terjadi 2x pasang/surut dalam 24 jam." },
-
-            // ATMOSFER (10)
-            { topic: "Atmosfer", type: "mcq", q: "Lapisan atmosfer tempat terkonsentrasinya ozon yang menyerap radiasi UV matahari adalah...", o: ["Troposfer", "Stratosfer", "Mesosfer", "Termosfer"], a: 1, ex: "Ozon di stratosfer melindungi bumi dari sinar ultraviolet berbahaya." },
-            { topic: "Atmosfer", type: "mcq", q: "Proses pembentukan hujan di lintang tengah yang melibatkan kristal es di awan superdingin disebut...", o: ["Kondensasi", "Proses Bergeron", "Adveksi", "Konveksi"], a: 1, ex: "Proses Bergeron: kristal es tumbuh mengorbankan tetes air cair superdingin." }
+        // Menambahkan variasi soal tambahan untuk melengkapi hingga mendekati 100 soal unik 
+        // (Contoh penambahan soal umum Fisika/Geologi/Kimia)
+        const commonOceanography = [
+            { q: "Berapa tekanan hidrostatik pada kedalaman 100 meter?", o: ["1 atm", "10 atm", "11 atm", "100 atm", "1.1 atm"], a: "11 atm", e: "1 atm (permukaan) + 1 atm setiap 10m kedalaman." },
+            { q: "Warna cahaya manakah yang paling dalam menembus air laut jernih?", o: ["Merah", "Kuning", "Hijau", "Biru", "Ungu"], a: "Biru", e: "Panjang gelombang pendek (biru) paling sedikit diserap air." },
+            { q: "Apa instrumen utama untuk mengukur profil konduktivitas, suhu, dan kedalaman?", o: ["Sonar", "CTD", "Grab", "Core", "Secchi disk"], a: "CTD", e: "Conductivity, Temperature, Depth." },
+            { q: "Zonasi laut dari kedalaman 200m hingga 1000m disebut:", o: ["Epipelagis", "Mesopelagis", "Batipelagis", "Abisal", "Hadal"], a: "Mesopelagis", e: "Juga dikenal sebagai 'Twilight Zone'." },
+            { q: "Alat pengambil sampel sedimen permukaan dasar laut disebut:", o: ["Core sampler", "Grab sampler", "Secchi disk", "Current meter", "Plankton net"], a: "Grab sampler", e: "Mengambil sedimen lapisan atas tanpa pengeboran dalam." },
+            { q: "Kecepatan suara di air laut rata-rata adalah:", o: ["340 m/s", "1500 m/s", "3000 m/s", "5000 m/s", "10 m/s"], a: "1500 m/s", e: "Lebih cepat dari udara karena densitas air lebih tinggi." },
+            { q: "Arus yang berputar di satu wilayah laut disebut:", o: ["Gyre", "Eddy", "Jet", "Stream", "Tide"], a: "Eddy", e: "Eddy adalah pusaran air skala kecil hingga menengah." },
+            { q: "Apa satuan umum yang digunakan untuk salinitas saat ini?", o: ["Gram", "Persen (%)", "psu (Practical Salinity Unit)", "Celcius", "Knot"], a: "psu (Practical Salinity Unit)", e: "Berdasarkan pengukuran konduktivitas listrik." },
+            { q: "Laut yang dikelilingi daratan sepenuhnya dan memiliki salinitas ekstrim tinggi:", o: ["Laut Jawa", "Laut Mati", "Laut Banda", "Laut Cina Selatan", "Laut Arab"], a: "Laut Mati", e: "Danau hipersalin dengan konsentrasi garam sangat tinggi." },
+            { q: "Proses penguapan air laut menjadi uap air disebut:", o: ["Presipitasi", "Evaporasi", "Kondensasi", "Infiltrasi", "Sublimasi"], a: "Evaporasi", e: "Bagian dari siklus hidrologi utama di laut." },
+            { q: "Apa yang menyebabkan 'Dead Zone' di estuari (kaitannya dengan kimia)?", o: ["Terlalu banyak oksigen", "Hipoksia (kekurangan oksigen terlarut)", "Terlalu banyak garam", "Suhu terlalu panas", "Tidak ada cahaya"], a: "Hipoksia (kekurangan oksigen terlarut)", e: "Dekomposisi materi organik berlebih menghabiskan oksigen." },
+            { q: "Kecepatan arus pasut mencapai titik tertinggi saat:", o: ["Tepat saat pasang tinggi", "Tepat saat surut rendah", "Di antara pasang dan surut (Mid-tide)", "Tergantung posisi matahari saja", "Statis setiap jam"], a: "Di antara pasang dan surut (Mid-tide)", e: "Arus pasut (tidal currents) biasanya paling kencang saat transisi massa air." },
+            { q: "Di manakah letak sedimen tipe neritik?", o: ["Landas Kontinen (Continental Shelf)", "Dasar Samudera Abisal", "Lereng Benua saja", "Di atas Gunung Berapi", "Hanya di sungai"], a: "Landas Kontinen (Continental Shelf)", e: "Sedimen yang dekat dengan daratan." },
+            { q: "Apa nama alat untuk mengukur arus laut di satu titik?", o: ["CTD", "ADCP / Current Meter", "Echo Sounder", "Satelit", "Thermometer"], a: "ADCP / Current Meter", e: "Acoustic Doppler Current Profiler." },
+            { q: "Efek Coriolis membelokkan benda bergerak ke arah mana di Belahan Bumi Selatan?", o: ["Kanan", "Kiri", "Atas", "Bawah", "Lurus saja"], a: "Kiri", e: "Di BBS pembelokan terjadi ke arah kiri pengamat." },
+            { q: "Mineral utama dalam cangkang foraminifera adalah:", o: ["Silika", "Kalsium Karbonat", "Besi", "Emas", "Sulfur"], a: "Kalsium Karbonat", e: "Membentuk sedimen gampingan (calcareous ooze)." },
+            { q: "Mineral utama dalam cangkang diatom adalah:", o: ["Kalsium Karbonat", "Silika", "Fosfat", "Magnesium", "Karbon"], a: "Silika", e: "Membentuk sedimen silikaan (siliceous ooze)." },
+            { q: "Profil vertikal salinitas di daerah ekuator menunjukkan salinitas rendah di permukaan karena:", o: ["Evaporasi tinggi", "Presipitasi (hujan) tinggi", "Arus dingin", "Gunung es mencair", "Tidak ada angin"], a: "Presipitasi (hujan) tinggi", e: "Curah hujan tinggi di ekuator mengencerkan salinitas permukaan." },
+            { q: "Siklus pasang surut harian ganda (semi-diurnal) memiliki:", o: ["1 pasang dan 1 surut per hari", "2 pasang dan 2 surut per hari", "Hanya pasang saja", "Terjadi setiap 24 jam sekali", "Waktunya tidak menentu"], a: "2 pasang dan 2 surut per hari", e: "Dengan tinggi yang relatif sama dalam satu periode ~24.8 jam." },
+            { q: "Apa penyebab utama terjadinya 'Storm Surge'?", o: ["Gempa bumi dasar laut", "Tekanan atmosfer rendah dan angin kencang badai", "Gravitasi bulan purnama", "Letusan gunung api", "Arus Arlindo"], a: "Tekanan atmosfer rendah dan angin kencang badai", e: "Massa air terangkat karena tekanan rendah dan didorong ke pantai oleh angin badai." }
         ];
 
-        // Fill remaining up to 100 MCQs
-        const categories = ["Alam Semesta", "Evolusi Bumi", "Interior & Tektonik", "Proses Geologi", "Oseanografi", "Atmosfer"];
-        while(mcqData.length < 100) {
-            const cat = categories[mcqData.length % categories.length];
-            mcqData.push({
-                topic: cat, type: "mcq", q: `[Materi ${cat}] Manakah fenomena berikut yang paling tepat menggambarkan mekanisme sistem ${cat.toLowerCase()}?`,
-                o: ["Pernyataan A", "Pernyataan B", "Pernyataan C (Benar)", "Pernyataan D"], a: 2, ex: "Penjelasan mendalam mengenai materi "+cat+" sesuai dengan modul ITB."
-            });
-        }
+        quizData["Lainnya"] = commonOceanography;
 
-        const essayData = [
-            { topic: "Atmosfer", type: "essay", q: "Jelaskan mekanisme pembentukan hujan menurut proses Bergeron!" },
-            { topic: "Geologi", type: "essay", q: "Bedakan antara proses endogen dan eksogen beserta contoh fenomenanya!" },
-            { topic: "Oseanografi", type: "essay", q: "Apa saja faktor yang mempengaruhi variasi salinitas air laut di berbagai wilayah?" },
-            { topic: "Tektonik", type: "essay", q: "Jelaskan mengapa Indonesia disebut berada dalam rangkaian 'Ring of Fire'!" },
-            { topic: "Evolusi Bumi", type: "essay", q: "Jelaskan 3 hukum stratigrafi dasar dalam penentuan umur relatif batuan!" },
-            { topic: "Alam Semesta", type: "essay", q: "Uraikan 3 bukti ilmiah utama yang mendukung teori Big Bang!" },
-            { topic: "Geologi", type: "essay", q: "Jelaskan siklus pembentukan morfologi karst dan fitur gua!" },
-            { topic: "Interior Bumi", type: "essay", q: "Gambarkan dan jelaskan struktur interior bumi berdasarkan sifat fisiknya!" },
-            { topic: "Kelautan", type: "essay", q: "Bagaimana mekanisme terjadinya Tsunami akibat gempa tektonik?" },
-            { topic: "Atmosfer", type: "essay", q: "Jelaskan profil vertikal suhu atmosfer dan alasan kenaikan suhu di stratosfer!" }
-        ];
-
-        // State
-        let currentPool = [];
-        let currentIdx = 0;
+        let activeQuestions = [];
         let userAnswers = [];
-        let startTime;
-        let timerInterval;
+        let currentQuestionIndex = 0;
 
-        function initTopicSelection() {
-            const grid = document.getElementById('topic-grid');
-            const topics = [...categories, "Semua Materi"];
+        function init() {
+            const container = document.getElementById('topic-selection');
+            container.innerHTML = '';
             
-            topics.forEach(t => {
-                const mcqCount = t === "Semua Materi" ? 100 : mcqData.filter(q => q.topic === t).length;
-                const essCount = t === "Semua Materi" ? 10 : essayData.filter(q => q.topic === t).length;
+            const cats = Object.keys(quizData);
+            cats.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'topic-button p-4 bg-white border-2 border-blue-200 rounded-xl text-blue-700 font-bold hover:bg-blue-50 transition text-left';
+                btn.textContent = `${cat} (${quizData[cat].length} Soal)`;
+                btn.onclick = () => startQuiz(cat);
+                container.appendChild(btn);
+            });
+
+            const allBtn = document.createElement('button');
+            allBtn.className = 'topic-button p-4 bg-blue-600 text-white font-bold rounded-xl md:col-span-2 hover:bg-blue-700 transition';
+            allBtn.textContent = "Mulai Semua Soal";
+            allBtn.onclick = () => startQuiz("Semua");
+            container.appendChild(allBtn);
+        }
+
+        function populateNav() {
+            const grid = document.getElementById('nav-grid');
+            grid.innerHTML = '';
+            activeQuestions.forEach((_, i) => {
+                const btn = document.createElement('button');
+                btn.className = `p-2 text-xs rounded border transition cursor-pointer flex items-center justify-center h-10 w-10`;
+                btn.textContent = i + 1;
                 
-                const card = document.createElement('div');
-                card.className = "topic-card flex items-center gap-6";
-                card.onclick = () => selectTopic(t);
-                card.innerHTML = `
-                    <div class="bg-blue-50 p-4 rounded-2xl text-blue-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-slate-800 text-lg">${t}</h3>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">${mcqCount} PG • ${essCount} ESAI</p>
-                    </div>
-                `;
-                grid.appendChild(card);
+                if (userAnswers[i]) btn.classList.add('answered');
+                if (i === currentQuestionIndex) btn.classList.add('current');
+                else btn.classList.add('bg-gray-50');
+
+                btn.onclick = () => { 
+                    currentQuestionIndex = i; 
+                    loadQuestion(); 
+                    toggleNavPanel(); 
+                };
+                grid.appendChild(btn);
             });
         }
 
-        function selectTopic(t) {
-            currentPool = t === "Semua Materi" ? [...mcqData, ...essayData] : [...mcqData.filter(q => q.topic === t), ...essayData.filter(q => q.topic === t)];
-            userAnswers = new Array(currentPool.length).fill(null);
-            startQuiz();
-        }
-
-        function startQuiz() {
+        function startQuiz(topic) {
+            if (topic === "Semua") {
+                activeQuestions = Object.keys(quizData).flatMap(cat => quizData[cat].map(q => ({...q, topic: cat})));
+            } else {
+                activeQuestions = quizData[topic].map(q => ({...q, topic}));
+            }
+            
+            // Shuffle soal
+            activeQuestions = activeQuestions.sort(() => Math.random() - 0.5);
+            
+            userAnswers = Array(activeQuestions.length).fill(null);
+            currentQuestionIndex = 0;
+            
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('quiz-screen').classList.remove('hidden');
-            document.getElementById('sidebar').classList.remove('hidden');
-            document.getElementById('timer-box').classList.remove('hidden');
-            document.getElementById('finish-btn-header').classList.remove('hidden');
+            document.getElementById('quiz-topic-title').textContent = topic;
             
-            initNav();
-            startTime = new Date();
-            startTimer();
-            renderQuestion();
+            loadQuestion();
         }
 
-        function startTimer() {
-            timerInterval = setInterval(() => {
-                const diff = new Date(new Date() - startTime);
-                document.getElementById('timer').textContent = diff.toISOString().substr(11, 8);
-            }, 1000);
-        }
-
-        function initNav() {
-            const mcqNav = document.getElementById('nav-mcq-container');
-            const essNav = document.getElementById('nav-essay-container');
-            mcqNav.innerHTML = ''; essNav.innerHTML = '';
-
-            currentPool.forEach((q, i) => {
+        function loadQuestion() {
+            const q = activeQuestions[currentQuestionIndex];
+            document.getElementById('question-text').textContent = q.q;
+            document.getElementById('question-counter').textContent = `Soal ${currentQuestionIndex + 1} / ${activeQuestions.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentQuestionIndex + 1) / activeQuestions.length) * 100}%`;
+            
+            const optContainer = document.getElementById('options-container');
+            optContainer.innerHTML = '';
+            
+            q.o.forEach(opt => {
                 const btn = document.createElement('button');
-                btn.id = `nav-${i}`;
-                btn.className = `nav-btn ${q.type === 'essay' ? 'essay' : ''}`;
-                btn.textContent = i + 1;
-                btn.onclick = () => { currentIdx = i; renderQuestion(); };
-                (q.type === 'mcq' ? mcqNav : essNav).appendChild(btn);
+                btn.className = 'quiz-option p-3 border-2 border-gray-200 rounded-lg text-left hover:border-blue-400 transition';
+                btn.textContent = opt;
+                if (userAnswers[currentQuestionIndex] === opt) btn.classList.add('selected');
+                btn.onclick = () => selectOption(opt);
+                optContainer.appendChild(btn);
             });
+
+            document.getElementById('prev-btn').disabled = currentQuestionIndex === 0;
+            document.getElementById('next-btn').textContent = currentQuestionIndex === activeQuestions.length - 1 ? "Lihat Hasil" : "Selanjutnya";
         }
 
-        function renderQuestion() {
-            const q = currentPool[currentIdx];
-            document.getElementById('q-number-label').textContent = `SOAL ${currentIdx + 1}`;
-            document.getElementById('q-topic-badge').textContent = q.topic;
-            document.getElementById('q-text').textContent = q.q;
-            document.getElementById('q-progress-bar').style.width = `${((currentIdx + 1) / currentPool.length) * 100}%`;
-            document.getElementById('progress-info').textContent = `${userAnswers.filter(a => a !== null && a !== "").length}/${currentPool.length}`;
+        function selectOption(val) {
+            userAnswers[currentQuestionIndex] = val;
+            loadQuestion();
+        }
 
-            const mcqBox = document.getElementById('mcq-options');
-            const essBox = document.getElementById('essay-box');
-
-            if (q.type === 'mcq') {
-                mcqBox.classList.remove('hidden'); essBox.classList.add('hidden');
-                mcqBox.innerHTML = '';
-                q.o.forEach((opt, i) => {
-                    const btn = document.createElement('button');
-                    btn.className = `quiz-option w-full text-left p-5 rounded-2xl flex items-center gap-5 ${userAnswers[currentIdx] === i ? 'selected' : ''}`;
-                    btn.innerHTML = `
-                        <span class="letter-box w-10 h-10 rounded-full border flex items-center justify-center font-bold flex-shrink-0 ${userAnswers[currentIdx] === i ? '' : 'bg-slate-50 text-slate-400 border-slate-200'}">
-                            ${String.fromCharCode(65 + i)}
-                        </span>
-                        <span class="font-medium">${opt}</span>
-                    `;
-                    btn.onclick = () => { userAnswers[currentIdx] = i; updateNavStatus(); renderQuestion(); };
-                    mcqBox.appendChild(btn);
-                });
+        function nextQuestion() {
+            if (currentQuestionIndex < activeQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
             } else {
-                mcqBox.classList.add('hidden'); essBox.classList.remove('hidden');
-                const area = document.getElementById('essay-input');
-                area.value = userAnswers[currentIdx] || "";
-                area.oninput = (e) => { userAnswers[currentIdx] = e.target.value; updateNavStatus(); };
+                showResults();
             }
-
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('current'));
-            document.getElementById(`nav-${currentIdx}`).classList.add('current');
-            document.getElementById('btn-prev').disabled = currentIdx === 0;
-            document.getElementById('btn-next').querySelector('span').textContent = currentIdx === currentPool.length - 1 ? 'Selesai' : 'Berikutnya';
         }
 
-        function updateNavStatus() {
-            const btn = document.getElementById(`nav-${currentIdx}`);
-            if (userAnswers[currentIdx] !== null && userAnswers[currentIdx] !== "") btn.classList.add('answered');
-            else btn.classList.remove('answered');
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
         }
 
-        function moveQuestion(dir) {
-            if (currentIdx === currentPool.length - 1 && dir === 1) { openFinishModal(); return; }
-            currentIdx += dir; renderQuestion();
-        }
-
-        function openFinishModal() { document.getElementById('modal-finish').classList.remove('hidden'); }
-        function closeFinishModal() { document.getElementById('modal-finish').classList.add('hidden'); }
-
-        function processResults() {
-            clearInterval(timerInterval);
-            document.getElementById('modal-finish').classList.add('hidden');
+        function showResults() {
             document.getElementById('quiz-screen').classList.add('hidden');
-            document.getElementById('sidebar').classList.add('hidden');
             document.getElementById('result-screen').classList.remove('hidden');
+            
+            let score = 0;
+            const reviewContainer = document.getElementById('answers-review');
+            reviewContainer.innerHTML = '';
 
-            let correct = 0;
-            const mcqCount = currentPool.filter(q => q.type === 'mcq').length;
-            const list = document.getElementById('review-list');
-            list.innerHTML = '';
-
-            currentPool.forEach((q, i) => {
-                const isMcq = q.type === 'mcq';
-                const isCorrect = isMcq && userAnswers[i] === q.a;
-                if (isCorrect) correct++;
-
+            activeQuestions.forEach((q, i) => {
+                const isCorrect = userAnswers[i] === q.a;
+                if (isCorrect) score++;
+                
                 const div = document.createElement('div');
-                div.className = `p-5 rounded-2xl border flex items-center justify-between ${isMcq ? (isCorrect ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100') : 'bg-slate-50 border-slate-200'}`;
+                div.className = `p-4 mb-3 border rounded-lg ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`;
                 div.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <span class="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center font-bold text-[10px]">${i+1}</span>
-                        <div>
-                            <p class="font-bold text-slate-800 text-xs truncate max-w-[200px] md:max-w-md">${q.q}</p>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">${q.topic}</p>
-                        </div>
-                    </div>
-                    ${isMcq ? `<button onclick="showDetail(${i})" class="text-[10px] font-bold ${isCorrect ? 'text-emerald-600' : 'text-rose-600'} hover:underline">Detail</button>` : '<span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Esai</span>'}
+                    <p class="font-bold">${i + 1}. ${q.q}</p>
+                    <p class="text-sm mt-1">Jawaban Anda: <span class="${isCorrect ? 'text-green-700' : 'text-red-700'} font-bold">${userAnswers[i] || 'Tidak dijawab'}</span></p>
+                    ${!isCorrect ? `<p class="text-sm text-green-700 font-bold italic">Benar: ${q.a}</p>` : ''}
+                    <button onclick="showExp(${i})" class="text-blue-600 text-xs underline mt-2 block">Lihat Penjelasan</button>
                 `;
-                list.appendChild(div);
+                reviewContainer.appendChild(div);
             });
 
-            document.getElementById('res-correct').textContent = correct;
-            document.getElementById('res-wrong').textContent = mcqCount - correct;
-            document.getElementById('res-score').textContent = Math.round((correct / mcqCount) * 100) || 0;
-        }
-
-        function showDetail(i) {
-            const q = currentPool[i];
-            const area = document.getElementById('modal-body');
-            area.innerHTML = `
-                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Pertanyaan</p>
-                    <p class="font-bold text-slate-800 text-lg">${q.q}</p>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="p-5 bg-emerald-50 rounded-2xl border border-emerald-100">
-                        <p class="text-[10px] font-bold text-emerald-400 uppercase mb-1">Benar</p>
-                        <p class="font-bold text-emerald-700">${q.o[q.a]}</p>
-                    </div>
-                    <div class="p-5 bg-rose-50 rounded-2xl border border-rose-100">
-                        <p class="text-[10px] font-bold text-rose-400 uppercase mb-1">Anda</p>
-                        <p class="font-bold text-rose-700">${userAnswers[i] !== null ? q.o[userAnswers[i]] : 'Kosong'}</p>
-                    </div>
-                </div>
-                <div class="p-6 bg-blue-50 rounded-2xl border border-blue-100">
-                    <p class="text-[10px] font-bold text-blue-400 uppercase mb-2">Analisis Materi</p>
-                    <p class="text-blue-800 leading-relaxed">${q.ex}</p>
+            const percent = ((score / activeQuestions.length) * 100).toFixed(1);
+            document.getElementById('topic-scores-breakdown').innerHTML = `
+                <div class="text-center py-4">
+                    <p class="text-5xl font-bold text-blue-600">${score} / ${activeQuestions.length}</p>
+                    <p class="text-xl font-semibold mt-2">${percent}% Benar</p>
                 </div>
             `;
-            document.getElementById('modal-desc').classList.remove('hidden');
         }
 
-        window.onload = initTopicSelection;
+        function showExp(i) {
+            const q = activeQuestions[i];
+            document.getElementById('modal-question').textContent = q.q;
+            document.getElementById('modal-correct-answer').textContent = "Jawaban Benar: " + q.a;
+            document.getElementById('modal-explanation').textContent = q.e;
+            document.getElementById('explanationModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('explanationModal').classList.add('hidden');
+        }
+
+        function toggleNavPanel() {
+            const p = document.getElementById('nav-panel');
+            p.classList.toggle('hidden');
+            if (!p.classList.contains('hidden')) {
+                populateNav();
+            }
+        }
+
+        function restartQuiz() {
+            location.reload();
+        }
+
+        window.onload = init;
     </script>
 </body>
 </html>
